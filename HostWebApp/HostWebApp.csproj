@@ -612,8 +612,6 @@
     <Content Include="Content\bootstrap.css.map" />
     <Content Include="Scripts\bootstrap.js" />
     <Content Include="Scripts\bootstrap.min.js" />
-    <Content Include="razorviews\Web.config" />
-    <Content Include="razorviews\customerror.cshtml" />
     <None Include="Scripts\jquery-1.11.1.intellisense.js" />
     <Content Include="Scripts\jquery-1.11.1.js" />
     <Content Include="Scripts\jquery-1.11.1.min.js" />
@@ -680,6 +678,15 @@
     <Content Include="_Apps\Developer\_PageStart.cshtml" />
     <Content Include="Scripts\jquery-1.11.1.min.map" />
     <Content Include="Views\Web.config" />
+    <Content Include="Views\Home\About.cshtml" />
+    <Content Include="Views\Home\Contact.cshtml" />
+    <Content Include="Views\Home\Index.cshtml" />
+    <Content Include="Views\Shared\customerror.cshtml" />
+    <Content Include="Views\Shared\Error.cshtml" />
+    <Content Include="Views\Shared\Lockout.cshtml" />
+    <Content Include="Views\Shared\_Layout.cshtml" />
+    <Content Include="Views\Shared\_LoginPartial.cshtml" />
+    <Content Include="Views\_ViewStart.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Content\dummy.txt" />
@@ -731,19 +738,31 @@
     <Compile Include="App_Start\BundleConfig.cs" />
     <Compile Include="App_Start\FilterConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
+    <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="dbfiles\" />
     <Folder Include="_plugins\" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\MvcLib\MvcLib.Bootstrapper\MvcLib.Bootstrapper.csproj">
       <Project>{741f4607-7d76-481f-9d5e-015fbb95aa84}</Project>
       <Name>MvcLib.Bootstrapper</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\MvcLib\MvcLib.Common.Mvc\MvcLib.Common.Mvc.csproj">
+      <Project>{4550bc11-b931-4872-87fd-726957542efa}</Project>
+      <Name>MvcLib.Common.Mvc</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\MvcLib\MvcLib.Common\MvcLib.Common.csproj">
+      <Project>{7ea8cab5-30b9-4069-a8c5-d553ca4016b0}</Project>
+      <Name>MvcLib.Common</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\MvcLib\MvcLib.FsDump\MvcLib.FsDump.csproj">
+      <Project>{3971d9ad-bb07-4675-babf-471be04e2490}</Project>
+      <Name>MvcLib.FsDump</Name>
     </ProjectReference>
   </ItemGroup>
   <PropertyGroup>
