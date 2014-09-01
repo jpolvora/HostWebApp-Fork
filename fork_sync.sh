@@ -1,4 +1,4 @@
-git commit -mav "commit before sync with fork"
+git commit -a -v -m "commit before sync with fork"
 git fetch hostwebapp
 git checkout master
 git merge hostwebapp/master
