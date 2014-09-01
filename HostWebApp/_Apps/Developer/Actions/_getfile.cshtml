@@ -1,0 +1,23 @@
+﻿@using System.Text
+@using MvcLib.DbFileSystem
+@using ResponseExtensions = MvcLib.Common.Mvc.ResponseExtensions
+
+@{
+    var id = IsPost ? Request.Form["id"].AsInt(0) : UrlData[0].AsInt(0);
+
+    using (var ctx = new DbFileContext())
+    {
+        var result = ctx.DbFiles.FirstOrDefault(x => x.Id == id && x.IsDirectory == false);
+        if (result != null)
+        {
+            Response.Clear();
+            Response.ContentType = "text/plain";
+            Response.Write(result.Texto);
+        }
+        else
+        {
+            Response.StatusCode = 404;
+            ResponseExtensions.WriteAjax(Response, new { success = false, msg = "Arquivo não encontrado" });
+        }
+    }
+}

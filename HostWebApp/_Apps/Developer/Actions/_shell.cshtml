@@ -1,0 +1,59 @@
+﻿@using System.Reflection
+@using MvcLib.Kompiler
+@using Roslyn.Compilers
+@using ResponseExtensions = MvcLib.Common.Mvc.ResponseExtensions
+@{
+
+    var json = Request.Unvalidated("_csharpcode");
+
+    if (json.IsEmpty())
+    {
+        ResponseExtensions.WriteAjax(Response, new { success = false, msg = "_csharpcode" });
+    }
+    else
+    {
+        var code = Json.Decode(json);
+        MemoryStream stream = null;
+        string msg = string.Empty;
+        try
+        {
+            msg = RoslynWrapper.TryCompile(code, Guid.NewGuid().ToString("N"), out stream, OutputKind.ConsoleApplication);
+        }
+        catch (Exception ex)
+        {
+            ResponseExtensions.WriteAjax(Response, new { success = false, msg = ex.Message }, true, 500);
+        }
+
+        if (string.IsNullOrEmpty(msg) && stream != null)
+        {
+            try
+            {
+                var bytes = stream.ToArray();
+                stream.Close();
+                
+                var assembly = Assembly.Load(bytes);
+                var method = assembly.EntryPoint;
+
+                using (var buffer = new StringWriter())
+                {
+                    Console.SetOut(buffer);
+                    
+                    method.Invoke(null, new object[0]);
+
+                    var sb = buffer.GetStringBuilder();
+                    ResponseExtensions.WriteAjax(Response, new { success = true, msg = sb.ToString() });
+
+                    buffer.Close();
+                }
+            }
+            catch (Exception ex)
+            {
+                ResponseExtensions.WriteAjax(Response, new { success = false, msg = ex.Message }, status: 500);
+            }
+        }
+        else
+        {
+            ResponseExtensions.WriteAjax(Response, new { success = false, msg });
+        }
+    }
+}

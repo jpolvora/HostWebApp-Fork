@@ -1,0 +1,37 @@
+﻿@using System.Data.Entity;
+@using MvcLib.DbFileSystem
+@using MvcLib.FsDump
+@using ResponseExtensions = MvcLib.Common.Mvc.ResponseExtensions
+
+@{
+    var id = IsPost ? Request.Form["id"].AsInt(0) : UrlData[0].AsInt(0);
+    var newFileName = IsPost ? Request.Form["newFileName"] : UrlData[1];
+
+    using (var ctx = new DbFileContext())
+    {
+        var result = ctx.DbFiles.Include(x => x.Children).Include(x => x.Parent).FirstOrDefault(x => x.Id == id);
+        if (result != null && result.Children.Count == 0)
+        {
+            var folderName = VirtualPathUtility.AppendTrailingSlash(result.Parent.VirtualPath);
+
+            var fName = Path.GetFileNameWithoutExtension(newFileName);
+            var fExtension = Path.GetExtension(newFileName);
+
+            result.Name = fName;
+            result.Extension = fExtension;
+            result.VirtualPath = string.Format("{0}{1}", folderName, newFileName);
+
+            ctx.SaveChanges();
+            
+            DbToLocal.RemoveFromDisk(result);
+            DbToLocal.WriteToDisk(result, true);
+            
+            ResponseExtensions.WriteAjax(Response, new { success = true });
+            return;
+        }
+
+        Response.StatusCode = 404;
+        ResponseExtensions.WriteAjax(Response, new { success = false, msg = "Arquivo não encontrado" });
+        return;
+    }
+}

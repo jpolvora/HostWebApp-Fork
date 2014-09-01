@@ -1,0 +1,32 @@
+﻿@using System.Data.Entity;
+@using MvcLib.DbFileSystem
+@using MvcLib.FsDump
+@using ResponseExtensions = MvcLib.Common.Mvc.ResponseExtensions
+
+@{
+    var id = IsPost ? Request.Form["id"].AsInt(0) : UrlData[0].AsInt(0);
+
+    using (var ctx = new DbFileContext())
+    {
+        var result = ctx.DbFiles.Include(x => x.Children).FirstOrDefault(x => x.Id == id);
+        if (result != null && result.Children.Count == 0)
+        {
+            ctx.DbFiles.Remove(result);
+            ctx.SaveChanges();
+
+            foreach (var dbFile in result.Children)
+            {
+                DbToLocal.RemoveFromDisk(dbFile);
+            }
+            DbToLocal.RemoveFromDisk(result);
+            
+
+            ResponseExtensions.WriteAjax(Response, new { success = true });
+            return;
+        }
+
+        Response.StatusCode = 404;
+        ResponseExtensions.WriteAjax(Response, new { success = false, msg = "Arquivo não encontrado/pasta não vazia!" });
+        return;
+    }
+}

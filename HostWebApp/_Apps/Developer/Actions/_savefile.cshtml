@@ -1,0 +1,36 @@
+﻿@using System.Text
+@using MvcLib.DbFileSystem
+@using MvcLib.FsDump
+@using ResponseExtensions = MvcLib.Common.Mvc.ResponseExtensions
+
+@{
+    var id = Request.Form["id"].AsInt(0);
+    var isHidden = Request.Form["isHidden"].AsBool(false);
+
+    var base64Str = Request.Unvalidated["content"];
+    var bytesStr = Convert.FromBase64String(base64Str);
+    var content = Encoding.UTF8.GetString(bytesStr);
+    var text = Server.HtmlDecode(content);
+
+    using (var ctx = new DbFileContext())
+    {
+        var result = ctx.DbFiles.FirstOrDefault(x => x.Id == id && x.IsDirectory == false);
+        if (result != null)
+        {
+            result.Texto = text;
+            result.IsHidden = isHidden;
+            ctx.SaveChanges();
+
+            /* remove do cache após alterações */
+            //copy to local
+            DbToLocal.WriteToDisk(result, true);
+
+            ResponseExtensions.WriteAjax(Response, new { success = true });
+            return;
+        }
+
+        Response.StatusCode = 404;
+        ResponseExtensions.WriteAjax(Response, new { success = false, msg = "Arquivo não encontrado" });
+        return;
+    }
+}
