@@ -32,6 +32,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MvcLib.Kompiler", "MvcLib\M
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MvcLib.PluginLoader", "MvcLib\MvcLib.PluginLoader\MvcLib.PluginLoader.csproj", "{FFBE8285-9C7A-41F6-BF1E-58DE5CAC726D}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{6AA9AACA-367B-4B44-BF08-6AD8C2E0F2B7}"
+	ProjectSection(SolutionItems) = preProject
+		docs\manual.txt = docs\manual.txt
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

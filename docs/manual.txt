@@ -1,0 +1,28 @@
+fork HostWebApp.git
+it will include a subtree (MvcLib.git)
+
+clone the fork
+run shell init scripts
+bash -x init_cfg_subtree.sh
+
+Rename solution to match your appharbor app slug
+
+Configure Connection String DbFileContext in Web.config
+Update-database -Verbose: will execute Migrations\Configuration.cs (inherited class from MvcLib Migrations...)
+
+Add a new Asp.NET Web Project with your classes, views, etc.
+(WebApplication will not run but It will make intelisense work)
+
+post build action => copy dll's from your project to ~/_plugins.
+
+on local development, it will use your views.
+
+at production, the files will be in database.
+
+changing database, need to sync over with the original repository
+
+
+structure of your folders:
+
+Root
+	
