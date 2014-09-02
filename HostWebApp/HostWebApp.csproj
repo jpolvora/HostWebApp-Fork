@@ -760,7 +760,8 @@
       <Project>{7ea8cab5-30b9-4069-a8c5-d553ca4016b0}</Project>
       <Name>MvcLib.Common</Name>
     </ProjectReference>
-    <ProjectReference Include="..\MvcLib\MvcLib.CustomVPP\MvcLib.CustomVPP.csproj">
+    <ProjectReference Include=".$(SolutionDir)\MvcLib\MvcLib.CustomVPP\MvcLib.CustomVPP.csproj">
+<<<<<<< .mine
       <Project>{6c33542a-e1a8-4487-8639-6b44d527847a}</Project>
       <Name>MvcLib.CustomVPP</Name>
     </ProjectReference>
@@ -769,6 +770,16 @@
       <Name>MvcLib.DbFileSystem</Name>
     </ProjectReference>
     <ProjectReference Include="$(SolutionDir)\MvcLib\MvcLib.FsDump\MvcLib.FsDump.csproj">
+=======
+      <Project>{6c33542a-e1a8-4487-8639-6b44d527847a}</Project>
+      <Name>MvcLib.CustomVPP</Name>
+    </ProjectReference>
+    <ProjectReference Include="$(SolutionDir)\MvcLib\MvcLib.DbFileSystem\MvcLib.DbFileSystem.csproj">
+      <Project>{969929c3-2898-49b8-9ec8-de7a28884524}</Project>
+      <Name>MvcLib.DbFileSystem</Name>
+    </ProjectReference>
+    <ProjectReference Include="$(SolutionDir)\MvcLib\MvcLib.FsDump\MvcLib.FsDump.csproj">
+>>>>>>> .theirs
       <Project>{3971d9ad-bb07-4675-babf-471be04e2490}</Project>
       <Name>MvcLib.FsDump</Name>
     </ProjectReference>
