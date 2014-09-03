@@ -11,26 +11,42 @@ namespace MvcLib.FsDump
 {
     public class DbToLocal
     {
-        static void RecursiveDelete(DirectoryInfo fsInfo, bool self = false)
+        static void RecursiveDelete(DirectoryInfo fsInfo, bool self = false, params string[] extensionsToIgnore)
         {
             foreach (var info in fsInfo.EnumerateFileSystemInfos())
             {
-                if (info is DirectoryInfo)
-                    RecursiveDelete((DirectoryInfo)info, true);
+                var directoryInfo = info as DirectoryInfo;
+                if (directoryInfo != null)
+                {
+                    RecursiveDelete(directoryInfo, true);
+                }
+                else
+                {
+                    if (extensionsToIgnore.Any(s => info.Extension.Equals(s)))
+                        continue;
 
-                //info.Delete();
+                    try
+                    {
+                        info.Delete();
+                    }
+                    catch (Exception ex)
+                    {
+                        Trace.TraceError(ex.Message);
+                    }
+                }
             }
+
+            if (!self || fsInfo.GetFiles().Any()) return;
             try
             {
-                if (self)
-                    fsInfo.Delete(true);
+                fsInfo.Delete(true);
             }
-            catch
+            catch (Exception ex)
             {
-
+                Trace.TraceError(ex.Message);
             }
         }
-        
+
         private static readonly DirectoryInfo DirInfo;
 
         static DbToLocal()
@@ -42,7 +58,7 @@ namespace MvcLib.FsDump
             if (!DirInfo.Exists)
                 DirInfo.Create();
             else
-                RecursiveDelete(DirInfo);
+                RecursiveDelete(DirInfo, false, ".Config");
         }
 
         public static void Execute()
@@ -127,7 +143,7 @@ namespace MvcLib.FsDump
             }
             else if (Directory.Exists(localpath))
             {
-                RecursiveDelete(new DirectoryInfo(localpath), true);
+                RecursiveDelete(new DirectoryInfo(localpath), true, ".Config");
             }
         }
     }
