@@ -685,6 +685,7 @@
     <Content Include="Content\png\novo.png" />
     <Content Include="Content\png\novo2.png" />
     <Content Include="Content\png\pesquisar.png" />
+    <Content Include="Content\Site.css" />
     <Content Include="fonts\glyphicons-halflings-regular.svg" />
     <Content Include="fonts\glyphicons-halflings-regular.woff" />
     <Content Include="fonts\glyphicons-halflings-regular.ttf" />
@@ -696,6 +697,7 @@
     <Content Include="404.cshtml" />
     <Content Include="Admin\teste500.cshtml" />
     <Content Include="App_Code\Functions.cshtml" />
+    <Content Include="dbfiles\Web.config" />
     <None Include="Scripts\jquery-1.11.1.intellisense.js" />
     <Content Include="Scripts\jquery-1.11.1.js" />
     <Content Include="Scripts\jquery-1.11.1.min.js" />
@@ -776,7 +778,6 @@
     <Content Include="Views\Home\Reset.cshtml" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Content\dummy.txt" />
     <Content Include="Global.asax" />
     <Content Include="Scripts\dummy.txt" />
     <Content Include="Web.config" />
@@ -836,7 +837,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="blog\" />
-    <Folder Include="dbfiles\" />
     <Folder Include="_plugins\" />
   </ItemGroup>
   <ItemGroup>
