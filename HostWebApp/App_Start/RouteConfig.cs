@@ -9,7 +9,8 @@ namespace HostWebApp
         {
             routes.IgnoreRoute("Content/{*pathInfo}");
             routes.IgnoreRoute("Scripts/{*pathInfo}");
-
+            routes.IgnoreRoute("{*pathinfo}.js");
+            routes.IgnoreRoute("{*pathinfo}.css");
             routes.IgnoreRoute("{resource}.axd/{*pathInfo}");
             routes.IgnoreRoute("{*favicon}", new { favicon = @"(.*/)?favicon.ico(/.*)?" });
 
