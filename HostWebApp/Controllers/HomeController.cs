@@ -1,5 +1,6 @@
 using System.Web;
 using System.Web.Mvc;
+using MvcLib.Common;
 using MvcLib.FsDump;
 
 namespace HostWebApp.Controllers
@@ -26,7 +27,7 @@ namespace HostWebApp.Controllers
         }
 
         public ActionResult Reset()
-        {            
+        {
             HttpRuntime.UnloadAppDomain();
             return RedirectToAction("Index", new { q = "Reset success" });
         }
@@ -34,8 +35,13 @@ namespace HostWebApp.Controllers
         public ActionResult Refresh()
         {
             DbToLocal.Execute();
-            
+
             return RedirectToAction("Index", new { q = "Refresh success" });
+        }
+
+        public ActionResult CatchAll(string url)
+        {
+            return new HttpStatusCodeResult(404, "Caminho sem rota: {0}".Fmt(url));
         }
     }
 }

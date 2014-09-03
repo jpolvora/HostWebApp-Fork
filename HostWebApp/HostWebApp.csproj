@@ -133,9 +133,6 @@
     <Reference Include="WebMarkupMin.Core">
       <HintPath>..\packages\WebMarkupMin.Core.0.9.0-beta1\lib\net40\WebMarkupMin.Core.dll</HintPath>
     </Reference>
-    <Reference Include="WebMarkupMin.Web">
-      <HintPath>..\packages\WebMarkupMin.Web.0.9.0-beta1\lib\net40\WebMarkupMin.Web.dll</HintPath>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Content Include="Content\blue-loading.gif" />
@@ -835,6 +832,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="blog\" />
     <Folder Include="_plugins\" />
   </ItemGroup>
   <ItemGroup>
