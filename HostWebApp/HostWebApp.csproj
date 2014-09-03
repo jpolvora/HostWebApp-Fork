@@ -773,6 +773,7 @@
     <Content Include="Views\_ViewStart.cshtml" />
     <Content Include="Views\Robots\Robots.cshtml" />
     <Content Include="_PageStart.cshtml" />
+    <Content Include="Views\Home\Reset.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Content\dummy.txt" />

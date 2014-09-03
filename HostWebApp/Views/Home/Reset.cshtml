@@ -1,0 +1,22 @@
+﻿@{
+    ViewBag.Title = "Reset";
+}
+
+<h2>Reset</h2>
+<h3>Aguarde enquanto o site está sendo reiniciado...</h3>
+
+@section scripts
+{
+    <script>
+        $(function () {
+            $.ajax({
+                type: "POST",
+                url: "/Home/Reset"
+            })
+            .always(function () {
+                window.location.href = '/';
+            });
+        });
+    </script>
+}
+

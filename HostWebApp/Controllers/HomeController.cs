@@ -28,8 +28,14 @@ namespace HostWebApp.Controllers
 
         public ActionResult Reset()
         {
+            return View();
+        }
+
+        [HttpPost, ActionName("Reset")]
+        public ActionResult Post()
+        {
             HttpRuntime.UnloadAppDomain();
-            return RedirectToAction("Index", new { q = "Reset success" });
+            return new HttpStatusCodeResult(200);
         }
 
         public ActionResult Refresh()
