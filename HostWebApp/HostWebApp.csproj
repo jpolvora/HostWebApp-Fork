@@ -771,9 +771,6 @@
     <Content Include="Views\Shared\_Layout.cshtml" />
     <Content Include="Views\Shared\_LoginPartial.cshtml" />
     <Content Include="Views\_ViewStart.cshtml" />
-    <None Include="WebMarkupMin.Configuration.xsd">
-      <SubType>Designer</SubType>
-    </None>
   </ItemGroup>
   <ItemGroup>
     <Content Include="Content\dummy.txt" />
