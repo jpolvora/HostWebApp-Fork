@@ -695,6 +695,7 @@
     <Content Include="Scripts\bootstrap.min.js" />
     <Content Include="404.cshtml" />
     <Content Include="Admin\teste500.cshtml" />
+    <Content Include="App_Code\Functions.cshtml" />
     <None Include="Scripts\jquery-1.11.1.intellisense.js" />
     <Content Include="Scripts\jquery-1.11.1.js" />
     <Content Include="Scripts\jquery-1.11.1.min.js" />
@@ -820,6 +821,7 @@
     <Content Include="Admin\Developer\mvc.js" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="App_Code\MinifyHandler.cs" />
     <Compile Include="App_Start\BundleConfig.cs" />
     <Compile Include="App_Start\FilterConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
