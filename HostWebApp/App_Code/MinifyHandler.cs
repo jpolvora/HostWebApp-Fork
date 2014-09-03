@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.IO;
 using System.Web;
 using System.Web.Caching;
@@ -17,11 +18,11 @@ namespace HostWebApp
 
             string ext = Path.GetExtension(file);
 
-            //if (context.IsDebuggingEnabled)
-            //{
-            //    context.Response.TransmitFile(file);
-            //}
-            //else
+            if (context.IsDebuggingEnabled)
+            {
+                context.Response.TransmitFile(file);
+            }
+            else
             {
                 Minify(context.Response, file, ext);
             }
@@ -49,11 +50,13 @@ namespace HostWebApp
 
             if (ext == ".css")
             {
+                Trace.TraceInformation("Applying Css Minification to '{0}'", file);
                 CssSettings settings = new CssSettings() { CommentMode = CssComment.None };
                 response.Write(minifier.MinifyStyleSheet(content, settings));
             }
             else if (ext == ".js")
             {
+                Trace.TraceInformation("Applying Javascript Minification to '{0}'", file);
                 CodeSettings settings = new CodeSettings() { PreserveImportantComments = false };
                 response.Write(minifier.MinifyJavaScript(content, settings));
             }
