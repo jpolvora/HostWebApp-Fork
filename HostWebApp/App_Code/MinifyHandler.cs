@@ -17,11 +17,11 @@ namespace HostWebApp
 
             string ext = Path.GetExtension(file);
 
-            if (context.IsDebuggingEnabled)
-            {
-                context.Response.TransmitFile(file);
-            }
-            else
+            //if (context.IsDebuggingEnabled)
+            //{
+            //    context.Response.TransmitFile(file);
+            //}
+            //else
             {
                 Minify(context.Response, file, ext);
             }
