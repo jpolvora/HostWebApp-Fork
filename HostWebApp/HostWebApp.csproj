@@ -833,6 +833,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="blog\" />
+    <Folder Include="dbfiles\" />
     <Folder Include="_plugins\" />
   </ItemGroup>
   <ItemGroup>
