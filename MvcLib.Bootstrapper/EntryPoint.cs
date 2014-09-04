@@ -61,6 +61,11 @@ namespace MvcLib.Bootstrapper
                     DynamicModuleUtility.RegisterModule(typeof(TracerHttpModule));
                 }
 
+                if (BootstrapperSection.Instance.StopMonitoring)
+                {
+                    HttpInternals.StopFileMonitoring();
+                }
+
                 if (Config.ValueOrDefault("Module:CustomError", false))
                 {
                     DynamicModuleUtility.RegisterModule(typeof(CustomErrorHttpModule));
@@ -88,10 +93,7 @@ namespace MvcLib.Bootstrapper
                     }
                 }
 
-                if (Config.ValueOrDefault("Bootstrapper:StopIISMonitoring", false))
-                {
-                    HttpInternals.StopFileMonitoring();
-                }
+
 
                 if (Config.ValueOrDefault("SubfolderVpp", false))
                 {
