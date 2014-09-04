@@ -29,12 +29,11 @@ namespace MvcLib.Common.Configuration
             }
         }
 
-
-        [ConfigurationProperty("httpModules")]
-        public HttpModulesElement HttpModules
+        [ConfigurationProperty("trace")]
+        public TraceElement Trace
         {
-            get { return (HttpModulesElement)this["httpModules"]; }
-            set { this["httpModules"] = value; }
+            get { return (TraceElement)this["trace"]; }
+            set { this["trace"] = value; }
         }
     }
 }

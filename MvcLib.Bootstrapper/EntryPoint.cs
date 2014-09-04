@@ -56,7 +56,7 @@ namespace MvcLib.Bootstrapper
 
             using (DisposableTimer.StartNew("PRE_START: Configuring HttpModules"))
             {
-                if (BootstrapperSection.Instance.HttpModules.Trace)
+                if (BootstrapperSection.Instance.Trace.Enabled)
                 {
                     DynamicModuleUtility.RegisterModule(typeof(TracerHttpModule));
                 }
