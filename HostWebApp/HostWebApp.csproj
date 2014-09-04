@@ -780,7 +780,9 @@
   <ItemGroup>
     <Content Include="Global.asax" />
     <Content Include="Scripts\dummy.txt" />
-    <Content Include="Web.config" />
+    <Content Include="Web.config">
+      <SubType>Designer</SubType>
+    </Content>
     <Content Include="Admin\Common\ux\FieldMoney.js" />
     <Content Include="Admin\Common\ux\FormWindow.js" />
     <Content Include="Admin\Common\ux\FullGrid.js" />
@@ -837,6 +839,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="blog\" />
+    <Folder Include="dbfiles\WebMatrix\" />
     <Folder Include="_plugins\" />
   </ItemGroup>
   <ItemGroup>
