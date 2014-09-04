@@ -8,38 +8,6 @@ using MvcLib.Common.Mvc;
 
 namespace MvcLib.HttpModules
 {
-    //http://msdn.microsoft.com/en-us/library/bb470252(v=vs.100).aspx
-
-    /*
-     * The following tasks are performed by the HttpApplication class while the request is being processed. The events are useful for page developers who want to run code when key request pipeline events are raised. They are also useful if you are developing a custom module and you want the module to be invoked for all requests to the pipeline. Custom modules implement the IHttpModule interface. In Integrated mode in IIS 7.0, you must register event handlers in a module's Init method.
-Validate the request, which examines the information sent by the browser and determines whether it contains potentially malicious markup. For more information, see ValidateRequest and Script Exploits Overview.
-Perform URL mapping, if any URLs have been configured in the UrlMappingsSection section of the Web.config file.
-Raise the BeginRequest event.
-Raise the AuthenticateRequest event.
-Raise the PostAuthenticateRequest event.
-Raise the AuthorizeRequest event.
-Raise the PostAuthorizeRequest event.
-Raise the ResolveRequestCache event.
-Raise the PostResolveRequestCache event.
-Raise the MapRequestHandler event. An appropriate handler is selected based on the file-name extension of the requested resource. The handler can be a native-code module such as the IIS 7.0 StaticFileModule or a managed-code module such as the PageHandlerFactory class (which handles .aspx files). 
-Raise the PostMapRequestHandler event.
-Raise the AcquireRequestState event.
-Raise the PostAcquireRequestState event.
-Raise the PreRequestHandlerExecute event.
-Call the ProcessRequest method (or the asynchronous version IHttpAsyncHandler.BeginProcessRequest) of the appropriate IHttpHandler class for the request. For example, if the request is for a page, the current page instance handles the request.
-Raise the PostRequestHandlerExecute event.
-Raise the ReleaseRequestState event.
-Raise the PostReleaseRequestState event.
-Perform response filtering if the Filter property is defined.
-Raise the UpdateRequestCache event.
-Raise the PostUpdateRequestCache event.
-Raise the LogRequest event.
-Raise the PostLogRequest event.
-Raise the EndRequest event.
-Raise the PreSendRequestHeaders event.
-Raise the PreSendRequestContent event.
-NoteNote	The MapRequestHandler, LogRequest, and PostLogRequest events are supported only if the application is running in Integrated mode in IIS 7.0 and with the .NET Framework 3.0 or later.
-     */
     public class TracerHttpModule : IHttpModule
     {
         private static int _counter;
@@ -76,33 +44,55 @@ NoteNote	The MapRequestHandler, LogRequest, and PostLogRequest events are suppor
             _counter++;
             Trace.TraceInformation("Init: {0}", this);
 
+            //http://msdn.microsoft.com/en-us/library/bb470252(v=vs.100).aspx
+
+            /*
+             * The following tasks are performed by the HttpApplication class while the request is being processed. The events are useful for page developers who want to run code when key request pipeline events are raised. They are also useful if you are developing a custom module and you want the module to be invoked for all requests to the pipeline. Custom modules implement the IHttpModule interface. In Integrated mode in IIS 7.0, you must register event handlers in a module's Init method.
+        Validate the request, which examines the information sent by the browser and determines whether it contains potentially malicious markup. For more information, see ValidateRequest and Script Exploits Overview.
+        Perform URL mapping, if any URLs have been configured in the UrlMappingsSection section of the Web.config file.
+             */
+
+
             on.Error += (sender, args) => OnError(on);
+
             on.BeginRequest += (sender, args) => OnBeginRequest(on);
-            on.AuthenticateRequest += (sender, args) => LogNotification(on, "AuthenticateRequest");
-            on.PostAuthenticateRequest += (sender, args) => LogNotification(on, "PostAuthenticateRequest");
-            on.AuthorizeRequest += (sender, args) => LogNotification(on, "AuthorizeRequest");
-            on.PostAuthorizeRequest += (sender, args) => LogNotification(on, "PostAuthorizeRequest");
-            on.ResolveRequestCache += (sender, args) => LogNotification(on, "ResolveRequestCache");
-            on.PostResolveRequestCache += (sender, args) => LogNotification(on, "PostResolveRequestCache"); //MVC Routing module remaps the handler here.
-            on.MapRequestHandler += (sender, args) => LogNotification(on, "MapRequestHandler");  //only iis7
-            on.PostMapRequestHandler += (sender, args) => LogNotification(on, "PostMapRequestHandler");
-            on.AcquireRequestState += (sender, args) => LogNotification(on, "AcquireRequestState");
-            on.PostAcquireRequestState += (sender, args) => LogNotification(on, "PostAcquireRequestState");
-            on.PreRequestHandlerExecute += (sender, args) => LogNotification(on, "PreRequestHandlerExecute");
+            on.AuthenticateRequest += (sender, args) => TraceNotification(on, "AuthenticateRequest");
+            on.PostAuthenticateRequest += (sender, args) => TraceNotification(on, "PostAuthenticateRequest");
+            on.AuthorizeRequest += (sender, args) => TraceNotification(on, "AuthorizeRequest");
+            on.PostAuthorizeRequest += (sender, args) => TraceNotification(on, "PostAuthorizeRequest");
+            on.ResolveRequestCache += (sender, args) => TraceNotification(on, "ResolveRequestCache");
+
+            //MVC Routing module remaps the handler here.
+            on.PostResolveRequestCache += (sender, args) => TraceNotification(on, "PostResolveRequestCache");
+
+            //only iis7
+            on.MapRequestHandler += (sender, args) => TraceNotification(on, "MapRequestHandler");
+
+            //An appropriate handler is selected based on the file-name extension of the requested resource. The handler can be a native-code module such as the IIS 7.0 StaticFileModule or a managed-code module such as the PageHandlerFactory class (which handles .aspx files). 
+            on.PostMapRequestHandler += (sender, args) => TraceNotification(on, "PostMapRequestHandler");
+
+            on.AcquireRequestState += (sender, args) => TraceNotification(on, "AcquireRequestState");
+            on.PostAcquireRequestState += (sender, args) => TraceNotification(on, "PostAcquireRequestState");
+            on.PreRequestHandlerExecute += (sender, args) => TraceNotification(on, "PreRequestHandlerExecute");
             //Call the ProcessRequest of IHttpHandler
-            on.PostRequestHandlerExecute += (sender, args) => LogNotification(on, "PostRequestHandlerExecute");
-            on.ReleaseRequestState += (sender, args) => LogNotification(on, "ReleaseRequestState");
-            on.PostReleaseRequestState += (sender, args) => LogNotification(on, "PostReleaseRequestState"); //Perform response filtering if the Filter property is defined.
-            on.UpdateRequestCache += (sender, args) => LogNotification(on, "UpdateRequestCache");
-            on.PostUpdateRequestCache += (sender, args) => LogNotification(on, "PostUpdateRequestCache");
-            on.LogRequest += (sender, args) => LogNotification(on, "LogRequest"); //iis7
-            on.PostLogRequest += (sender, args) => LogNotification(on, "PostLogRequest"); //iis7
+            on.PostRequestHandlerExecute += (sender, args) => TraceNotification(on, "PostRequestHandlerExecute");
+            on.ReleaseRequestState += (sender, args) => TraceNotification(on, "ReleaseRequestState");
+
+            //Perform response filtering if the Filter property is defined.
+            on.PostReleaseRequestState += (sender, args) => TraceNotification(on, "PostReleaseRequestState");
+
+            on.UpdateRequestCache += (sender, args) => TraceNotification(on, "UpdateRequestCache");
+            on.PostUpdateRequestCache += (sender, args) => TraceNotification(on, "PostUpdateRequestCache");
+
+            //The MapRequestHandler, LogRequest, and PostLogRequest events are supported only if the application is running in Integrated mode in IIS 7.0 and with the .NET Framework 3.0 or later.
+            on.LogRequest += (sender, args) => TraceNotification(on, "LogRequest"); //iis7
+            on.PostLogRequest += (sender, args) => TraceNotification(on, "PostLogRequest"); //iis7
             on.EndRequest += (sender, args) => OnEndRequest(on);
-            on.PreSendRequestHeaders += (sender, args) => LogNotification(on, "PreSendRequestHeaders");
-            on.PreSendRequestContent += (sender, args) => LogNotification(on, "PreSendRequestContent");
+            on.PreSendRequestHeaders += (sender, args) => TraceNotification(on, "PreSendRequestHeaders");
+            on.PreSendRequestContent += (sender, args) => TraceNotification(on, "PreSendRequestContent");
         }
 
-        private void LogNotification(HttpApplication application, string eventName)
+        private void TraceNotification(HttpApplication application, string eventName)
         {
             if (!MustLog(eventName))
                 return;
