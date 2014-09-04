@@ -2,6 +2,7 @@ using System.Web;
 using System.Web.Mvc;
 using MvcLib.Common;
 using MvcLib.FsDump;
+using MvcLib.HttpModules;
 
 namespace HostWebApp.Controllers
 {
@@ -23,6 +24,11 @@ namespace HostWebApp.Controllers
         {
             ViewData["Message"] = "Your contact page.";
 
+            return View();
+        }
+
+        public ActionResult Error(CustomErrorHttpModule.ErrorModel model)
+        {
             return View();
         }
 
