@@ -2,7 +2,6 @@
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Threading;
 using System.Web.Hosting;
 using MvcLib.Common;
 using MvcLib.DbFileSystem;
@@ -11,40 +10,28 @@ namespace MvcLib.FsDump
 {
     public class DbToLocal
     {
-        static void RecursiveDelete(DirectoryInfo fsInfo, bool self = false, params string[] extensionsToIgnore)
+        static void RecursiveDelete(DirectoryInfo fsInfo, bool self, params string[] extensionsToIgnore)
         {
-            foreach (var info in fsInfo.EnumerateFileSystemInfos())
+            var files = fsInfo.GetFiles("*.*", SearchOption.AllDirectories);
+            foreach (var fileInfo in files)
             {
-                var directoryInfo = info as DirectoryInfo;
-                if (directoryInfo != null)
-                {
-                    RecursiveDelete(directoryInfo, true, extensionsToIgnore);
-                }
-                else
-                {
-                    if (extensionsToIgnore.Any(s => info.Extension.Equals(s)))
-                        continue;
+                if (extensionsToIgnore.Any(s => fileInfo.Extension.Equals(s, StringComparison.OrdinalIgnoreCase)))
+                    continue;
 
-                    try
-                    {
-                        info.Delete();
-                    }
-                    catch (Exception ex)
-                    {
-                        Trace.TraceError(ex.Message);
-                    }
-                }
+                fileInfo.Delete();
             }
 
-            if (!self || fsInfo.GetFiles().Any()) return;
-            try
+            var folders = fsInfo.GetDirectories("*.*", SearchOption.AllDirectories);
+            foreach (var directoryInfo in folders)
             {
+                if (directoryInfo.GetFiles("*.*", SearchOption.AllDirectories).Any())
+                    continue;
+
+                directoryInfo.Delete(true);
+            }
+
+            if (self && !fsInfo.GetFiles("*.*", SearchOption.AllDirectories).Any())
                 fsInfo.Delete(true);
-            }
-            catch (Exception ex)
-            {
-                Trace.TraceError(ex.Message);
-            }
         }
 
         private static readonly DirectoryInfo DirInfo;
