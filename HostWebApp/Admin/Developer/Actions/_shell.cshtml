@@ -1,6 +1,5 @@
 ﻿@using System.Reflection
 @using MvcLib.Kompiler
-@using Roslyn.Compilers
 @using ResponseExtensions = MvcLib.Common.Mvc.ResponseExtensions
 @{
 
@@ -13,37 +12,36 @@
     else
     {
         var code = Json.Decode(json);
-        MemoryStream stream = null;
+        byte[] buffer = { };
         string msg = string.Empty;
         try
         {
-            msg = RoslynWrapper.TryCompile(code, Guid.NewGuid().ToString("N"), out stream, OutputKind.ConsoleApplication);
+            var kompiler = new CodeDomWrapper();
+            msg = kompiler.CompileString(code, out buffer);
         }
         catch (Exception ex)
         {
             ResponseExtensions.WriteAjax(Response, new { success = false, msg = ex.Message }, true, 500);
         }
 
-        if (string.IsNullOrEmpty(msg) && stream != null)
+        if (string.IsNullOrEmpty(msg) && buffer.Length > 0)
         {
             try
             {
-                var bytes = stream.ToArray();
-                stream.Close();
                 
-                var assembly = Assembly.Load(bytes);
+                var assembly = Assembly.Load(buffer);
                 var method = assembly.EntryPoint;
 
-                using (var buffer = new StringWriter())
+                using (var writer = new StringWriter())
                 {
-                    Console.SetOut(buffer);
-                    
+                    Console.SetOut(writer);
+
                     method.Invoke(null, new object[0]);
 
-                    var sb = buffer.GetStringBuilder();
+                    var sb = writer.GetStringBuilder();
                     ResponseExtensions.WriteAjax(Response, new { success = true, msg = sb.ToString() });
 
-                    buffer.Close();
+                    writer.Close();
                 }
             }
             catch (Exception ex)
