@@ -1,5 +1,8 @@
 using System;
+using System.IO;
 using System.Web;
+using System.Web.Caching;
+using System.Web.Hosting;
 using System.Web.Mvc;
 using System.Web.WebPages;
 
@@ -7,6 +10,33 @@ namespace MvcLib.Common.Mvc
 {
     public static class WebPageExtensions
     {
+        public static string FingerPrint(string rootRelativePath, string cdnPath = "")
+        {
+            if (HttpContext.Current.Request.IsLocal)
+                return rootRelativePath;
+
+            if (!string.IsNullOrEmpty(cdnPath) && !HttpContext.Current.IsDebuggingEnabled)
+                return cdnPath;
+
+            if (HttpRuntime.Cache[rootRelativePath] == null)
+            {
+                string relative = VirtualPathUtility.ToAbsolute("~" + rootRelativePath);
+                string absolute = HostingEnvironment.MapPath(relative);
+
+                if (!File.Exists(absolute))
+                    throw new FileNotFoundException("File not found", absolute);
+
+                DateTime date = File.GetLastWriteTime(absolute);
+                int index = relative.LastIndexOf('.');
+
+                string result = Config.ValueOrDefault("blog:cdnUrl", "") + relative.Insert(index, "_" + date.Ticks);
+
+                HttpRuntime.Cache.Insert(rootRelativePath, result, new CacheDependency(absolute));
+            }
+
+            return HttpRuntime.Cache[rootRelativePath] as string;
+        }
+
         public static Chunk BeginChunk(this WebPageBase page, string tag, string info, params string[] classes)
         {
             TagBuilder tagBuilder = null;
