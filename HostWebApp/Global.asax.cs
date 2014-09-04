@@ -15,7 +15,7 @@ namespace HostWebApp
 
         protected void Application_Start(object sender, EventArgs e)
         {
-            _rewriteBasePath = Config.ValueOrDefault("DumpToLocalFolder", "~/dbfiles").TrimEnd('/');
+            _rewriteBasePath = Config.ValueOrDefault("DumpToLocalFolder", "~/App_Data").TrimEnd('/');
             if (!_rewriteBasePath.StartsWith("~"))
                 _rewriteBasePath = "~" + _rewriteBasePath;
 

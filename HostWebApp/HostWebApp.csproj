@@ -697,7 +697,7 @@
     <Content Include="404.cshtml" />
     <Content Include="Admin\teste500.cshtml" />
     <Content Include="App_Code\Functions.cshtml" />
-    <Content Include="dbfiles\Mvc\Web.config" />
+    <Content Include="App_Data\Mvc\Web.config" />
     <None Include="Scripts\jquery-1.11.1.intellisense.js" />
     <Content Include="Scripts\jquery-1.11.1.js" />
     <Content Include="Scripts\jquery-1.11.1.min.js" />
@@ -837,7 +837,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="App_Data\" />
     <Folder Include="blog\" />
     <Folder Include="_plugins\" />
   </ItemGroup>
