@@ -1,0 +1,3 @@
+VsDevCmd
+msbuild MvcLib\ConsoleApplication1\ConsoleApplication1.csproj
+MvcLib\ConsoleApplication1\bin\Debug\ConsoleApplication1.exe
