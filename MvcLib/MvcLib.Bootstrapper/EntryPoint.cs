@@ -11,6 +11,7 @@ using System.Web.WebPages;
 using Microsoft.Web.Infrastructure.DynamicModuleHelper;
 using MvcLib.Common;
 using MvcLib.Common.Cache;
+using MvcLib.Common.Configuration;
 using MvcLib.Common.Mvc;
 using MvcLib.CustomVPP;
 using MvcLib.CustomVPP.Impl;
@@ -51,12 +52,20 @@ namespace MvcLib.Bootstrapper
                 catch { }
             }
 
+            BootstrapperSection.Initialize();
+
             using (DisposableTimer.StartNew("PRE_START: Configuring HttpModules"))
             {
-                if (Config.ValueOrDefault("Module:Trace", false))
+                if (BootstrapperSection.Instance.HttpModules.Trace)
                 {
                     DynamicModuleUtility.RegisterModule(typeof(TracerHttpModule));
                 }
+
+                if (BootstrapperSection.Instance.StopMonitoring)
+                {
+                    HttpInternals.StopFileMonitoring();
+                }
+
                 if (Config.ValueOrDefault("Module:CustomError", false))
                 {
                     DynamicModuleUtility.RegisterModule(typeof(CustomErrorHttpModule));
@@ -83,13 +92,10 @@ namespace MvcLib.Bootstrapper
                         PluginLoader.EntryPoint.Initialize();
                     }
                 }
-				
-				if (Config.ValueOrDefault("Bootstrapper:StopIISMonitoring", false))
-                {
-                    HttpInternals.StopFileMonitoring();
-				}
-				
-				if (Config.ValueOrDefault("SubfolderVpp", false))
+
+
+
+                if (Config.ValueOrDefault("SubfolderVpp", false))
                 {
                     var customvpp = new SubfolderVpp();
                     HostingEnvironment.RegisterVirtualPathProvider(customvpp);
@@ -102,8 +108,8 @@ namespace MvcLib.Bootstrapper
                         DbToLocal.Execute();
                     }
                 }
-				
-				//todo: Dependency Injection
+
+                //todo: Dependency Injection
                 if (Config.ValueOrDefault("CustomVirtualPathProvider", false))
                 {
                     var customvpp = new CustomVirtualPathProvider()

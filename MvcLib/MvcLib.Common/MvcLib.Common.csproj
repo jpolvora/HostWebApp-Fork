@@ -77,9 +77,11 @@
     <Compile Include="Cache\WebCacheWrapper.cs" />
     <Compile Include="CollectionExtensions.cs" />
     <Compile Include="Config.cs" />
+    <Compile Include="Configuration\HttpModulesElement.cs" />
     <Compile Include="DisposableTimer.cs" />
     <Compile Include="DynamicDictionaryWrapper.cs" />
     <Compile Include="Cache\ICacheProvider.cs" />
+    <Compile Include="Configuration\BootstrapperSection.cs" />
     <Compile Include="ExceptionHelpers.cs" />
     <Compile Include="LogEvent.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
