@@ -3,8 +3,10 @@
 }
 
 <h2>Reset</h2>
-<h3>Aguarde enquanto o site está sendo reiniciado...</h3>
-<button>Reset</button>
+<div id="msg">
+
+</div>
+<button>Reiniciar !</button>
 
 @section scripts
 {
@@ -16,9 +18,10 @@
                     url: "/Home/Reset"
                 })
                 .always(function () {
-                    window.location.href = '/';
+                    window.location.href = '/Home/Index';
                 });
 
+                $("msg").append("<h3>Aguarde enquanto o servidor reinicia...</h3>");
             });
         });
     </script>
