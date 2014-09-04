@@ -7,13 +7,17 @@ namespace HostWebApp
     {
         public static void RegisterRoutes(RouteCollection routes)
         {
-            routes.IgnoreRoute("Content/{*pathInfo}");
-            routes.IgnoreRoute("Scripts/{*pathInfo}");
-            
+            routes.RouteExistingFiles = false;
+            routes.LowercaseUrls = true;
+            routes.AppendTrailingSlash = true;
+
             routes.IgnoreRoute("{resource}.axd/{*pathInfo}");
             routes.IgnoreRoute("{*favicon}", new { favicon = @"(.*/)?favicon.ico(/.*)?" });
+            routes.IgnoreRoute("{*staticfile}", new { staticfile = @".*\.(css|js|txt|png|gif|jpg|jpeg|bmp)(/.*)?" });
 
-            routes.RouteExistingFiles = false;
+            routes.IgnoreRoute("Content/{*pathInfo}");
+            routes.IgnoreRoute("Scripts/{*pathInfo}");
+            routes.IgnoreRoute("Bundles/{*pathInfo}");
 
             routes.MapRoute(
                 name: "Default",
