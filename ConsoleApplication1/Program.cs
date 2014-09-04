@@ -14,7 +14,7 @@ namespace ConsoleApplication1
 
         static void Main(string[] args)
         {
-            var setDirStr = Config.ValueOrDefault("dumpDir", "..\\..\\..\\HostWebApp\\dbfiles");
+            var setDirStr = Config.ValueOrDefault("dumpDir", "..\\..\\HostWebApp\\dbfiles");
 
             Directory.SetCurrentDirectory(setDirStr);
             DirInfo = new DirectoryInfo(Directory.GetCurrentDirectory());
