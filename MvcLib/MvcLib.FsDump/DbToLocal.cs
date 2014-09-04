@@ -18,7 +18,7 @@ namespace MvcLib.FsDump
                 var directoryInfo = info as DirectoryInfo;
                 if (directoryInfo != null)
                 {
-                    RecursiveDelete(directoryInfo, true);
+                    RecursiveDelete(directoryInfo, true, extensionsToIgnore);
                 }
                 else
                 {
