@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
+using Fclp;
 using MvcLib.Common;
 using MvcLib.DbFileSystem;
 
@@ -15,12 +16,14 @@ namespace ConsoleApplication1
         //recomendado executar este programa no diretório raiz do projeto
         static void Main(string[] args)
         {
-            string setDir;
-            if (args != null && args.Length > 0)
-            {
-                setDir = args[0];
-            }
-            else setDir = Config.ValueOrDefault("dumpDir", "HostWebApp\\dbfiles");
+            var setDir = Config.ValueOrDefault("dumpDir", "HostWebApp\\dbfiles");
+
+            var p = new FluentCommandLineParser();
+            p.Setup<string>('d', "dir")
+                .SetDefault(setDir)
+                .WithDescription("Diretório raiz")
+                .Callback(x => setDir = x);
+
             try
             {
                 var path = Path.Combine(Directory.GetCurrentDirectory(), setDir);
