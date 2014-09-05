@@ -11,10 +11,18 @@ namespace MvcLib.Common.Configuration
 
         public static BootstrapperSection Initialize()
         {
-            Instance = (BootstrapperSection)ConfigurationManager.GetSection("MvcLib");
-
-            Trace.TraceInformation("Reading MvcLib section configuration: {0}", Instance != null);
-
+            try
+            {
+                Instance = (BootstrapperSection)ConfigurationManager.GetSection("MvcLib");
+            }
+            catch (Exception ex)
+            {
+                Trace.TraceInformation("Exception Reading MvcLib section configuration: {0}", ex.Message);
+            }
+            finally
+            {
+                Trace.TraceInformation("Reading MvcLib section configuration: {0}", Instance != null);
+            }
             return Instance;
         }
 

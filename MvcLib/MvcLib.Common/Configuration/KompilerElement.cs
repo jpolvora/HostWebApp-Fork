@@ -25,11 +25,11 @@ namespace MvcLib.Common.Configuration
             set { this["roslyn"] = value; }
         }
 
-        [ConfigurationProperty("assemblyName", DefaultValue = "db-compiled-assembly")]
+        [ConfigurationProperty("assemblyname", DefaultValue = "db-compiled-assembly")]
         public string AssemblyName
         {
-            get { return (string)this["assemblyName"]; }
-            set { this["assemblyName"] = value; }
+            get { return (string)this["assemblyname"]; }
+            set { this["assemblyname"] = value; }
         }
     }
 }
