@@ -76,7 +76,7 @@
   <ItemGroup>
     <Compile Include="Cache\WebCacheWrapper.cs" />
     <Compile Include="CollectionExtensions.cs" />
-    <None Include="Config.cs" />
+    <Compile Include="Config.cs" />
     <Compile Include="Configuration\CustomErrorElement.cs" />
     <Compile Include="Configuration\BooleanElementBase.cs" />
     <Compile Include="Configuration\DbFileContextElement.cs" />
