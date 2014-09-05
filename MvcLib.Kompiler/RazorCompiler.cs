@@ -21,7 +21,7 @@ namespace MvcLib.Kompiler
         public static string GenereateCode(string sourceRazor, string virtualPath)
         {
             WebPageRazorHost host = WebRazorHostFactory.CreateHostFromConfig(virtualPath);
-            string code = GenerateCodeFromRazorTemplate(host, virtualPath);
+            string code = GenerateCodeFromRazorString(host, sourceRazor, virtualPath);
 
             return code;
         }
@@ -53,6 +53,38 @@ namespace MvcLib.Kompiler
 
             return srcFileWriter.ToString();
         }
+
+        private static string GenerateCodeFromRazorString(WebPageRazorHost host, string razorString, string virtualPath)
+        {
+
+            // Create Razor engine and use it to generate a CodeCompileUnit
+            var engine = new RazorTemplateEngine(host);
+            GeneratorResults results = null;
+
+            using (StringReader reader = new StringReader(razorString))
+            {
+                results = engine.GenerateCode(reader, className: null, rootNamespace: null,
+                    sourceFileName: host.PhysicalPath);
+            }
+
+            if (!results.Success)
+            {
+                throw CreateExceptionFromParserError(results.ParserErrors.Last(), virtualPath);
+            }
+
+            // Use CodeDom to generate source code from the CodeCompileUnit
+            using (var codeDomProvider = new CSharpCodeProvider())
+            {
+                using (var srcFileWriter = new StringWriter())
+                {
+                    codeDomProvider.GenerateCodeFromCompileUnit(results.GeneratedCode, srcFileWriter,
+                        new CodeGeneratorOptions());
+
+                    return srcFileWriter.ToString();
+                }
+            }
+        }
+
 
         private static HttpParseException CreateExceptionFromParserError(RazorError error, string virtualPath)
         {
