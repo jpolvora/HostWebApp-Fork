@@ -2,6 +2,7 @@
 using System.Data.Entity;
 using System.Diagnostics;
 using MvcLib.Common;
+using MvcLib.Common.Configuration;
 
 namespace MvcLib.DbFileSystem
 {
@@ -34,8 +35,8 @@ namespace MvcLib.DbFileSystem
 
         static DbFileContext()
         {
-            ConnectionStringKey = Config.ValueOrDefault("DbFileContextKey", "DbFileContext");
-            Verbose = Config.ValueOrDefault("DbFileContextVerbose", false);
+            ConnectionStringKey = BootstrapperSection.Instance.DbFileContext.ConnectionStringKey;
+            Verbose = BootstrapperSection.Instance.DbFileContext.Verbose;
         }
 
         public DbFileContext()
