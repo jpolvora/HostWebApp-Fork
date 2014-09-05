@@ -10,14 +10,11 @@ namespace MvcLib.Common.Mvc
 {
     public static class WebPageExtensions
     {
-        public static string FingerPrint(string rootRelativePath, string cdnPath = "")
+        public static string FingerPrint(string rootRelativePath)
         {
             if (HttpContext.Current.Request.IsLocal)
                 return rootRelativePath;
-
-            if (!string.IsNullOrEmpty(cdnPath) && !HttpContext.Current.IsDebuggingEnabled)
-                return cdnPath;
-
+         
             if (HttpRuntime.Cache[rootRelativePath] == null)
             {
                 string relative = VirtualPathUtility.ToAbsolute("~" + rootRelativePath);
@@ -29,7 +26,7 @@ namespace MvcLib.Common.Mvc
                 DateTime date = File.GetLastWriteTime(absolute);
                 int index = relative.LastIndexOf('.');
 
-                string result = Config.ValueOrDefault("blog:cdnUrl", "") + relative.Insert(index, "_" + date.Ticks);
+                string result = relative.Insert(index, "_" + date.Ticks);
 
                 HttpRuntime.Cache.Insert(rootRelativePath, result, new CacheDependency(absolute));
             }
@@ -71,7 +68,7 @@ namespace MvcLib.Common.Mvc
                 if (tagBuilder == null) return;
 
                 
-                if (Config.IsInDebugMode)
+                if (HttpContext.Current.IsDebuggingEnabled)
                     page.Output.WriteLine("<!-- BEGIN {0} -->", page.VirtualPath);
 
                 page.Output.WriteLine(Environment.NewLine + tagBuilder.ToString(TagRenderMode.StartTag));
@@ -84,7 +81,7 @@ namespace MvcLib.Common.Mvc
 
                 _page.Output.WriteLine(Environment.NewLine + _tagBuilder.ToString(TagRenderMode.EndTag));
 
-                if (Config.IsInDebugMode)
+                if (HttpContext.Current.IsDebuggingEnabled)
                     _page.Output.WriteLine("<!-- END {0} -->", _page.VirtualPath);
             }
         }

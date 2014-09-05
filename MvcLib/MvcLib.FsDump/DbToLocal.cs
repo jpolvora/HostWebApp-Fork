@@ -3,7 +3,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Web.Hosting;
-using MvcLib.Common;
+using MvcLib.Common.Configuration;
 using MvcLib.DbFileSystem;
 
 namespace MvcLib.FsDump
@@ -38,7 +38,7 @@ namespace MvcLib.FsDump
 
         static DbToLocal()
         {
-            var path = Config.ValueOrDefault("DumpToLocalFolder", "~/App_Data");
+            var path = BootstrapperSection.Instance.DumpToLocal.Folder;
 
             var root = Path.GetFullPath(HostingEnvironment.MapPath(path));
             DirInfo = new DirectoryInfo(root);
