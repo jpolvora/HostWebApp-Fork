@@ -82,7 +82,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="EntryPoint.cs" />
+    <Compile Include="Init.cs" />
     <Compile Include="HttpInternals.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

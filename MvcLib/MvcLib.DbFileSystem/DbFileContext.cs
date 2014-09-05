@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Data.Entity;
 using System.Diagnostics;
-using MvcLib.Common;
 using MvcLib.Common.Configuration;
 
 namespace MvcLib.DbFileSystem
@@ -24,12 +23,8 @@ namespace MvcLib.DbFileSystem
 
             using (var db = new DbFileContext())
             {
-                using (DisposableTimer.StartNew("Initializing DbFileContext"))
-                {
-                    Trace.TraceInformation("Connection String: {0}", db.Database.Connection.ConnectionString);
-                    db.Database.Initialize(false);
-
-                }
+                Trace.TraceInformation("Connection String: {0}", db.Database.Connection.ConnectionString);
+                db.Database.Initialize(false);
             }
         }
 

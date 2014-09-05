@@ -1,7 +1,5 @@
-﻿using System;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using System.Reflection;
 using System.Web;
 using System.Web.Hosting;
@@ -9,6 +7,7 @@ using System.Web.Mvc;
 using System.Web.Routing;
 using System.Web.WebPages;
 using Microsoft.Web.Infrastructure.DynamicModuleHelper;
+using MvcLib.Bootstrapper;
 using MvcLib.Common;
 using MvcLib.Common.Cache;
 using MvcLib.Common.Configuration;
@@ -19,59 +18,60 @@ using MvcLib.CustomVPP.RemapperVpp;
 using MvcLib.DbFileSystem;
 using MvcLib.FsDump;
 using MvcLib.HttpModules;
+using MvcLib.Kompiler;
 using MvcLib.PluginLoader;
-using EntryPoint = MvcLib.Bootstrapper.EntryPoint;
 
-[assembly: WebActivatorEx.PreApplicationStartMethod(typeof(EntryPoint), "PreStart")]
-[assembly: WebActivatorEx.PostApplicationStartMethod(typeof(EntryPoint), "PostStart")]
+[assembly: WebActivatorEx.PreApplicationStartMethod(typeof(Init), "PreStart")]
+[assembly: WebActivatorEx.PostApplicationStartMethod(typeof(Init), "PostStart")]
 
 namespace MvcLib.Bootstrapper
 {
-    public class EntryPoint
+    public class Init
     {
         private static bool _initialized;
 
         public static void PreStart()
         {
-            var executingAssembly = Assembly.GetExecutingAssembly();
-            Trace.TraceInformation("Entry Assembly: {0}", executingAssembly.GetName().Name);
-
-            if (Debugger.IsAttached)
+            using (DisposableTimer.StartNew("PRE_START"))
             {
-                try
+                var executingAssembly = Assembly.GetExecutingAssembly();
+                Trace.TraceInformation("Entry Assembly: {0}", executingAssembly.GetName().Name);
+
+                if (Debugger.IsAttached)
                 {
-                    var traceOutput = HostingEnvironment.MapPath("~/traceOutput.log");
-                    if (File.Exists(traceOutput))
-                        File.Delete(traceOutput);
+                    try
+                    {
+                        var traceOutput = HostingEnvironment.MapPath("~/traceOutput.log");
+                        if (File.Exists(traceOutput))
+                            File.Delete(traceOutput);
 
-                    var listener = new TextWriterTraceListener(traceOutput, "StartupListener");
+                        var listener = new TextWriterTraceListener(traceOutput, "StartupListener");
 
-                    Trace.Listeners.Add(listener);
-                    Trace.AutoFlush = true;
+                        Trace.Listeners.Add(listener);
+                        Trace.AutoFlush = true;
+                    }
+                    catch { }
                 }
-                catch { }
-            }
 
-            BootstrapperSection.Initialize();
+                var cfg = BootstrapperSection.Initialize();
 
-            using (DisposableTimer.StartNew("PRE_START: Configuring HttpModules"))
-            {
-                if (BootstrapperSection.Instance.HttpModules.Trace.Enabled)
+
+                if (cfg.HttpModules.Trace.Enabled)
                 {
                     DynamicModuleUtility.RegisterModule(typeof(TracerHttpModule));
                 }
 
-                if (BootstrapperSection.Instance.StopMonitoring)
+                if (cfg.StopMonitoring)
                 {
                     HttpInternals.StopFileMonitoring();
                 }
 
-                if (BootstrapperSection.Instance.HttpModules.CustomError.Enabled)
+                if (cfg.HttpModules.CustomError.Enabled)
                 {
                     DynamicModuleUtility.RegisterModule(typeof(CustomErrorHttpModule));
                 }
 
-                if (BootstrapperSection.Instance.HttpModules.WhiteSpace.Enabled)
+                if (cfg.HttpModules.WhiteSpace.Enabled)
                 {
                     DynamicModuleUtility.RegisterModule(typeof(WhitespaceModule));
                 }
@@ -81,22 +81,20 @@ namespace MvcLib.Bootstrapper
                     DbFileContext.Initialize();
                 }
 
-                //plugin loader deve ser utilizado se dump to local = true ou se utilizar o custom vpp
-                if (BootstrapperSection.Instance.PluginLoader.Enabled)
+                if (cfg.PluginLoader.Enabled)
                 {
                     using (DisposableTimer.StartNew("PluginLoader"))
                     {
-                        PluginLoader.EntryPoint.Initialize();
+                        PluginLoaderEntryPoint.Initialize();
                     }
                 }
 
-                if (BootstrapperSection.Instance.VirtualPathProviders.SubFolderVpp.Enabled)
+                if (cfg.VirtualPathProviders.SubFolderVpp.Enabled)
                 {
-                    var customvpp = new SubfolderVpp();
-                    HostingEnvironment.RegisterVirtualPathProvider(customvpp);
+                    SubfolderVpp.SelfRegister();
                 }
 
-                if (BootstrapperSection.Instance.DumpToLocal.Enabled)
+                if (cfg.DumpToLocal.Enabled)
                 {
                     using (DisposableTimer.StartNew("DumpToLocal"))
                     {
@@ -105,7 +103,7 @@ namespace MvcLib.Bootstrapper
                 }
 
                 //todo: Dependency Injection
-                if (BootstrapperSection.Instance.VirtualPathProviders.DbFileSystemVpp.Enabled)
+                if (cfg.VirtualPathProviders.DbFileSystemVpp.Enabled)
                 {
                     var customvpp = new CustomVirtualPathProvider()
                         .AddImpl(new CachedDbServiceFileSystemProvider(new DefaultDbService(), new WebCacheWrapper()));
@@ -114,26 +112,13 @@ namespace MvcLib.Bootstrapper
 
                 //todo: implementar dependência entre módulos
 
-                if (BootstrapperSection.Instance.Kompiler.Enabled)
+                if (cfg.Kompiler.Enabled)
                 {
-                    if (BootstrapperSection.Instance.Kompiler.ForceRecompilation)
+                    KompilerEntryPoint.AddReferences(typeof(Controller), typeof(WebPageRenderingBase), typeof(WebCacheWrapper), typeof(ViewRenderer), typeof(DbToLocal), typeof(CustomErrorHttpModule.ErrorModel));
+
+                    using (DisposableTimer.StartNew("Kompiler"))
                     {
-                        //se forçar a recompilação, remove o assembly existente.
-                        Kompiler.KompilerDbService.RemoveExistingCompiledAssemblyFromDb();
-                    }
-
-                    //se já houver um assembly compilado, não executa a compilação
-                    if (!Kompiler.KompilerDbService.ExistsCompiledAssembly())
-                    {
-                        //EntryPoint depends on PluginLoader, so, initializes it if not previously initialized.
-                        PluginLoader.EntryPoint.Initialize();
-
-                        Kompiler.EntryPoint.AddReferences(typeof(Controller), typeof(WebPageRenderingBase), typeof(WebCacheWrapper), typeof(ViewRenderer), typeof(DbToLocal), typeof(CustomErrorHttpModule.ErrorModel));
-
-                        using (DisposableTimer.StartNew("Kompiler"))
-                        {
-                            Kompiler.EntryPoint.Execute();
-                        }
+                        KompilerEntryPoint.Execute();
                     }
                 }
 

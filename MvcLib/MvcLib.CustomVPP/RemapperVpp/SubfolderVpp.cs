@@ -5,7 +5,6 @@ using System.IO;
 using System.Web;
 using System.Web.Caching;
 using System.Web.Hosting;
-using MvcLib.Common;
 using MvcLib.Common.Configuration;
 
 namespace MvcLib.CustomVPP.RemapperVpp
@@ -15,6 +14,19 @@ namespace MvcLib.CustomVPP.RemapperVpp
         private readonly string _relativePath;
         private readonly string _absolutePath;
 
+        public static void SelfRegister()
+        {
+            var instance = new SubfolderVpp();
+
+            Trace.TraceInformation("[SubFolderVpp]: Self registration: {0}", instance);
+            HostingEnvironment.RegisterVirtualPathProvider(instance);
+        }
+
+        public SubfolderVpp()
+            : this(BootstrapperSection.Instance.DumpToLocal.Folder)
+        {
+        }
+
         public SubfolderVpp(string cfg)
         {
             _relativePath = VirtualPathUtility.AppendTrailingSlash(VirtualPathUtility.ToAppRelative(cfg));
@@ -23,11 +35,6 @@ namespace MvcLib.CustomVPP.RemapperVpp
             string subfolder = HostingEnvironment.MapPath(_relativePath);
             if (!Directory.Exists(subfolder))
                 Directory.CreateDirectory(subfolder);
-        }
-
-        public SubfolderVpp()
-            : this(BootstrapperSection.Instance.DumpToLocal.Folder)
-        {
         }
 
         public override bool DirectoryExists(string virtualDir)

@@ -26,7 +26,7 @@ namespace MvcLib.Kompiler
             if (files == null)
                 throw new ArgumentNullException("files");
 
-            var output = Path.Combine(Path.GetTempPath(), EntryPoint.CompiledAssemblyName + ".dll");
+            var output = Path.Combine(Path.GetTempPath(), KompilerEntryPoint.CompiledAssemblyName + ".dll");
 
             CodeDomProvider codeDomProvider = new CSharpCodeProvider();
             var compilerParameters = new CompilerParameters
@@ -37,7 +37,7 @@ namespace MvcLib.Kompiler
                 IncludeDebugInformation = false,
             };
 
-            foreach (var codeDomReference in EntryPoint.CodeDomReferences)
+            foreach (var codeDomReference in KompilerEntryPoint.CodeDomReferences)
             {
                 compilerParameters.ReferencedAssemblies.Add(codeDomReference);
             }
