@@ -6,6 +6,7 @@ using System.Web.Mvc;
 using System.Web.Optimization;
 using System.Web.Routing;
 using MvcLib.Common;
+using MvcLib.Common.Configuration;
 
 namespace HostWebApp
 {
@@ -15,7 +16,7 @@ namespace HostWebApp
 
         protected void Application_Start(object sender, EventArgs e)
         {
-            _rewriteBasePath = Config.ValueOrDefault("DumpToLocalFolder", "~/App_Data").TrimEnd('/');
+            _rewriteBasePath = BootstrapperSection.Instance.DumpToLocal.Folder.TrimEnd('/');
             if (!_rewriteBasePath.StartsWith("~"))
                 _rewriteBasePath = "~" + _rewriteBasePath;
 
