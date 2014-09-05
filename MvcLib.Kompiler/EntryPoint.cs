@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using MvcLib.Common;
+using MvcLib.Common.Configuration;
 using Roslyn.Compilers;
 
 namespace MvcLib.Kompiler
@@ -32,7 +33,7 @@ namespace MvcLib.Kompiler
                     //todo: usar depdendency injection
                     IKompiler kompiler;
 
-                    if (Config.ValueOrDefault("Kompiler:UseRoslyn", false))
+                    if (BootstrapperSection.Instance.Kompiler.Roslyn)
                     {
                         kompiler = new RoslynWrapper();
                     }
@@ -41,7 +42,7 @@ namespace MvcLib.Kompiler
                         kompiler = new CodeDomWrapper();
                     }
 
-                    if (Config.ValueOrDefault("Kompiler:LoadFromDb", false))
+                    if (BootstrapperSection.Instance.Kompiler.LoadFromDb)
                     {
                         Trace.TraceInformation("Compiling from DB...");
                         var source = KompilerDbService.LoadSourceCodeFromDb();
@@ -49,7 +50,7 @@ namespace MvcLib.Kompiler
                     }
                     else
                     {
-                        var localRootFolder = Config.ValueOrDefault("DumpToLocalFolder", "~/App_Data");
+                        var localRootFolder = BootstrapperSection.Instance.DumpToLocal.Folder;
                         Trace.TraceInformation("Compiling from Local File System: {0}", localRootFolder);
                         msg = kompiler.CompileFromFolder(localRootFolder, out buffer);
                     }
@@ -64,7 +65,7 @@ namespace MvcLib.Kompiler
                 {
                     Trace.TraceInformation("[Kompiler]: DB Compilation Result: SUCCESS");
 
-                    if (!Config.ValueOrDefault("Kompiler:ForceRecompilation", false))
+                    if (!BootstrapperSection.Instance.Kompiler.ForceRecompilation)
                     {
                         //só salva no banco se compilação forçada for False
                         KompilerDbService.SaveCompiledCustomAssembly(CompiledAssemblyName, buffer);

@@ -39,7 +39,7 @@ namespace MvcLib.HttpModules
 
         public void Init(HttpApplication on)
         {
-            _eventsToTrace = BootstrapperSection.Instance.Trace.Events.Split(',');
+            _eventsToTrace = BootstrapperSection.Instance.HttpModules.Trace.Events.Split(',');
 
             _counter++;
             Trace.TraceInformation("Init: {0}", this);
@@ -168,6 +168,7 @@ namespace MvcLib.HttpModules
 
         private void OnError(HttpApplication application)
         {
+            if (BootstrapperSection.Instance.StopMonitoring)
             StopTimer(application);
             Trace.Flush();
 

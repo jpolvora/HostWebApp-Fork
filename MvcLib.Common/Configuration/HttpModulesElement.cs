@@ -2,20 +2,27 @@
 
 namespace MvcLib.Common.Configuration
 {
-    public class TraceElement : ConfigurationElement
+    public class HttpModulesElement : ConfigurationElement
     {
-        [ConfigurationProperty("enabled", DefaultValue = false)]
-        public bool Enabled
+        [ConfigurationProperty("trace")]
+        public TraceElement Trace
         {
-            get { return (bool)this["enabled"]; }
-            set { this["enabled"] = value; }
+            get { return (TraceElement)this["trace"]; }
+            set { this["trace"] = value; }
         }
 
-        [ConfigurationProperty("events", DefaultValue = "")]
-        public string Events
+        [ConfigurationProperty("customerror")]
+        public CustomErrorElement CustomError
         {
-            get { return (string)this["events"]; }
-            set { this["events"] = value; }
+            get { return (CustomErrorElement)this["customerror"]; }
+            set { this["customerror"] = value; }
+        }
+
+        [ConfigurationProperty("whitespace")]
+        public CustomErrorElement WhiteSpace
+        {
+            get { return (CustomErrorElement)this["whitespace"]; }
+            set { this["whitespace"] = value; }
         }
     }
 }

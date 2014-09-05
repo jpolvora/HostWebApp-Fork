@@ -36,7 +36,7 @@ namespace MvcLib.Bootstrapper
             var executingAssembly = Assembly.GetExecutingAssembly();
             Trace.TraceInformation("Entry Assembly: {0}", executingAssembly.GetName().Name);
 
-            if (Config.IsInDebugMode)
+            if (HttpContext.Current.IsDebuggingEnabled)
             {
                 try
                 {
@@ -56,7 +56,7 @@ namespace MvcLib.Bootstrapper
 
             using (DisposableTimer.StartNew("PRE_START: Configuring HttpModules"))
             {
-                if (BootstrapperSection.Instance.Trace.Enabled)
+                if (BootstrapperSection.Instance.HttpModules.Trace.Enabled)
                 {
                     DynamicModuleUtility.RegisterModule(typeof(TracerHttpModule));
                 }
@@ -66,17 +66,14 @@ namespace MvcLib.Bootstrapper
                     HttpInternals.StopFileMonitoring();
                 }
 
-                if (Config.ValueOrDefault("Module:CustomError", false))
+                if (BootstrapperSection.Instance.HttpModules.CustomError.Enabled)
                 {
                     DynamicModuleUtility.RegisterModule(typeof(CustomErrorHttpModule));
                 }
-                if (Config.ValueOrDefault("Module:WhiteSpace", true))
+
+                if (BootstrapperSection.Instance.HttpModules.WhiteSpace.Enabled)
                 {
                     DynamicModuleUtility.RegisterModule(typeof(WhitespaceModule));
-                }
-                if (Config.ValueOrDefault("Module:ForceCache", true))
-                {
-                    DynamicModuleUtility.RegisterModule(typeof(SetCacheHttpModule));
                 }
 
                 using (DisposableTimer.StartNew("DbFileContext"))
@@ -85,7 +82,7 @@ namespace MvcLib.Bootstrapper
                 }
 
                 //plugin loader deve ser utilizado se dump to local = true ou se utilizar o custom vpp
-                if (Config.ValueOrDefault("PluginLoader", false))
+                if (BootstrapperSection.Instance.PluginLoader.Enabled)
                 {
                     using (DisposableTimer.StartNew("PluginLoader"))
                     {
@@ -93,15 +90,13 @@ namespace MvcLib.Bootstrapper
                     }
                 }
 
-
-
-                if (Config.ValueOrDefault("SubfolderVpp", false))
+                if (BootstrapperSection.Instance.VirtualPathProviders.SubFolderVpp.Enabled)
                 {
                     var customvpp = new SubfolderVpp();
                     HostingEnvironment.RegisterVirtualPathProvider(customvpp);
                 }
 
-                if (Config.ValueOrDefault("DumpToLocal", false))
+                if (BootstrapperSection.Instance.DumpToLocal.Enabled)
                 {
                     using (DisposableTimer.StartNew("DumpToLocal"))
                     {
@@ -110,7 +105,7 @@ namespace MvcLib.Bootstrapper
                 }
 
                 //todo: Dependency Injection
-                if (Config.ValueOrDefault("CustomVirtualPathProvider", false))
+                if (BootstrapperSection.Instance.VirtualPathProviders.DbFileSystemVpp.Enabled)
                 {
                     var customvpp = new CustomVirtualPathProvider()
                         .AddImpl(new CachedDbServiceFileSystemProvider(new DefaultDbService(), new WebCacheWrapper()));
@@ -119,9 +114,9 @@ namespace MvcLib.Bootstrapper
 
                 //todo: implementar dependência entre módulos
 
-                if (Config.ValueOrDefault("Kompiler", false))
+                if (BootstrapperSection.Instance.Kompiler.Enabled)
                 {
-                    if (Config.ValueOrDefault("Kompiler:ForceRecompilation", false))
+                    if (BootstrapperSection.Instance.Kompiler.ForceRecompilation)
                     {
                         //se forçar a recompilação, remove o assembly existente.
                         Kompiler.KompilerDbService.RemoveExistingCompiledAssemblyFromDb();
@@ -178,7 +173,7 @@ namespace MvcLib.Bootstrapper
 
             using (DisposableTimer.StartNew("RUNNING POST_START ..."))
             {
-                if (Config.ValueOrDefault("MvcTracerFilter", false))
+                if (BootstrapperSection.Instance.MvcTrace.Enabled)
                 {
                     GlobalFilters.Filters.Add(new MvcTracerFilter());
                 }
@@ -203,7 +198,7 @@ namespace MvcLib.Bootstrapper
                     Trace.TraceInformation("Handler: {0} at URL: {1}", route.RouteHandler, route.Url);
                 }
 
-                if (!Config.IsInDebugMode)
+                if (!HttpContext.Current.IsDebuggingEnabled)
                 {
                     Trace.Listeners.Remove("StartupListener");
                 }

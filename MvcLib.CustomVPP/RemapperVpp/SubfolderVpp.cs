@@ -6,6 +6,7 @@ using System.Web;
 using System.Web.Caching;
 using System.Web.Hosting;
 using MvcLib.Common;
+using MvcLib.Common.Configuration;
 
 namespace MvcLib.CustomVPP.RemapperVpp
 {
@@ -25,7 +26,7 @@ namespace MvcLib.CustomVPP.RemapperVpp
         }
 
         public SubfolderVpp()
-            : this(Config.ValueOrDefault("DumpToLocalFolder", "~/App_Data"))
+            : this(BootstrapperSection.Instance.DumpToLocal.Folder)
         {
         }
 
