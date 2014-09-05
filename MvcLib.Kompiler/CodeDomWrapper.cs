@@ -18,7 +18,7 @@ namespace MvcLib.Kompiler
             if (!AppDomain.CurrentDomain.IsFullyTrusted)
             {
                 Trace.TraceWarning("CodeDom works only in full trust!");
-            }    
+            }
         }
 
         public string CompileFromSource(Dictionary<string, string> files, out byte[] buffer)

@@ -16,7 +16,7 @@ namespace MvcLib.Common.Configuration
 
         public static BootstrapperSection Instance { get; private set; }
 
-        [ConfigurationProperty("stopMonitoring", DefaultValue = "false")]
+        [ConfigurationProperty("stopMonitoring", DefaultValue = "true")]
         public Boolean StopMonitoring
         {
             get
