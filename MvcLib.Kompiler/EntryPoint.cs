@@ -6,6 +6,7 @@ using System.Linq;
 using System.Reflection;
 using MvcLib.Common;
 using MvcLib.Common.Configuration;
+using MvcLib.PluginLoader;
 using Roslyn.Compilers;
 
 namespace MvcLib.Kompiler
@@ -41,6 +42,8 @@ namespace MvcLib.Kompiler
                     {
                         kompiler = new CodeDomWrapper();
                     }
+
+                    AddReferences(PluginStorage.GetAssemblies().ToArray());
 
                     if (BootstrapperSection.Instance.Kompiler.LoadFromDb)
                     {
@@ -95,8 +98,10 @@ namespace MvcLib.Kompiler
 
         public static void AddReferences(params Assembly[] assemblies)
         {
+
             foreach (var assembly in assemblies)
             {
+                CodeDomReferences.Add(assembly.Location);
                 RoslynReferences.Add(new MetadataFileReference(assembly.Location));
             }
         }
