@@ -1,6 +1,7 @@
 ﻿@using System.Text
 @using MvcLib.DbFileSystem
 @using MvcLib.FsDump
+@using MvcLib.Kompiler
 @using ResponseExtensions = MvcLib.Common.Mvc.ResponseExtensions
 
 @{
@@ -25,7 +26,10 @@
             //copy to local
             DbToLocal.WriteToDisk(result, true);
 
-            ResponseExtensions.WriteAjax(Response, new { success = true });
+            //se for .cshtml, compila
+            var src = RazorCompiler.GenereateCode(text, "~" + result.VirtualPath);
+
+            ResponseExtensions.WriteAjax(Response, new { success = true, generated = src });
             return;
         }
 
