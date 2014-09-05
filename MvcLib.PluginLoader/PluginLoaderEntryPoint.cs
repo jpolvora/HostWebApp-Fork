@@ -81,7 +81,7 @@ namespace MvcLib.PluginLoader
                     if (File.Exists(filename))
                         File.Delete(filename);
                     filenames.Remove(filename);
-                }    
+                }
             }
 
 
@@ -98,6 +98,7 @@ namespace MvcLib.PluginLoader
 
         public static void LoadPlugin(string fileName, byte[] bytes)
         {
+            Trace.TraceInformation("Writing and Loading new compiled assembly: '{0}'", fileName);
             var kvp = new KeyValuePair<string, byte[]>(fileName, bytes);
 
             var fileNames = WriteToDisk(new[] { kvp });

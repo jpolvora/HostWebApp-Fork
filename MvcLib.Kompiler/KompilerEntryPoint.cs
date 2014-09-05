@@ -13,7 +13,7 @@ namespace MvcLib.Kompiler
 {
     public class KompilerEntryPoint
     {
-        internal const string CompiledAssemblyName = "db-compiled-assembly";
+        internal readonly static string CompiledAssemblyName = BootstrapperSection.Instance.Kompiler.AssemblyName;
 
         private static bool _initialized;
 
@@ -24,19 +24,14 @@ namespace MvcLib.Kompiler
 
             _initialized = true;
 
+            //plugin loader 
+            PluginLoaderEntryPoint.Initialize();
+
             if (BootstrapperSection.Instance.Kompiler.ForceRecompilation)
             {
                 //se forçar a recompilação, remove o assembly existente.
                 KompilerDbService.RemoveExistingCompiledAssemblyFromDb();
             }
-
-            //se já houver um assembly compilado, não executa a compilação
-            if (!KompilerDbService.ExistsCompiledAssembly())
-            {
-                //KompilerEntryPoint depends on PluginLoader, so, initializes it if not previously initialized.
-                PluginLoaderEntryPoint.Initialize();
-            }
-
 
             byte[] buffer = new byte[0];
             string msg;
@@ -86,7 +81,7 @@ namespace MvcLib.Kompiler
                     KompilerDbService.SaveCompiledCustomAssembly(CompiledAssemblyName, buffer);
                 }
 
-                PluginLoader.PluginLoaderEntryPoint.LoadPlugin(CompiledAssemblyName + ".dll", buffer);
+                PluginLoaderEntryPoint.LoadPlugin(CompiledAssemblyName + ".dll", buffer);
             }
             else
             {
