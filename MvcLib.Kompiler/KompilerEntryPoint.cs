@@ -11,7 +11,7 @@ using Roslyn.Compilers;
 
 namespace MvcLib.Kompiler
 {
-    public class EntryPoint
+    public class KompilerEntryPoint
     {
         internal const string CompiledAssemblyName = "db-compiled-assembly";
 
@@ -24,65 +24,77 @@ namespace MvcLib.Kompiler
 
             _initialized = true;
 
-            using (DisposableTimer.StartNew("Dynamic Compilation"))
+            if (BootstrapperSection.Instance.Kompiler.ForceRecompilation)
             {
-                byte[] buffer = new byte[0];
-                string msg;
+                //se forçar a recompilação, remove o assembly existente.
+                KompilerDbService.RemoveExistingCompiledAssemblyFromDb();
+            }
 
-                try
+            //se já houver um assembly compilado, não executa a compilação
+            if (!KompilerDbService.ExistsCompiledAssembly())
+            {
+                //KompilerEntryPoint depends on PluginLoader, so, initializes it if not previously initialized.
+                PluginLoaderEntryPoint.Initialize();
+            }
+
+
+            byte[] buffer = new byte[0];
+            string msg;
+
+            try
+            {
+                //todo: usar depdendency injection
+                IKompiler kompiler;
+
+                if (BootstrapperSection.Instance.Kompiler.Roslyn)
                 {
-                    //todo: usar depdendency injection
-                    IKompiler kompiler;
-
-                    if (BootstrapperSection.Instance.Kompiler.Roslyn)
-                    {
-                        kompiler = new RoslynWrapper();
-                    }
-                    else
-                    {
-                        kompiler = new CodeDomWrapper();
-                    }
-
-                    AddReferences(PluginStorage.GetAssemblies().ToArray());
-
-                    if (BootstrapperSection.Instance.Kompiler.LoadFromDb)
-                    {
-                        Trace.TraceInformation("Compiling from DB...");
-                        var source = KompilerDbService.LoadSourceCodeFromDb();
-                        msg = kompiler.CompileFromSource(source, out buffer);
-                    }
-                    else
-                    {
-                        var localRootFolder = BootstrapperSection.Instance.DumpToLocal.Folder;
-                        Trace.TraceInformation("Compiling from Local File System: {0}", localRootFolder);
-                        msg = kompiler.CompileFromFolder(localRootFolder, out buffer);
-                    }
-                }
-                catch (Exception ex)
-                {
-                    msg = ex.Message;
-                    Trace.TraceInformation("Erro durante a compilação do projeto no banco de dados. \r\n" + ex.Message);
-                }
-
-                if (string.IsNullOrWhiteSpace(msg) && buffer.Length > 0)
-                {
-                    Trace.TraceInformation("[Kompiler]: DB Compilation Result: SUCCESS");
-
-                    if (!BootstrapperSection.Instance.Kompiler.ForceRecompilation)
-                    {
-                        //só salva no banco se compilação forçada for False
-                        KompilerDbService.SaveCompiledCustomAssembly(CompiledAssemblyName, buffer);
-                    }
-
-                    PluginLoader.EntryPoint.LoadPlugin(CompiledAssemblyName + ".dll", buffer);
+                    kompiler = new RoslynWrapper();
                 }
                 else
                 {
-                    Trace.TraceInformation("[Kompiler]: DB Compilation Result: Bytes:{0}, Msg:{1}",
-                        buffer.Length, msg);
+                    kompiler = new CodeDomWrapper();
+                }
+
+                AddReferences(PluginStorage.GetAssemblies().ToArray());
+
+                if (BootstrapperSection.Instance.Kompiler.LoadFromDb)
+                {
+                    Trace.TraceInformation("Compiling from DB...");
+                    var source = KompilerDbService.LoadSourceCodeFromDb();
+                    msg = kompiler.CompileFromSource(source, out buffer);
+                }
+                else
+                {
+                    var localRootFolder = BootstrapperSection.Instance.DumpToLocal.Folder;
+                    Trace.TraceInformation("Compiling from Local File System: {0}", localRootFolder);
+                    msg = kompiler.CompileFromFolder(localRootFolder, out buffer);
                 }
             }
+            catch (Exception ex)
+            {
+                msg = ex.Message;
+                Trace.TraceInformation("Erro durante a compilação do projeto no banco de dados. \r\n" + ex.Message);
+            }
+
+            if (string.IsNullOrWhiteSpace(msg) && buffer.Length > 0)
+            {
+                Trace.TraceInformation("[Kompiler]: DB Compilation Result: SUCCESS");
+
+                if (!BootstrapperSection.Instance.Kompiler.ForceRecompilation)
+                {
+                    //só salva no banco se compilação forçada for False
+                    KompilerDbService.SaveCompiledCustomAssembly(CompiledAssemblyName, buffer);
+                }
+
+                PluginLoader.PluginLoaderEntryPoint.LoadPlugin(CompiledAssemblyName + ".dll", buffer);
+            }
+            else
+            {
+                Trace.TraceInformation("[Kompiler]: DB Compilation Result: Bytes:{0}, Msg:{1}",
+                    buffer.Length, msg);
+            }
         }
+
 
         public static void AddReferences(params Type[] types)
         {

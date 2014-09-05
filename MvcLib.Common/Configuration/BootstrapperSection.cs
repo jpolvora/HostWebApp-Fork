@@ -1,20 +1,33 @@
 ﻿using System;
 using System.Configuration;
+using System.Diagnostics;
 
 namespace MvcLib.Common.Configuration
 {
+    //singleton static
     public class BootstrapperSection : ConfigurationSection
     {
-        public static void Initialize()
-        {
-        }
+        private static BootstrapperSection _instance;
 
-        static BootstrapperSection()
+        public static BootstrapperSection Initialize()
         {
             Instance = (BootstrapperSection)ConfigurationManager.GetSection("MvcLib");
+
+            Trace.TraceInformation("Reading MvcLib section configuration: {0}", Instance != null);
+
+            return Instance;
         }
 
-        public static BootstrapperSection Instance { get; private set; }
+        public static BootstrapperSection Instance
+        {
+            get
+            {
+                {
+                    return _instance ?? (_instance = Initialize());
+                }
+            }
+            private set { _instance = value; }
+        }
 
         [ConfigurationProperty("stopMonitoring", DefaultValue = "true")]
         public Boolean StopMonitoring

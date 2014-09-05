@@ -14,13 +14,13 @@ namespace MvcLib.PluginLoader
      * http://shazwazza.com/post/Developing-a-plugin-framework-in-ASPNET-with-medium-trust
      */
 
-    public class EntryPoint
+    public class PluginLoaderEntryPoint
     {
         public static readonly DirectoryInfo PluginFolder;
 
         private static bool _initialized;
 
-        static EntryPoint()
+        static PluginLoaderEntryPoint()
         {
             //determinar probingPath
 
