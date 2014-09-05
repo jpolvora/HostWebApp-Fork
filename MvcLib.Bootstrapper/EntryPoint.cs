@@ -36,7 +36,7 @@ namespace MvcLib.Bootstrapper
             var executingAssembly = Assembly.GetExecutingAssembly();
             Trace.TraceInformation("Entry Assembly: {0}", executingAssembly.GetName().Name);
 
-            if (HttpContext.Current.IsDebuggingEnabled)
+            if (Debugger.IsAttached)
             {
                 try
                 {
@@ -198,7 +198,7 @@ namespace MvcLib.Bootstrapper
                     Trace.TraceInformation("Handler: {0} at URL: {1}", route.RouteHandler, route.Url);
                 }
 
-                if (!HttpContext.Current.IsDebuggingEnabled)
+                if (!Debugger.IsAttached)
                 {
                     Trace.Listeners.Remove("StartupListener");
                 }
