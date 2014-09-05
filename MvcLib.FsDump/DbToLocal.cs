@@ -24,13 +24,17 @@ namespace MvcLib.FsDump
             var folders = fsInfo.GetDirectories("*.*", SearchOption.AllDirectories);
             foreach (var directoryInfo in folders)
             {
-                if (directoryInfo.Exists)
+                try
                 {
-                    if (directoryInfo.GetFiles("*.*", SearchOption.AllDirectories).Any())
-                        continue;
+                    if (directoryInfo.Exists)
+                    {
+                        if (directoryInfo.GetFiles("*.*", SearchOption.AllDirectories).Any())
+                            continue;
 
-                    directoryInfo.Delete(true);
+                        directoryInfo.Delete(true);
+                    }
                 }
+                catch { }
             }
 
             if (self && !fsInfo.GetFiles("*.*", SearchOption.AllDirectories).Any())
