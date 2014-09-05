@@ -80,8 +80,9 @@ namespace MvcLib.PluginLoader
                 {
                     if (File.Exists(filename))
                         File.Delete(filename);
-                    filenames.Remove(filename);
                 }
+
+                filenames.Clear();
             }
 
 
