@@ -18,12 +18,22 @@ namespace MvcLib.Kompiler
 {
     public class RazorCompiler
     {
-        public static string GenereateCode(string sourceRazor, string virtualPath)
+        public static string GenereateCode(string sourceRazor, string virtualPath, bool throws = false)
         {
-            WebPageRazorHost host = WebRazorHostFactory.CreateHostFromConfig(virtualPath);
-            string code = GenerateCodeFromRazorString(host, sourceRazor, virtualPath);
+            try
+            {
+                var host = WebRazorHostFactory.CreateHostFromConfig(virtualPath);
+                string code = GenerateCodeFromRazorString(host, sourceRazor, virtualPath);
 
-            return code;
+                return code;
+            }
+            catch (Exception ex)
+            {
+                if (throws)
+                    throw;
+
+                return ex.Message;
+            }
         }
 
         private static string GenerateCodeFromRazorTemplate(WebPageRazorHost host, string virtualPath)
