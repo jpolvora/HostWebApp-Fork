@@ -1,6 +1,7 @@
 using System;
 using System.CodeDom.Compiler;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -22,6 +23,7 @@ namespace MvcLib.Kompiler
         {
             try
             {
+                Trace.TraceInformation("Parsing razor... {0}", virtualPath);
                 var host = WebRazorHostFactory.CreateHostFromConfig(virtualPath);
                 string code = GenerateCodeFromRazorString(host, sourceRazor, virtualPath);
 
@@ -29,6 +31,7 @@ namespace MvcLib.Kompiler
             }
             catch (Exception ex)
             {
+                Trace.TraceInformation("Error:... {0}", ex.Message);
                 if (throws)
                     throw;
 
