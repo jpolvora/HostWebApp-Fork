@@ -53,7 +53,7 @@ namespace MvcLib.FsDump
 
         public static void Execute()
         {
-            Trace.TraceInformation("[DbToLocal]: Starting...");
+            Trace.TraceInformation("[DbToLocal]: Starting... {0}", DirInfo.FullName);
 
             using (var ctx = new DbFileContext())
             {
