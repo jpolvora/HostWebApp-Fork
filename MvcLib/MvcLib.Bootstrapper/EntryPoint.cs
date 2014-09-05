@@ -129,7 +129,6 @@ namespace MvcLib.Bootstrapper
                         PluginLoader.EntryPoint.Initialize();
 
                         Kompiler.EntryPoint.AddReferences(typeof(Controller), typeof(WebPageRenderingBase), typeof(WebCacheWrapper), typeof(ViewRenderer), typeof(DbToLocal), typeof(CustomErrorHttpModule.ErrorModel));
-                        Kompiler.EntryPoint.AddReferences(PluginStorage.GetAssemblies().ToArray());
 
                         using (DisposableTimer.StartNew("Kompiler"))
                         {
