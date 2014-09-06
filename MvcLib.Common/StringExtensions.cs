@@ -8,17 +8,23 @@ namespace MvcLib.Common
 
     public static class ArrayExtensions
     {
-        public static T[] Extend<T>(this T[] originalArray, params T[] addItem) where T : class
+        public static T[] Extend<T>(this T[] srcArray, bool insertAfter = true, params T[] addItems) where T : class
         {
-            if (addItem == null)
+            if (addItems == null)
             {
-                throw new ArgumentNullException("addItem");
+                throw new ArgumentNullException("addItems");
             }
-            if (originalArray == null)
+            if (srcArray == null)
             {
-                return addItem;
+                return addItems;
             }
-            return originalArray.Concat(addItem).ToArray(); // although Concat is not recommended for performance reasons, see the accepted answer
+
+            var result = insertAfter
+                ? srcArray.Concat(addItems).ToArray()
+                : addItems.Concat(srcArray).ToArray();
+            return result;
+
+            //return srcArray.Concat(addItems).ToArray(); // although Concat is not recommended for performance reasons, see the accepted answer
         }
     }
 

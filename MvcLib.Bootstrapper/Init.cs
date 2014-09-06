@@ -206,42 +206,42 @@ namespace MvcLib.Bootstrapper
                         mvcroot + "/Views/{1}/{0}.cshtml",
                         mvcroot + "/Views/Shared/{0}.cshtml",
                     };
-                    razorViewEngine.ViewLocationFormats.Extend(vlf);
+                    razorViewEngine.ViewLocationFormats.Extend(false, vlf);
 
                     var mlf = new string[]
                     {
                         mvcroot + "/Views/{1}/{0}.cshtml",
                         mvcroot + "/Views/Shared/{0}.cshtml",
                     };
-                    razorViewEngine.MasterLocationFormats.Extend(mlf);
+                    razorViewEngine.MasterLocationFormats.Extend(false, mlf);
 
                     var plf = new string[]
                     {
                         mvcroot + "/Views/{1}/{0}.cshtml",
                         mvcroot + "/Views/Shared/{0}.cshtml",
                     };
-                    razorViewEngine.PartialViewLocationFormats.Extend(plf);
+                    razorViewEngine.PartialViewLocationFormats.Extend(false, plf);
 
                     var avlf = new string[]
                     {
                         mvcroot + "/Areas/{2}/Views/{1}/{0}.cshtml",
                         mvcroot + "/Areas/{2}/Views/Shared/{0}.cshtml",
                     };
-                    razorViewEngine.AreaViewLocationFormats.Extend(avlf);
+                    razorViewEngine.AreaViewLocationFormats.Extend(false, avlf);
 
                     var amlf = new string[]
                     {
                         mvcroot + "/Areas/{2}/Views/{1}/{0}.cshtml",
                         mvcroot + "/Areas/{2}/Views/Shared/{0}.cshtml",
                     };
-                    razorViewEngine.AreaMasterLocationFormats.Extend(amlf);
+                    razorViewEngine.AreaMasterLocationFormats.Extend(false, amlf);
 
                     var apvlf = new string[]
                     {
                         mvcroot + "/Areas/{2}/Views/{1}/{0}.cshtml",
                         mvcroot + "/Areas/{2}/Views/Shared/{0}.cshtml",
                     };
-                    razorViewEngine.AreaPartialViewLocationFormats.Extend(apvlf);
+                    razorViewEngine.AreaPartialViewLocationFormats.Extend(false, apvlf);
                 }
                 else
                 {
