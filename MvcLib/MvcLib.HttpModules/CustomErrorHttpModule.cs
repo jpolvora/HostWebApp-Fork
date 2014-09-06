@@ -59,6 +59,7 @@ namespace MvcLib.HttpModules
             }
             else
             {
+                application.Response.Buffer = true;
                 var model = new ErrorModel()
                 {
                     Message = exception.Message,
