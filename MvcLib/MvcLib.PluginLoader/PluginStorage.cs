@@ -36,9 +36,7 @@ namespace MvcLib.PluginLoader
 
             Trace.TraceInformation("Assembly Loaded... {0}", args.LoadedAssembly.Location);
 
-            var path = Path.GetDirectoryName(args.LoadedAssembly.Location);
-
-            if (path.IsNotNullOrWhiteSpace() && path.StartsWith(_pluginFolder.FullName, StringComparison.InvariantCultureIgnoreCase))
+            if (args.LoadedAssembly.Location.StartsWith(_pluginFolder.FullName, StringComparison.InvariantCultureIgnoreCase))
             {
                 try
                 {
