@@ -92,8 +92,8 @@ namespace MvcLib.HttpModules
                 LogEvent.Raise(exception.Message, exception);
             }
 
-            //application.CompleteRequest(); //não imprime o resultado
-            response.End();
+            application.CompleteRequest(); //não imprime o resultado
+            //response.End();
         }
 
         private static void RenderView(string errorViewPath, ErrorModel model, HttpResponse response)
