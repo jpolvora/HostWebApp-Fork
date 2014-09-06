@@ -1,5 +1,7 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Web;
 using System.Web.Hosting;
@@ -160,7 +162,9 @@ namespace MvcLib.Bootstrapper
 
             using (DisposableTimer.StartNew("RUNNING POST_START ..."))
             {
-                if (BootstrapperSection.Instance.MvcTrace.Enabled)
+                var cfg = BootstrapperSection.Instance;
+
+                if (cfg.MvcTrace.Enabled)
                 {
                     GlobalFilters.Filters.Add(new MvcTracerFilter());
                 }
@@ -188,6 +192,60 @@ namespace MvcLib.Bootstrapper
                 if (!Debugger.IsAttached)
                 {
                     Trace.Listeners.Remove("StartupListener");
+                }
+
+                //viewengine locations
+                var mvcroot = cfg.DumpToLocal.Folder;
+
+                var razorViewEngine = ViewEngines.Engines.OfType<RazorViewEngine>().FirstOrDefault();
+                if (razorViewEngine != null)
+                {
+                    Trace.TraceInformation("Configuring RazorViewEngine Location Formats");
+                    var vlf = new string[]
+                    {
+                        mvcroot + "/Views/{1}/{0}.cshtml",
+                        mvcroot + "/Views/Shared/{0}.cshtml",
+                    };
+                    razorViewEngine.ViewLocationFormats.Extend(vlf);
+
+                    var mlf = new string[]
+                    {
+                        mvcroot + "/Views/{1}/{0}.cshtml",
+                        mvcroot + "/Views/Shared/{0}.cshtml",
+                    };
+                    razorViewEngine.MasterLocationFormats.Extend(mlf);
+
+                    var plf = new string[]
+                    {
+                        mvcroot + "/Views/{1}/{0}.cshtml",
+                        mvcroot + "/Views/Shared/{0}.cshtml",
+                    };
+                    razorViewEngine.PartialViewLocationFormats.Extend(plf);
+
+                    var avlf = new string[]
+                    {
+                        mvcroot + "/Areas/{2}/Views/{1}/{0}.cshtml",
+                        mvcroot + "/Areas/{2}/Views/Shared/{0}.cshtml",
+                    };
+                    razorViewEngine.AreaViewLocationFormats.Extend(avlf);
+
+                    var amlf = new string[]
+                    {
+                        mvcroot + "/Areas/{2}/Views/{1}/{0}.cshtml",
+                        mvcroot + "/Areas/{2}/Views/Shared/{0}.cshtml",
+                    };
+                    razorViewEngine.AreaMasterLocationFormats.Extend(amlf);
+
+                    var apvlf = new string[]
+                    {
+                        mvcroot + "/Areas/{2}/Views/{1}/{0}.cshtml",
+                        mvcroot + "/Areas/{2}/Views/Shared/{0}.cshtml",
+                    };
+                    razorViewEngine.AreaPartialViewLocationFormats.Extend(apvlf);
+                }
+                else
+                {
+                    Trace.TraceInformation("Cannot Configure RazorViewEngine: View Engine not found");
                 }
             }
         }
