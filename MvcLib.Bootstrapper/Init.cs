@@ -37,11 +37,16 @@ namespace MvcLib.Bootstrapper
                 var executingAssembly = Assembly.GetExecutingAssembly();
                 Trace.TraceInformation("Entry Assembly: {0}", executingAssembly.GetName().Name);
 
-                if (Debugger.IsAttached)
+                var cfg = BootstrapperSection.Initialize();
+
+                if (Debugger.IsAttached || cfg.TraceOutput.IsNotNullOrWhiteSpace())
                 {
                     try
                     {
-                        var traceOutput = HostingEnvironment.MapPath("~/traceOutput.log");
+                        var path = cfg.TraceOutput;
+                        if (!path.StartsWith("~"))
+                            path = "~" + path;
+                        var traceOutput = HostingEnvironment.MapPath(path);
                         if (File.Exists(traceOutput))
                             File.Delete(traceOutput);
 
@@ -52,9 +57,6 @@ namespace MvcLib.Bootstrapper
                     }
                     catch { }
                 }
-
-                var cfg = BootstrapperSection.Initialize();
-
 
                 if (cfg.HttpModules.Trace.Enabled)
                 {
@@ -122,29 +124,30 @@ namespace MvcLib.Bootstrapper
                     }
                 }
 
-                //config routing
-                //var routes = RouteTable.Routes;
+                if (cfg.InsertRoutes)
+                {
+                    var routes = RouteTable.Routes;
 
-                //if (EntropiaSection.Instance.InsertRoutesDefaults)
-                //{
-                //    routes.RouteExistingFiles = false;
-                //    routes.LowercaseUrls = true;
-                //    routes.AppendTrailingSlash = true;
+                    routes.RouteExistingFiles = false;
+                    routes.LowercaseUrls = true;
+                    routes.AppendTrailingSlash = true;
 
-                //    routes.IgnoreRoute("{resource}.axd/{*pathInfo}");
-                //    routes.IgnoreRoute("{*favicon}", new { favicon = @"(.*/)?favicon.ico(/.*)?" });
-                //    routes.IgnoreRoute("{*staticfile}", new { staticfile = @".*\.(css|js|txt|png|gif|jpg|jpeg|bmp)(/.*)?" });
+                    routes.IgnoreRoute("{resource}.axd/{*pathInfo}");
+                    routes.IgnoreRoute("{*favicon}", new { favicon = @"(.*/)?favicon.ico(/.*)?" });
+                    routes.IgnoreRoute("{*staticfile}", new { staticfile = @".*\.(css|js|txt|png|gif|jpg|jpeg|bmp)(/.*)?" });
 
-                //    routes.IgnoreRoute("Content/{*pathInfo}");
-                //    routes.IgnoreRoute("Scripts/{*pathInfo}");
-                //    routes.IgnoreRoute("Bundles/{*pathInfo}");
-                //}
+                    routes.IgnoreRoute("Content/{*pathInfo}");
+                    routes.IgnoreRoute("Scripts/{*pathInfo}");
+                    routes.IgnoreRoute("Bundles/{*pathInfo}");
 
-                //if (EntropiaSection.Instance.EnableDumpLog)
-                //{
-                //    var endpoint = EntropiaSection.Instance.DumpLogEndPoint;
-                //    routes.MapHttpHandler<DumpHandler>(endpoint);
-                //}
+                    //routes.MapRoute("MvcLib", "{controller}/{action}", new string[] { "" });
+
+
+                    if (cfg.TraceOutput.IsNotNullOrWhiteSpace())
+                    {
+                        //routes.MapHttpHandler<WebPagesRouteHandler>("~/dump.cshtml");
+                    }
+                }
             }
         }
 
