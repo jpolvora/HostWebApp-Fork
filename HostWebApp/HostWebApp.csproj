@@ -696,7 +696,7 @@
     <Content Include="Scripts\bootstrap.min.js" />
     <Content Include="404.cshtml" />
     <Content Include="Admin\teste500.cshtml" />
-    <Content Include="App_Data\Mvc\Web.config" />
+    <Content Include="App_Data\Views\Web.config" />
     <Content Include="App_Data\Web.config" />
     <None Include="Scripts\jquery-1.11.1.intellisense.js" />
     <Content Include="Scripts\jquery-1.11.1.js" />
