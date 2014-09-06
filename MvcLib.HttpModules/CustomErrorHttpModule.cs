@@ -25,8 +25,6 @@ namespace MvcLib.HttpModules
 
         static void OnBeginRequest(object sender, EventArgs eventArgs)
         {
-            var application = (HttpApplication)sender;
-            application.Response.TrySkipIisCustomErrors = true;
         }
 
         void OnError(object sender, EventArgs args)
@@ -46,12 +44,8 @@ namespace MvcLib.HttpModules
 
             Trace.TraceInformation("[CustomError]: Ocorreu uma exceção: {0}", exception.Message);
 
-            var statusCode = response.StatusCode;
-            var httpException = exception as HttpException;
-            if (httpException != null)
-            {
-                statusCode = httpException.GetHttpCode();
-            }
+            var httpException = exception as HttpException ?? new HttpException(null, exception);
+            var statusCode = httpException.GetHttpCode();
 
             server.ClearError();
             response.Clear();
@@ -93,6 +87,7 @@ namespace MvcLib.HttpModules
                 LogEvent.Raise(exception.Message, exception);
             }
 
+            application.Response.TrySkipIisCustomErrors = true;
             application.CompleteRequest(); //não imprime o resultado
             //response.End();
         }
