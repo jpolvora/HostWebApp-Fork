@@ -697,7 +697,7 @@
     <Content Include="Content\bootstrap.css.map" />
     <Content Include="Scripts\bootstrap.js" />
     <Content Include="Scripts\bootstrap.min.js" />
-    <Content Include="dummy.cshtml" />
+    <Content Include="teste.cshtml" />
     <Content Include="Admin\teste500.cshtml" />
     <Content Include="App_Data\Views\Web.config" />
     <Content Include="App_Data\Web.config" />
@@ -732,7 +732,6 @@
       <SubType>Designer</SubType>
     </Content>
     <Content Include="Content\ext-theme-classic\Readme.md" />
-    <Content Include="default.cshtml" />
     <None Include="Scripts\jquery.validate-vsdoc.js" />
     <Content Include="Scripts\jquery.unobtrusive-ajax.js" />
     <Content Include="Scripts\jquery.unobtrusive-ajax.min.js" />
