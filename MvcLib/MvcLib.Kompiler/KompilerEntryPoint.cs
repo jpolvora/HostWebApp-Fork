@@ -4,7 +4,6 @@ using System.Data.Entity;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
-using MvcLib.Common;
 using MvcLib.Common.Configuration;
 using MvcLib.PluginLoader;
 using Roslyn.Compilers;
@@ -78,7 +77,7 @@ namespace MvcLib.Kompiler
                 if (!BootstrapperSection.Instance.Kompiler.ForceRecompilation)
                 {
                     //só salva no banco se compilação forçada for False
-                    KompilerDbService.SaveCompiledCustomAssembly(CompiledAssemblyName, buffer);
+                    KompilerDbService.SaveCompiledCustomAssembly(buffer);
                 }
 
                 PluginLoaderEntryPoint.SaveAndLoadAssembly(CompiledAssemblyName + ".dll", buffer);
