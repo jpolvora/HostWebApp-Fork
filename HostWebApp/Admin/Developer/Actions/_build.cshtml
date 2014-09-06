@@ -3,6 +3,7 @@
 @{
     var src = KompilerDbService.LoadSourceCodeFromDb();
     var wrapper = new CodeDomWrapper();
+    
     byte[] buffer;
     var result = wrapper.CompileFromSource(src, out buffer);
 
