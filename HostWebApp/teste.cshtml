@@ -3,3 +3,7 @@
     @IsRazorWebPage.ToString()
     @ServerInfo.GetHtml()
 }
+else
+{
+    Response.StatusCode = 403;
+}
