@@ -114,12 +114,16 @@ namespace MvcLib.Bootstrapper
                     HostingEnvironment.RegisterVirtualPathProvider(customvpp);
                 }
 
-                //todo: implementar dependência entre módulos
+                KompilerEntryPoint.AddReferences(
+                    typeof(Controller),
+                    typeof(WebPageRenderingBase),
+                    typeof(WebCacheWrapper),
+                    typeof(ViewRenderer),
+                    typeof(DbToLocal),
+                    typeof(CustomErrorHttpModule.ErrorModel));
 
                 if (cfg.Kompiler.Enabled)
                 {
-                    KompilerEntryPoint.AddReferences(typeof(Controller), typeof(WebPageRenderingBase), typeof(WebCacheWrapper), typeof(ViewRenderer), typeof(DbToLocal), typeof(CustomErrorHttpModule.ErrorModel));
-
                     using (DisposableTimer.StartNew("Kompiler"))
                     {
                         KompilerEntryPoint.Execute();
