@@ -247,6 +247,9 @@ namespace MvcLib.Bootstrapper
                     {
                         Trace.WriteLine(locationFormat);
                     }
+
+                    ViewEngines.Engines.Clear();
+                    ViewEngines.Engines.Add(razorViewEngine);
                 }
                 else
                 {
