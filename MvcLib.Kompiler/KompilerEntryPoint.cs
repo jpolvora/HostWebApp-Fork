@@ -4,7 +4,6 @@ using System.Data.Entity;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
-using MvcLib.Common;
 using MvcLib.Common.Configuration;
 using MvcLib.PluginLoader;
 using Roslyn.Compilers;

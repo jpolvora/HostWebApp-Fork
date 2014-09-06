@@ -9,6 +9,23 @@ namespace MvcLib.Kompiler
 {
     public class KompilerDbService
     {
+        public static string CompileAndSave(IKompiler compiler)
+        {
+            if (compiler == null)
+                throw new ArgumentNullException("compiler");
+
+            var src = LoadSourceCodeFromDb();
+            byte[] buffer;
+            var result = compiler.CompileFromSource(src, out buffer);
+
+            if (string.IsNullOrEmpty(result))
+            {
+                SaveCompiledCustomAssembly(buffer);
+            }
+
+            return result;
+        }
+
         public static Dictionary<string, string> LoadSourceCodeFromDb()
         {
             var dict = new Dictionary<string, string>();
