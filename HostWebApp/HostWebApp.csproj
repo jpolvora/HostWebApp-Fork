@@ -764,7 +764,8 @@
     <Content Include="Admin\Developer\_Layout.cshtml" />
     <Content Include="Admin\Developer\_PageStart.cshtml" />
     <Content Include="Scripts\jquery-1.11.1.min.map" />
-    <Content Include="customerror.cshtml" />
+    <Content Include="Views\Shared\customerror.cshtml" />
+    <Content Include="Views\Web.config" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Global.asax" />
