@@ -8,7 +8,7 @@ namespace HostWebApp
         public static void RegisterGlobalFilters(GlobalFilterCollection filters)
         {
             //if (!HttpContext.Current.IsDebuggingEnabled)
-                filters.Add(new HandleErrorAttribute());
+                //filters.Add(new HandleErrorAttribute());
         }
     }
 }
