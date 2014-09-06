@@ -17,7 +17,7 @@ namespace MvcLib.PluginLoader
 
     public class PluginLoaderEntryPoint
     {
-        public static readonly DirectoryInfo PluginFolder;
+        private static readonly DirectoryInfo PluginFolder;
 
         private static bool _initialized;
 
@@ -37,13 +37,16 @@ namespace MvcLib.PluginLoader
 
                 if (probingElement != null)
                 {
-                    privatePath = probingElement.Attribute("privatePath").Value;
+                    var paths = probingElement.Attribute("privatePath").Value; //pode conter vários paths, separados por ';'
+                    Trace.TraceInformation("Private Path is '{0}'", paths);
+                    privatePath = paths.Split(';')[0];
                 }
             }
             catch (Exception ex)
             {
                 Trace.TraceInformation("Error reading probing privatePath in web.config. {0}", ex.Message);
             }
+            
 
             PluginFolder = new DirectoryInfo(HostingEnvironment.MapPath(privatePath));
 
@@ -60,6 +63,7 @@ namespace MvcLib.PluginLoader
 
             _initialized = true;
 
+            AppDomain.CurrentDomain.AssemblyLoad += OnAssemblyLoad;
             if (AppDomain.CurrentDomain.IsFullyTrusted)
             {
                 AppDomain.CurrentDomain.AssemblyResolve += OnAssemblyResolve;
@@ -68,8 +72,7 @@ namespace MvcLib.PluginLoader
             {
                 Trace.TraceWarning("We are not in FULL TRUST! We must use private probing path in Web.Config");
             }
-
-            AppDomain.CurrentDomain.AssemblyLoad += OnAssemblyLoad;
+            
 
             var existingAssemblies = PluginFolder.GetFiles("*.dll", SearchOption.AllDirectories);
             var filenames = existingAssemblies.Select(fileInfo => fileInfo.FullName).ToList();
@@ -173,7 +176,8 @@ namespace MvcLib.PluginLoader
             var ass = PluginStorage.FindAssembly(args.Name);
             if (ass != null)
                 Trace.TraceInformation("Assembly found and resolved: {0} = {1}", ass.FullName, ass.Location);
-
+            else
+                Trace.TraceInformation("Assembly not found: {0}", args.Name);
             return ass; //not found
         }
 
@@ -197,13 +201,7 @@ namespace MvcLib.PluginLoader
             {
                 Trace.TraceInformation("No types exported by Assembly: '{0}'", args.LoadedAssembly.GetName().Name);
             }
-
-            if (args.LoadedAssembly.IsDynamic)
-            {
-                Trace.TraceInformation("DYNAMIC Assembly Loaded... {0}", args.LoadedAssembly.Location);
-                return;
-            }
-
+         
             var path = Path.GetDirectoryName(args.LoadedAssembly.Location);
 
             if (string.IsNullOrWhiteSpace(path) ||
