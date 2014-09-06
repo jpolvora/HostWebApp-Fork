@@ -173,24 +173,30 @@ namespace MvcLib.Bootstrapper
                     GlobalFilters.Filters.Add(new MvcTracerFilter());
                 }
 
-                var application = HttpContext.Current.ApplicationInstance;
-
-                var modules = application.Modules;
-                foreach (var module in modules)
+                if (cfg.Verbose)
                 {
-                    Trace.TraceInformation("Module Loaded: {0}", module);
+                    var application = HttpContext.Current.ApplicationInstance;
+
+                    var modules = application.Modules;
+                    foreach (var module in modules)
+                    {
+                        Trace.TraceInformation("Module Loaded: {0}", module);
+                    }
                 }
 
                 //dump routes
                 var routes = RouteTable.Routes;
 
-                var i = routes.Count;
-                Trace.TraceInformation("Found {0} routes in RouteTable", i);
-
-                foreach (var routeBase in routes)
+                if (cfg.Verbose)
                 {
-                    var route = (Route)routeBase;
-                    Trace.TraceInformation("Handler: {0} at URL: {1}", route.RouteHandler, route.Url);
+                    var i = routes.Count;
+                    Trace.TraceInformation("Found {0} routes in RouteTable", i);
+
+                    foreach (var routeBase in routes)
+                    {
+                        var route = (Route) routeBase;
+                        Trace.TraceInformation("Handler: {0} at URL: {1}", route.RouteHandler, route.Url);
+                    }
                 }
 
                 if (!Debugger.IsAttached)
@@ -247,9 +253,12 @@ namespace MvcLib.Bootstrapper
                     };
                     razorViewEngine.AreaPartialViewLocationFormats = razorViewEngine.AreaPartialViewLocationFormats.Extend(false, apvlf);
 
-                    foreach (var locationFormat in razorViewEngine.ViewLocationFormats)
+                    if (cfg.Verbose)
                     {
-                        Trace.WriteLine(locationFormat);
+                        foreach (var locationFormat in razorViewEngine.ViewLocationFormats)
+                        {
+                            Trace.WriteLine(locationFormat);
+                        }
                     }
 
                     ViewEngines.Engines.Clear();
