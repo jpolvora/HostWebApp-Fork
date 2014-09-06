@@ -22,9 +22,10 @@ namespace MvcLib.Common
             var result = insertAfter
                 ? srcArray.Concat(addItems).ToArray()
                 : addItems.Concat(srcArray).ToArray();
-            return result;
 
-            //return srcArray.Concat(addItems).ToArray(); // although Concat is not recommended for performance reasons, see the accepted answer
+            srcArray = result;
+
+            return srcArray;
         }
     }
 
