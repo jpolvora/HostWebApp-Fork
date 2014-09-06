@@ -4,6 +4,7 @@ using System.Data.Entity;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
+using System.Web.Compilation;
 using MvcLib.Common.Configuration;
 using MvcLib.PluginLoader;
 using Roslyn.Compilers;
@@ -32,6 +33,8 @@ namespace MvcLib.Kompiler
                 KompilerDbService.RemoveExistingCompiledAssemblyFromDb();
             }
 
+            AddReferences(PluginStorage.GetAssemblies().ToArray());
+
             byte[] buffer = new byte[0];
             string msg;
 
@@ -48,8 +51,6 @@ namespace MvcLib.Kompiler
                 {
                     kompiler = new CodeDomWrapper();
                 }
-
-                AddReferences(PluginStorage.GetAssemblies().ToArray());
 
                 if (BootstrapperSection.Instance.Kompiler.LoadFromDb)
                 {
