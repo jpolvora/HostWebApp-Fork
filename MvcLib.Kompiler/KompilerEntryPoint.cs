@@ -78,7 +78,7 @@ namespace MvcLib.Kompiler
                 if (!BootstrapperSection.Instance.Kompiler.ForceRecompilation)
                 {
                     //só salva no banco se compilação forçada for False
-                    KompilerDbService.SaveCompiledCustomAssembly(CompiledAssemblyName, buffer);
+                    KompilerDbService.SaveCompiledCustomAssembly(buffer);
                 }
 
                 PluginLoaderEntryPoint.SaveAndLoadAssembly(CompiledAssemblyName + ".dll", buffer);
