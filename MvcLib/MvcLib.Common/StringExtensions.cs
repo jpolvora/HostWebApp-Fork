@@ -1,9 +1,34 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
 namespace MvcLib.Common
 {
+
+    public static class ArrayExtensions
+    {
+        public static T[] Extend<T>(this T[] srcArray, bool insertAfter = true, params T[] addItems) where T : class
+        {
+            if (addItems == null)
+            {
+                throw new ArgumentNullException("addItems");
+            }
+            if (srcArray == null)
+            {
+                return addItems;
+            }
+
+            var result = insertAfter
+                ? srcArray.Concat(addItems).ToArray()
+                : addItems.Concat(srcArray).ToArray();
+            return result;
+
+            //return srcArray.Concat(addItems).ToArray(); // although Concat is not recommended for performance reasons, see the accepted answer
+        }
+    }
+
+
     public static class StringExtensions
     {
         public static string Fmt(this string str, params object[] args)
