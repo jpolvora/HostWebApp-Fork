@@ -81,7 +81,7 @@ namespace MvcLib.Kompiler
                     KompilerDbService.SaveCompiledCustomAssembly(CompiledAssemblyName, buffer);
                 }
 
-                PluginLoaderEntryPoint.LoadPlugin(CompiledAssemblyName + ".dll", buffer);
+                PluginLoaderEntryPoint.SaveAndLoadAssembly(CompiledAssemblyName + ".dll", buffer);
             }
             else
             {
