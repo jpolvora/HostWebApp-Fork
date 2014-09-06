@@ -88,7 +88,7 @@ namespace MvcLib.HttpModules
             }
 
             application.Response.TrySkipIisCustomErrors = true;
-            application.CompleteRequest(); //não imprime o resultado
+            //application.CompleteRequest(); //não imprime o resultado
             //response.End();
         }
 
