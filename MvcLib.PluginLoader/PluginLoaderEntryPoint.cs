@@ -46,7 +46,7 @@ namespace MvcLib.PluginLoader
             {
                 Trace.TraceInformation("Error reading probing privatePath in web.config. {0}", ex.Message);
             }
-            
+
 
             PluginFolder = new DirectoryInfo(HostingEnvironment.MapPath(privatePath));
 
@@ -72,7 +72,7 @@ namespace MvcLib.PluginLoader
             {
                 Trace.TraceWarning("We are not in FULL TRUST! We must use private probing path in Web.Config");
             }
-            
+
 
             var existingAssemblies = PluginFolder.GetFiles("*.dll", SearchOption.AllDirectories);
             var filenames = existingAssemblies.Select(fileInfo => fileInfo.FullName).ToList();
@@ -175,10 +175,11 @@ namespace MvcLib.PluginLoader
 
             var ass = PluginStorage.FindAssembly(args.Name);
             if (ass != null)
+            {
                 Trace.TraceInformation("Assembly found and resolved: {0} = {1}", ass.FullName, ass.Location);
-            else
-                Trace.TraceInformation("Assembly not found: {0}", args.Name);
-            return ass; //not found
+                return ass; 
+            }
+            return null; //not found
         }
 
         private static void OnAssemblyLoad(object sender, AssemblyLoadEventArgs args)
@@ -186,22 +187,6 @@ namespace MvcLib.PluginLoader
             if (args.LoadedAssembly.GlobalAssemblyCache)
                 return;
 
-            Trace.TraceInformation("Assembly Loaded... {0}", args.LoadedAssembly.Location);
-
-            var types = args.LoadedAssembly.GetExportedTypes();
-
-            if (types.Any())
-            {
-                foreach (var type in types)
-                {
-                    Trace.TraceInformation("Type exported: {0}", type.FullName);
-                }
-            }
-            else
-            {
-                Trace.TraceInformation("No types exported by Assembly: '{0}'", args.LoadedAssembly.GetName().Name);
-            }
-         
             var path = Path.GetDirectoryName(args.LoadedAssembly.Location);
 
             if (string.IsNullOrWhiteSpace(path) ||
@@ -210,6 +195,21 @@ namespace MvcLib.PluginLoader
             try
             {
                 PluginStorage.Register(args.LoadedAssembly);
+                Trace.TraceInformation("Assembly Loaded... {0}", args.LoadedAssembly.Location);
+
+                var types = args.LoadedAssembly.GetExportedTypes();
+
+                if (types.Any())
+                {
+                    foreach (var type in types)
+                    {
+                        Trace.TraceInformation("Type exported: {0}", type.FullName);
+                    }
+                }
+                else
+                {
+                    Trace.TraceInformation("No types exported by Assembly: '{0}'", args.LoadedAssembly.GetName().Name);
+                }
             }
             catch (Exception ex)
             {
