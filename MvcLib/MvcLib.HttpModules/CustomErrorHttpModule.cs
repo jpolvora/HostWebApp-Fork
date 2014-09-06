@@ -61,8 +61,7 @@ namespace MvcLib.HttpModules
             //Prevents customError behavior when the request is determined to be an AJAX request.
             if (request.IsAjaxRequest())
             {
-                //response.Write(string.Format("<html><body><h1>{0} {1}</h1></body></html>", statusCode, exception.Message));
-                new HttpContextWrapper(HttpContext.Current).Response.WriteAjaxException(exception);
+                response.Write(string.Format("<html><body><h1>{0} {1}</h1></body></html>", statusCode, exception.Message));
             }
             else
             {
