@@ -697,7 +697,7 @@
     <Content Include="Content\bootstrap.css.map" />
     <Content Include="Scripts\bootstrap.js" />
     <Content Include="Scripts\bootstrap.min.js" />
-    <Content Include="404.cshtml" />
+    <Content Include="dummy.cshtml" />
     <Content Include="Admin\teste500.cshtml" />
     <Content Include="App_Data\Views\Web.config" />
     <Content Include="App_Data\Web.config" />
