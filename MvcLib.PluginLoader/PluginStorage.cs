@@ -10,13 +10,14 @@ namespace MvcLib.PluginLoader
 {
     public static class PluginStorage
     {
-        private static readonly Dictionary<string, Assembly> Assemblies = new Dictionary<string, Assembly>();
+        private static readonly Dictionary<string, Assembly> StoredAssemblies = new Dictionary<string, Assembly>();
 
         internal static void Register(string fileName)
         {
             try
             {
                 var loadingAssembly = Assembly.LoadFile(fileName);
+                
                 Register(loadingAssembly);
             }
             catch (Exception ex)
@@ -29,12 +30,12 @@ namespace MvcLib.PluginLoader
 
         internal static void Register(Assembly assembly)
         {
-            if (Assemblies.ContainsKey(assembly.FullName))
+            if (StoredAssemblies.ContainsKey(assembly.FullName))
             {
                 return;
             }
 
-            Assemblies.Add(assembly.FullName, assembly);
+            StoredAssemblies.Add(assembly.FullName, assembly);
             BuildManager.AddReferencedAssembly(assembly);
 
             Trace.TraceInformation("[PluginLoader]:Plugin registered: {0}", assembly.FullName);
@@ -42,19 +43,19 @@ namespace MvcLib.PluginLoader
 
         internal static Assembly FindAssembly(string fullName)
         {
-            return Assemblies.ContainsKey(fullName)
-                ? Assemblies[fullName]
+            return StoredAssemblies.ContainsKey(fullName)
+                ? StoredAssemblies[fullName]
                 : null;
         }
 
         public static IEnumerable<string> GetPluginNames()
         {
-            return Assemblies.Values.Select(item => item.GetName().Name);
+            return StoredAssemblies.Values.Select(item => item.GetName().Name);
         }
 
         public static IEnumerable<Assembly> GetAssemblies()
         {
-            return Assemblies.Select(pair => pair.Value);
+            return StoredAssemblies.Select(pair => pair.Value);
         }
     }
 }
