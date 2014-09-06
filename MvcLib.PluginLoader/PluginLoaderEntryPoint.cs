@@ -149,6 +149,9 @@ namespace MvcLib.PluginLoader
                     File.WriteAllBytes(fullFileName, assembly.Value);
 
                     result.Add(fullFileName);
+
+                    Trace.TraceInformation("[PluginLoader]: Assembly written to disk: {0}", fullFileName);
+
                 }
             }
             catch (Exception ex)

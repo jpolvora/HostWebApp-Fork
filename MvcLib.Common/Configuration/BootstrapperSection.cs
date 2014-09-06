@@ -51,6 +51,13 @@ namespace MvcLib.Common.Configuration
             set { this["insertroutes"] = value; }
         }
 
+        [ConfigurationProperty("verbose", DefaultValue = false)]
+        public bool Verbose
+        {
+            get { return (Boolean)this["verbose"]; }
+            set { this["verbose"] = value; }
+        }
+
         [ConfigurationProperty("traceoutput")]
         public string TraceOutput
         {
