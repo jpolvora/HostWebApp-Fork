@@ -1,0 +1,19 @@
+﻿@using MvcLib.Kompiler
+@using ResponseExtensions = MvcLib.Common.Mvc.ResponseExtensions
+@{
+    var src = KompilerDbService.LoadSourceCodeFromDb();
+    var wrapper = new CodeDomWrapper();
+    byte[] buffer;
+    var result = wrapper.CompileFromSource(src, out buffer);
+
+    if (string.IsNullOrEmpty(result))
+    {
+        KompilerDbService.SaveCompiledCustomAssembly(buffer);
+
+        ResponseExtensions.WriteAjax(Response, new { success = true, msg = "Assembly compilado com sucesso: " });
+    }
+    else
+    {
+        ResponseExtensions.WriteAjax(Response, new { success = false, msg = result });
+    }
+}
