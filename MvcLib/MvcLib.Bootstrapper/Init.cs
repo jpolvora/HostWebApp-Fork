@@ -242,6 +242,11 @@ namespace MvcLib.Bootstrapper
                         mvcroot + "/Areas/{2}/Views/Shared/{0}.cshtml",
                     };
                     razorViewEngine.AreaPartialViewLocationFormats.Extend(false, apvlf);
+
+                    foreach (var locationFormat in razorViewEngine.ViewLocationFormats)
+                    {
+                        Trace.WriteLine(locationFormat);
+                    }
                 }
                 else
                 {
