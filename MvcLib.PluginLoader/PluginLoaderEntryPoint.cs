@@ -6,6 +6,7 @@ using System.Linq;
 using System.Reflection;
 using System.Web.Hosting;
 using System.Xml.Linq;
+using MvcLib.Common;
 using MvcLib.Common.Configuration;
 using MvcLib.DbFileSystem;
 
@@ -177,7 +178,7 @@ namespace MvcLib.PluginLoader
             if (ass != null)
             {
                 Trace.TraceInformation("Assembly found and resolved: {0} = {1}", ass.FullName, ass.Location);
-                return ass; 
+                return ass;
             }
             return null; //not found
         }
@@ -187,33 +188,36 @@ namespace MvcLib.PluginLoader
             if (args.LoadedAssembly.GlobalAssemblyCache)
                 return;
 
+            Trace.TraceInformation("Assembly Loaded... {0}", args.LoadedAssembly.Location);
+
             var path = Path.GetDirectoryName(args.LoadedAssembly.Location);
 
-            if (string.IsNullOrWhiteSpace(path) ||
-                !path.StartsWith(PluginFolder.FullName, StringComparison.InvariantCultureIgnoreCase)) return;
-
-            try
+            Debug.Assert(path != null, "path != null");
+            if (path.IsNotNullOrWhiteSpace() && path.StartsWith(PluginFolder.FullName, StringComparison.InvariantCultureIgnoreCase))
             {
-                PluginStorage.Register(args.LoadedAssembly);
-                Trace.TraceInformation("Assembly Loaded... {0}", args.LoadedAssembly.Location);
-
-                var types = args.LoadedAssembly.GetExportedTypes();
-
-                if (types.Any())
+                try
                 {
-                    foreach (var type in types)
+                    PluginStorage.Register(args.LoadedAssembly);
+
+                    var types = args.LoadedAssembly.GetExportedTypes();
+
+                    if (types.Any())
                     {
-                        Trace.TraceInformation("Type exported: {0}", type.FullName);
+                        foreach (var type in types)
+                        {
+                            Trace.TraceInformation("Type exported: {0}", type.FullName);
+                        }
+                    }
+                    else
+                    {
+                        Trace.TraceInformation("No types exported by Assembly: '{0}'",
+                            args.LoadedAssembly.GetName().Name);
                     }
                 }
-                else
+                catch (Exception ex)
                 {
-                    Trace.TraceInformation("No types exported by Assembly: '{0}'", args.LoadedAssembly.GetName().Name);
+                    Trace.TraceInformation(ex.Message);
                 }
-            }
-            catch (Exception ex)
-            {
-                Trace.TraceInformation(ex.Message);
             }
         }
 
