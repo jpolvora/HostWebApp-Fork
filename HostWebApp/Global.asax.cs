@@ -37,9 +37,6 @@ namespace HostWebApp
         {
             string path = Request.Url.AbsolutePath;
 
-            if (path == "/")
-                path = "/index.cshtml";
-
             if (path.StartsWith(_rewriteBasePath.Substring(1)))
                 return;
 

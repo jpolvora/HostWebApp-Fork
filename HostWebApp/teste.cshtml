@@ -1,4 +1,5 @@
-﻿@{
-    Layout = null;
+﻿@if (Request.IsLocal)
+{
+    @IsRazorWebPage.ToString()
+    @ServerInfo.GetHtml()
 }
-<p>@ServerInfo.GetHtml()</p>

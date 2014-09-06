@@ -700,7 +700,6 @@
     <Content Include="teste.cshtml" />
     <Content Include="Admin\teste500.cshtml" />
     <Content Include="App_Data\Views\Web.config" />
-    <Content Include="App_Data\Web.config" />
     <None Include="Scripts\jquery-1.11.1.intellisense.js" />
     <Content Include="Scripts\jquery-1.11.1.js" />
     <Content Include="Scripts\jquery-1.11.1.min.js" />
@@ -765,19 +764,7 @@
     <Content Include="Admin\Developer\_Layout.cshtml" />
     <Content Include="Admin\Developer\_PageStart.cshtml" />
     <Content Include="Scripts\jquery-1.11.1.min.map" />
-    <Content Include="Views\Web.config" />
-    <Content Include="Views\Home\About.cshtml" />
-    <Content Include="Views\Home\Contact.cshtml" />
-    <Content Include="Views\Home\Index.cshtml" />
-    <Content Include="Views\Shared\customerror.cshtml" />
-    <Content Include="Views\Shared\Error.cshtml" />
-    <Content Include="Views\Shared\Lockout.cshtml" />
-    <Content Include="Views\Shared\_Layout.cshtml" />
-    <Content Include="Views\Shared\_LoginPartial.cshtml" />
-    <Content Include="Views\_ViewStart.cshtml" />
-    <Content Include="Views\Robots\Robots.cshtml" />
-    <Content Include="_PageStart.cshtml" />
-    <Content Include="Views\Home\Reset.cshtml" />
+    <Content Include="customerror.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Global.asax" />
@@ -831,7 +818,7 @@
     <Compile Include="App_Start\FilterConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
     <None Include="Controllers\TesteController.cs" />
-    <Compile Include="Controllers\HomeController.cs" />
+    <None Include="Controllers\HomeController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
