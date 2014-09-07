@@ -1,8 +1,8 @@
 using System;
+using System.Configuration;
 using System.Diagnostics;
 using System.Web;
-using System.Web.Mvc;
-using System.Web.Routing;
+using System.Web.WebPages;
 using MvcLib.Common;
 using MvcLib.Common.Configuration;
 using MvcLib.Common.Mvc;
@@ -12,7 +12,6 @@ namespace MvcLib.HttpModules
     public class CustomErrorHttpModule : IHttpModule
     {
         private string _errorViewPath;
-        private string _errorController;
 
         public void Init(HttpApplication context)
         {
@@ -20,7 +19,6 @@ namespace MvcLib.HttpModules
             context.Error += OnError;
 
             _errorViewPath = BootstrapperSection.Instance.HttpModules.CustomError.ErrorViewPath;
-            _errorController = BootstrapperSection.Instance.HttpModules.CustomError.ControllerName;
         }
 
         static void OnBeginRequest(object sender, EventArgs eventArgs)
@@ -29,129 +27,106 @@ namespace MvcLib.HttpModules
 
         void OnError(object sender, EventArgs args)
         {
+            //<httpErrors errorMode="Custom" existingResponse="Auto" defaultResponseMode="ExecuteURL">
+            //  <remove statusCode="404"/>
+            //  <error statusCode="404" path="/404.cshtml" responseMode="ExecuteURL"/>
+            //  <remove statusCode="500"/>
+            //  <error statusCode="500" path="/500.cshtml" responseMode="ExecuteURL"/>
+            //</httpErrors>
+
             var application = (HttpApplication)sender;
 
+            var context = application.Context;
             var server = application.Server;
             var response = application.Response;
-            var request = application.Request;
-            var exception = server.GetLastError();
+            
+            Exception ex = server.GetLastError();
 
-            if (exception == null)
+            HttpException httpException = ex as HttpException ?? new HttpException("Unknown exception...", ex);
+
+            var rootException = httpException.GetBaseException();
+
+            Trace.TraceError("[CustomError]:Ocorreu um Erro: {0}", rootException.ToString());
+
+            //checa se o ambiente é de produção
+            bool release = ConfigurationManager.AppSettings["Environment"]
+                .Equals("Release", StringComparison.OrdinalIgnoreCase);
+
+            if (release)
             {
-                Trace.TraceWarning("Erro desconhecido. Url: {0}", request.Url);
-                return;
+                //log or send email to developer notifiying the exception ?
+                LogError(httpException);
+                server.ClearError();
             }
 
-            Trace.TraceInformation("[CustomError]: Ocorreu uma exceção: {0}", exception.Message);
-
-            var httpException = exception as HttpException ?? new HttpException(null, exception);
             var statusCode = httpException.GetHttpCode();
 
-            server.ClearError();
-            response.Clear();
+            //setar o statuscode para que o IIS selecione a view correta (no web.config)
             response.StatusCode = statusCode;
-            response.StatusDescription = exception.Message;
+            response.StatusDescription = rootException.Message; //todo: colocar uma msg melhor
 
-            //Prevents customError behavior when the request is determined to be an AJAX request.
-            if (request.IsAjaxRequest())
+            switch (statusCode)
             {
-                //response.Write(string.Format("<html><body><h1>{0} {1}</h1></body></html>", statusCode, exception.Message));
-                new HttpContextWrapper(HttpContext.Current).Response.WriteAjaxException(exception);
-            }
-            else
-            {
-                var model = new ErrorModel()
-                {
-                    Message = exception.Message,
-                    FullMessage = exception.LoopException(),
-                    StackTrace = exception.StackTrace,
-                    Url = application.Request.RawUrl,
-                    StatusCode = statusCode
-                };
+                case 404:
+                    break;
+                case 500:
+                    {
+                        //check for exception types you want to show custom info
+                        //for example, business rules exceptions
+                        if (!(rootException is CustomException))
+                        {
+                            //will show default 500.
+                            //to show default 500 in dev mode, call Server.ClearError() 
+                            //or modify web.config to debug=false
+                            break;
+                        }
+                        server.ClearError();
+                        response.TrySkipIisCustomErrors = true;
+                        response.Clear();
 
-                bool useController = !string.IsNullOrWhiteSpace(_errorController);
-                if (useController)
-                {
-                    RenderController(application.Context, _errorController, model);
-                }
-                else
-                {
-                    RenderView(_errorViewPath, model, response);
-                }
-            }
+                        try
+                        {
+                            //atualiza os paths para o request (exceto RawUrl)
+                            context.RewritePath(_errorViewPath);
 
-            Trace.TraceInformation("[CustomError]: Completing response.");
+                            var model = new ErrorModel()
+                            {
+                                Message = rootException.Message,
+                                FullMessage = rootException.ToString(),
+                                StackTrace = rootException.StackTrace,
+                                Url = application.Request.RawUrl,
+                                StatusCode = statusCode,
+                                StatusDescription = rootException.Message
+                            };
 
-            if (statusCode == 500)
-            {
-                LogEvent.Raise(exception.Message, exception);
-            }
-
-            application.Response.TrySkipIisCustomErrors = true;
-            //application.CompleteRequest(); //não imprime o resultado
-            //response.End();
-        }
-
-        private static void RenderView(string errorViewPath, ErrorModel model, HttpResponse response)
-        {
-            try
-            {
-                var html = ViewRenderer.RenderView(errorViewPath, model);
-                response.Write(html);
-
-            }
-            catch (Exception ex)
-            {
-                var msg = string.Format("Error rendering view '{0}': {1}", errorViewPath, ex.Message);
-                response.Write(msg);
-                response.Write("<BR />");
-                response.Write(model.Message);
-                response.StatusCode = 500;
-                Trace.TraceInformation(msg);
+                            RenderView(_errorViewPath, model, context);
+                        }
+                        catch
+                        {
+                            //erro ao renderizar a página customizada, então Response.Write como fallback
+                            response.Write(rootException.ToString());
+                        }
+                        break;
+                    }
             }
         }
 
-        private static void RenderController(HttpContext context, string controllerName, ErrorModel model)
+        static void LogError(HttpException exception)
         {
-            var wrapper = new HttpContextWrapper(context);
+            var status = exception.GetHttpCode();
+            if (status >= 500)
+                LogEvent.Raise(exception.Message, exception.GetBaseException());
+        }
 
-            var routeData = new RouteData();
-            routeData.Values.Add("controller", controllerName);
-			routeData.Values.Add("action", "Error");
-            routeData.Values.Add("Message", model.Message);
-            routeData.Values.Add("StackTrace", model.StackTrace);
-            routeData.Values.Add("Url", model.Url);
-            routeData.Values.Add("StatusCode", model.StatusCode);
+        private static void RenderView(string errorViewPath, ErrorModel model, HttpContext context)
+        {
+            var handler = WebPageHttpHandler.CreateFromVirtualPath(errorViewPath);
+            context.Session["exception"] = model;
+            handler.ProcessRequest(context);
+            context.Session.Remove("exception");
 
-            var factory = ControllerBuilder.Current.GetControllerFactory();
-
-            IController controller = null;
-            try
-            {
-                var requestContext = new RequestContext(wrapper, routeData);
-                controller = factory.CreateController(requestContext, controllerName);
-                if (controller != null)
-                {
-
-                    controller.Execute(requestContext);
-                }
-            }
-            catch (Exception ex)
-            {
-                var msg = string.Format("Error executing controller {0}: {1}", controller, ex.Message);
-                context.Response.Write(msg);
-                context.Response.Write("<BR />");
-                context.Response.Write(model.Message);
-                context.Response.StatusCode = 500;
-                Trace.TraceInformation(msg);
-            }
-            finally
-            {
-                if (controller != null)
-                {
-                    factory.ReleaseController(controller);
-                }
-            }
+            //var html = ViewRenderer.RenderView(errorViewPath, model);
+            //response.Write(html);
         }
 
         public void Dispose()
@@ -165,6 +140,7 @@ namespace MvcLib.HttpModules
             public string StackTrace { get; set; }
             public string Url { get; set; }
             public int StatusCode { get; set; }
+            public string StatusDescription { get; set; }
 
             public override string ToString()
             {
