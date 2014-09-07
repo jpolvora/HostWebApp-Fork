@@ -767,6 +767,7 @@
     <Content Include="Scripts\jquery-1.11.1.min.map" />
     <Content Include="Views\Shared\customerror.cshtml" />
     <Content Include="Views\Web.config" />
+    <Content Include="Views\Shared\notfound.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Global.asax" />

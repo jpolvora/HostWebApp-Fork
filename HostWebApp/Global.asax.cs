@@ -13,6 +13,7 @@ namespace HostWebApp
     public class Global : System.Web.HttpApplication
     {
         private static string _rewriteBasePath;
+        
 
         protected void Application_Start(object sender, EventArgs e)
         {
