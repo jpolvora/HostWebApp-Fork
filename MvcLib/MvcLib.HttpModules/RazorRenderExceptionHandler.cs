@@ -27,18 +27,27 @@ namespace MvcLib.HttpModules
 
             if (cfg.Mail.SendExceptionToDeveloper)
             {
+                Trace.TraceInformation("[RazorRenderExceptionHandler]: Preparing to send email to developer");
                 string body = exception.GetHtmlErrorMessage();
                 string subject = exception.Message;
                 ThreadPool.QueueUserWorkItem(x =>
                 {
-                    using (var client = new SmtpClient())
+                    try
                     {
-                        var msg = new MailMessage(cfg.Mail.MailAdmin, cfg.Mail.MailDeveloper, subject, body)
+                        using (var client = new SmtpClient())
                         {
-                            IsBodyHtml = true
-                        };
+                            var msg = new MailMessage(cfg.Mail.MailAdmin, cfg.Mail.MailDeveloper, subject, body)
+                            {
+                                IsBodyHtml = true
+                            };
 
-                        client.Send(msg);
+                            client.Send(msg);
+                            Trace.TraceInformation("[RazorRenderExceptionHandler]: Email was sent to {0}", cfg.Mail.MailDeveloper);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Trace.TraceError("[RazorRenderExceptionHandler]: Failed to send email. {0}", ex.Message);
                     }
                 });
 
@@ -58,6 +67,7 @@ namespace MvcLib.HttpModules
         {
             //Application.Context.RewritePath(ErrorViewPath);
 
+            Trace.TraceInformation("[RazorRenderExceptionHandler]: Rendering Custom Exception");
             var model = new ErrorModel()
             {
                 Message = exception.Message,

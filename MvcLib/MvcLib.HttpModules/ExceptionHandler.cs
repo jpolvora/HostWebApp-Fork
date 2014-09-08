@@ -36,13 +36,13 @@ namespace MvcLib.HttpModules
 
             var rootException = httpException.GetBaseException();
 
-            Trace.TraceError("Exception: {0}", rootException.Message);
+            Trace.TraceError("[ExceptionHandler]: {0}", rootException.Message);
 
             if (IsProduction())
             {
                 //log or send email to developer notifiying the exception ?
                 LogAction(httpException);
-                //server.ClearError();
+                server.ClearError(); //limpar o erro para exibir a página customizada
             }
 
             var statusCode = httpException.GetHttpCode();
