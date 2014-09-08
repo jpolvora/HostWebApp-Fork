@@ -120,7 +120,7 @@ namespace MvcLib.Bootstrapper
                     typeof(WebCacheWrapper),
                     typeof(ViewRenderer),
                     typeof(DbToLocal),
-                    typeof(CustomErrorHttpModule.ErrorModel));
+                    typeof(ErrorModel));
 
                 if (cfg.Kompiler.Enabled)
                 {
