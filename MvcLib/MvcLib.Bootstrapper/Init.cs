@@ -1,10 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net.Mail;
-using System.Net.Mime;
 using System.Reflection;
 using System.Web;
 using System.Web.Hosting;
@@ -59,7 +57,10 @@ namespace MvcLib.Bootstrapper
 
                 var executingAssembly = Assembly.GetExecutingAssembly();
                 Trace.TraceInformation("Entry Assembly: {0}", executingAssembly.GetName().Name);
-
+                Trace.TraceInformation("Debugging Enabled: {0}", HttpContext.Current.IsDebuggingEnabled);
+                Trace.TraceInformation("CustomErrors Enabled: {0}", HttpContext.Current.IsCustomErrorEnabled);
+                var commitId = Config.ValueOrDefault("appharbor.commit_id", "");
+                Trace.TraceInformation("Commit Id: {0}", commitId);
 
                 if (cfg.HttpModules.Trace.Enabled)
                 {

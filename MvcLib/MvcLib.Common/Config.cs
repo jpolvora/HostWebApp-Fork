@@ -9,8 +9,11 @@ namespace MvcLib.Common
         public static T ValueOrDefault<T>(string key, T defaultValue)
         {
             var cfgValue = ConfigurationManager.AppSettings[key];
+            if (Debugger.IsAttached)
+            {
+                Trace.TraceInformation("[Config]: Value for '{0}' is '{1}' (default is {2})", key, cfgValue, defaultValue);
+            }
 
-            Trace.TraceInformation("[Config]: Value for '{0}' is '{1}' (default is {2})", key, cfgValue, defaultValue);
             if (string.IsNullOrEmpty(cfgValue))
             {
                 return defaultValue;
