@@ -206,17 +206,20 @@ namespace MvcLib.Bootstrapper
                     Trace.Flush();
                     Trace.Listeners.Remove("StartupListener");
                     //envia log de startup por email
+
                     try
                     {
-                        using (var client = new SmtpClient())
+                        var traceOutput = HostingEnvironment.MapPath(cfg.TraceOutput);
+                        if (File.Exists(traceOutput))
                         {
-                            var file = HostingEnvironment.MapPath(cfg.TraceOutput);
+                            using (var client = new SmtpClient())
+                            {
+                                var msg = new MailMessage(cfg.Mail.MailAdmin, cfg.Mail.MailDeveloper);
 
-                            var msg = new MailMessage("Admin", cfg.Mail.MailDeveloper);
-                            
-                            msg.Attachments.Add(new Attachment(file));
+                                msg.Attachments.Add(new Attachment(traceOutput));
 
-                            client.Send(msg);
+                                client.Send(msg);
+                            }
                         }
                     }
                     catch (Exception ex)
