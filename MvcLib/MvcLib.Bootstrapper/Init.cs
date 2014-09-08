@@ -280,10 +280,11 @@ namespace MvcLib.Bootstrapper
                 try
                 {
                     if (!File.Exists(_traceFileName)) return;
-                    var body = File.ReadAllText(_traceFileName);
+                    var txt = File.ReadAllText(_traceFileName);
+                    var body = Environment.NewLine + txt + Environment.NewLine;
                     using (var client = new SmtpClient())
                     {
-                        var msg = new MailMessage(cfg.Mail.MailAdmin, cfg.Mail.MailDeveloper, "Start", "Attached log.");
+                        var msg = new MailMessage(cfg.Mail.MailAdmin, cfg.Mail.MailDeveloper, cfg.Mail.MailAdmin + ": Application Start Log", "Attached log.");
                         msg.Body = body;
                         msg.IsBodyHtml = false;
                         //msg.Attachments.Add(new Attachment(_traceFileName));
