@@ -32,7 +32,7 @@ namespace MvcLib.HttpModules
 
         protected override void RenderException(CustomException exception)
         {
-            Application.Context.RewritePath(ErrorViewPath);
+            //Application.Context.RewritePath(ErrorViewPath);
 
             var model = new ErrorModel()
             {
