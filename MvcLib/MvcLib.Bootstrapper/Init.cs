@@ -214,7 +214,7 @@ namespace MvcLib.Bootstrapper
                         {
                             using (var client = new SmtpClient())
                             {
-                                var msg = new MailMessage(cfg.Mail.MailAdmin, cfg.Mail.MailDeveloper);
+                                var msg = new MailMessage(cfg.Mail.MailAdmin, cfg.Mail.MailDeveloper, "Start", "Attached log.");
 
                                 msg.Attachments.Add(new Attachment(traceOutput));
 
