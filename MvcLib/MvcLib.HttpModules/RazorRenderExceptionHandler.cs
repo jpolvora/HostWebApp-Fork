@@ -2,6 +2,7 @@ using System;
 using System.Configuration;
 using System.Diagnostics;
 using System.Net.Mail;
+using System.Threading;
 using System.Web;
 using MvcLib.Common;
 using MvcLib.Common.Configuration;
@@ -21,10 +22,26 @@ namespace MvcLib.HttpModules
             var status = exception.GetHttpCode();
             if (status < 500) return;
             LogEvent.Raise(exception.Message, exception.GetBaseException());
-            using (var smptClient = new SmtpClient())
+
+            var cfg = BootstrapperSection.Instance;
+
+            if (cfg.Mail.SendExceptionToDeveloper)
             {
-                //todo: Enviar async
-                smptClient.Send("Admin", BootstrapperSection.Instance.Mail.MailDeveloper, "Exception " + status, exception.ToString());
+                string body = exception.GetHtmlErrorMessage();
+                string subject = exception.Message;
+                ThreadPool.QueueUserWorkItem(x =>
+                {
+                    using (var client = new SmtpClient())
+                    {
+                        var msg = new MailMessage(cfg.Mail.MailAdmin, cfg.Mail.MailDeveloper, subject, body)
+                        {
+                            IsBodyHtml = true
+                        };
+
+                        client.Send(msg);
+                    }
+                });
+
             }
         }
 

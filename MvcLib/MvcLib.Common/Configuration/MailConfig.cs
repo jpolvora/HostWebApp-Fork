@@ -25,5 +25,12 @@ namespace MvcLib.Common.Configuration
             get { return (Boolean)this["sendstartuplog"]; }
             set { this["sendstartuplog"] = value; }
         }
+
+        [ConfigurationProperty("sendexceptiontodeveloper", DefaultValue = false)]
+        public bool SendExceptionToDeveloper
+        {
+            get { return (Boolean)this["sendexceptiontodeveloper"]; }
+            set { this["sendexceptiontodeveloper"] = value; }
+        }
     }
 }
