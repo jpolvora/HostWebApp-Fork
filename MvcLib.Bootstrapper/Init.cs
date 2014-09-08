@@ -2,6 +2,8 @@
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Net.Mail;
+using System.Net.Mime;
 using System.Reflection;
 using System.Web;
 using System.Web.Hosting;
@@ -194,14 +196,33 @@ namespace MvcLib.Bootstrapper
 
                     foreach (var routeBase in routes)
                     {
-                        var route = (Route) routeBase;
+                        var route = (Route)routeBase;
                         Trace.TraceInformation("Handler: {0} at URL: {1}", route.RouteHandler, route.Url);
                     }
                 }
 
                 if (!Debugger.IsAttached)
                 {
+                    Trace.Flush();
                     Trace.Listeners.Remove("StartupListener");
+                    //envia log de startup por email
+                    try
+                    {
+                        using (var client = new SmtpClient())
+                        {
+                            var file = HostingEnvironment.MapPath(cfg.TraceOutput);
+
+                            var msg = new MailMessage("Admin", cfg.Mail.MailDeveloper);
+                            
+                            msg.Attachments.Add(new Attachment(file));
+
+                            client.Send(msg);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Trace.TraceError(ex.Message);
+                    }
                 }
 
                 //viewengine locations

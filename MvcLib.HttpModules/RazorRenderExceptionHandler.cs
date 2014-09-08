@@ -1,7 +1,10 @@
 using System;
 using System.Configuration;
+using System.Diagnostics;
+using System.Net.Mail;
 using System.Web;
 using MvcLib.Common;
+using MvcLib.Common.Configuration;
 using MvcLib.Common.Mvc;
 
 namespace MvcLib.HttpModules
@@ -16,8 +19,13 @@ namespace MvcLib.HttpModules
         static void LogActionEx(HttpException exception)
         {
             var status = exception.GetHttpCode();
-            if (status >= 500)
-                LogEvent.Raise(exception.Message, exception.GetBaseException());
+            if (status < 500) return;
+            LogEvent.Raise(exception.Message, exception.GetBaseException());
+            using (var smptClient = new SmtpClient())
+            {
+                //todo: Enviar async
+                smptClient.Send("Admin", BootstrapperSection.Instance.Mail.MailDeveloper, "Exception " + status, exception.ToString());
+            }
         }
 
         protected override bool IsProduction()
@@ -31,7 +39,7 @@ namespace MvcLib.HttpModules
 
         protected override void RenderException(CustomException exception)
         {
-            Application.Context.RewritePath(ErrorViewPath);
+            //Application.Context.RewritePath(ErrorViewPath);
 
             var model = new ErrorModel()
             {
@@ -42,6 +50,7 @@ namespace MvcLib.HttpModules
                 StatusCode = Application.Response.StatusCode,
             };
 
+            Trace.TraceWarning("Rendering razor view: {0}", ErrorViewPath);
             var html = ViewRenderer.RenderView(ErrorViewPath, model);
             Application.Response.Write(html);
 
