@@ -701,6 +701,8 @@
     <Content Include="Admin\teste500.cshtml" />
     <Content Include="App_Data\Views\Web.config" />
     <Content Include="Admin\Developer\Actions\_build.cshtml" />
+    <Content Include="404.cshtml" />
+    <Content Include="500.cshtml" />
     <None Include="Scripts\jquery-1.11.1.intellisense.js" />
     <Content Include="Scripts\jquery-1.11.1.js" />
     <Content Include="Scripts\jquery-1.11.1.min.js" />
