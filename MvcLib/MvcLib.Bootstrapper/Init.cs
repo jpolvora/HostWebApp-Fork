@@ -279,7 +279,7 @@ namespace MvcLib.Bootstrapper
                 }
 
                 //envia log de startup por email
-                if (cfg.Mail.SendStartupLog)
+                if (cfg.Mail.SendStartupLog && !Config.IsInDebugMode)
                 {
                     try
                     {
