@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Configuration;
 using System.Diagnostics;
+using MvcLib.Common.Configuration;
 
 namespace MvcLib.Common
 {
@@ -9,7 +10,7 @@ namespace MvcLib.Common
         public static T ValueOrDefault<T>(string key, T defaultValue)
         {
             var cfgValue = ConfigurationManager.AppSettings[key];
-            if (Debugger.IsAttached)
+            if (BootstrapperSection.Instance.Verbose)
             {
                 Trace.TraceInformation("[Config]: Value for '{0}' is '{1}' (default is {2})", key, cfgValue, defaultValue);
             }
