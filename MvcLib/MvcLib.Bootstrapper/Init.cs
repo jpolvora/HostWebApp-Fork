@@ -276,24 +276,27 @@ namespace MvcLib.Bootstrapper
                 }
 
                 //envia log de startup por email
-
-                try
+                if (cfg.Mail.SendStartupLog)
                 {
-                    if (!File.Exists(_traceFileName)) return;
-                    var txt = File.ReadAllText(_traceFileName);
-                    var body = Environment.NewLine + txt + Environment.NewLine;
-                    using (var client = new SmtpClient())
+                    try
                     {
-                        var msg = new MailMessage(cfg.Mail.MailAdmin, cfg.Mail.MailDeveloper, cfg.Mail.MailAdmin + ": Application Start Log", "Attached log.");
-                        msg.Body = body;
-                        msg.IsBodyHtml = false;
-                        //msg.Attachments.Add(new Attachment(_traceFileName));
-                        client.Send(msg);
+                        if (!File.Exists(_traceFileName)) return;
+                        var txt = File.ReadAllText(_traceFileName);
+                        var body = Environment.NewLine + txt + Environment.NewLine;
+                        using (var client = new SmtpClient())
+                        {
+                            var msg = new MailMessage(cfg.Mail.MailAdmin, cfg.Mail.MailDeveloper,
+                                cfg.Mail.MailAdmin + ": Application Start Log", "Attached log.");
+                            msg.Body = body;
+                            msg.IsBodyHtml = false;
+                            //msg.Attachments.Add(new Attachment(_traceFileName));
+                            client.Send(msg);
+                        }
                     }
-                }
-                catch (Exception ex)
-                {
-                    Trace.TraceError(ex.Message);
+                    catch (Exception ex)
+                    {
+                        Trace.TraceError(ex.Message);
+                    }
                 }
             }
         }
