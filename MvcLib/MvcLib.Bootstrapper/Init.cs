@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -32,6 +33,7 @@ namespace MvcLib.Bootstrapper
 {
     public class Init
     {
+        private static string _traceFileName;
         private static bool _initialized;
 
         public static void PreStart()
@@ -50,11 +52,12 @@ namespace MvcLib.Bootstrapper
                         var path = cfg.TraceOutput;
                         if (!path.StartsWith("~"))
                             path = "~" + path;
-                        var traceOutput = HostingEnvironment.MapPath(path);
-                        if (File.Exists(traceOutput))
-                            File.Delete(traceOutput);
 
-                        var listener = new TextWriterTraceListener(traceOutput, "StartupListener");
+                        _traceFileName = HostingEnvironment.MapPath(path);
+                        if (File.Exists(_traceFileName))
+                            File.Delete(_traceFileName);
+
+                        var listener = new TextWriterTraceListener(_traceFileName, "StartupListener");
 
                         Trace.Listeners.Add(listener);
                         Trace.AutoFlush = true;
@@ -201,30 +204,6 @@ namespace MvcLib.Bootstrapper
                     }
                 }
 
-                if (!Debugger.IsAttached)
-                {
-                    Trace.Flush();
-                    Trace.Listeners.Remove("StartupListener");
-                    //envia log de startup por email
-                    try
-                    {
-                        using (var client = new SmtpClient())
-                        {
-                            var file = HostingEnvironment.MapPath(cfg.TraceOutput);
-
-                            var msg = new MailMessage("Admin", cfg.Mail.MailDeveloper);
-                            
-                            msg.Attachments.Add(new Attachment(file));
-
-                            client.Send(msg);
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        Trace.TraceError(ex.Message);
-                    }
-                }
-
                 //viewengine locations
                 var mvcroot = cfg.DumpToLocal.Folder;
 
@@ -289,6 +268,40 @@ namespace MvcLib.Bootstrapper
                 {
                     Trace.TraceInformation("Cannot Configure RazorViewEngine: View Engine not found");
                 }
+
+                if (!Debugger.IsAttached)
+                {
+                    Trace.Flush();
+                    var listener = Trace.Listeners["StartupListener"] as TextWriterTraceListener;
+                    if (listener != null)
+                    {
+                        listener.Flush();
+                        listener.Close();
+                        Trace.Listeners.Remove(listener);
+                    }
+
+                    //envia log de startup por email
+
+                    try
+                    {
+                        if (File.Exists(_traceFileName))
+                        {
+                            using (var client = new SmtpClient())
+                            {
+                                var msg = new MailMessage(cfg.Mail.MailAdmin, cfg.Mail.MailDeveloper, "Start", "Attached log.");
+
+                                msg.Attachments.Add(new Attachment(_traceFileName));
+
+                                client.Send(msg);
+                            }
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Trace.TraceError(ex.Message);
+                    }
+                }
+
             }
         }
     }
