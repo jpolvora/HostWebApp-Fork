@@ -31,7 +31,8 @@ namespace MvcLib.HttpModules
 
             Exception ex = server.GetLastError();
 
-            HttpException httpException = ex as HttpException ?? new HttpException("Unknown exception...", ex);
+            HttpException httpException = ex as HttpException
+                ?? new HttpException("Generic exception...", ex);
 
             var rootException = httpException.GetBaseException();
 
@@ -41,7 +42,7 @@ namespace MvcLib.HttpModules
             {
                 //log or send email to developer notifiying the exception ?
                 LogAction(httpException);
-                server.ClearError();
+                //server.ClearError();
             }
 
             var statusCode = httpException.GetHttpCode();
@@ -56,25 +57,24 @@ namespace MvcLib.HttpModules
                     break; //IIS will handle 404
                 case 500:
                     {
-                        //check for exception type you want to show custom rendering
-                        if (!(rootException is TException))
+                        //check for exception type you want to show custom message
+                        if (rootException is TException)
                         {
-                            break; //IIS will handle 500
-                        }
-                        server.ClearError();
-                        response.TrySkipIisCustomErrors = true;
-                        response.Clear();
+                            server.ClearError();
+                            response.TrySkipIisCustomErrors = true;
+                            response.Clear();
 
-                        try
-                        {
-                            RenderException(rootException as TException);
+                            try
+                            {
+                                RenderCustomException(rootException as TException);
+                            }
+                            catch
+                            {
+                                //fallback to response.Write
+                                response.Write(rootException.ToString());
+                            }
                         }
-                        catch
-                        {
-                            //fallback to response.Write
-                            response.Write(rootException.ToString());
-                        }
-                        break;
+                        break; //IIS will handle 500
                     }
             }
         }
@@ -92,7 +92,7 @@ namespace MvcLib.HttpModules
         /// Overridable Method. Default implementation uses Razor WebPages.
         /// </summary>
         /// <param name="exception"></param>
-        protected virtual void RenderException(TException exception)
+        protected virtual void RenderCustomException(TException exception)
         {
             //stores exception in session for later retrieve
             Application.Session["exception"] = exception;
