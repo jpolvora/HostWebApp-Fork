@@ -54,13 +54,8 @@ namespace MvcLib.Bootstrapper
                 }
                 catch { }
 
-
                 var executingAssembly = Assembly.GetExecutingAssembly();
                 Trace.TraceInformation("Entry Assembly: {0}", executingAssembly.GetName().Name);
-                Trace.TraceInformation("Debugging Enabled: {0}", HttpContext.Current.IsDebuggingEnabled);
-                Trace.TraceInformation("CustomErrors Enabled: {0}", HttpContext.Current.IsCustomErrorEnabled);
-                var commitId = Config.ValueOrDefault("appharbor.commit_id", "");
-                Trace.TraceInformation("Commit Id: {0}", commitId);
 
                 if (cfg.HttpModules.Trace.Enabled)
                 {
@@ -168,6 +163,11 @@ namespace MvcLib.Bootstrapper
 
             using (DisposableTimer.StartNew("RUNNING POST_START ..."))
             {
+                Trace.TraceInformation("Debugging Enabled: {0}", HttpContext.Current.IsDebuggingEnabled);
+                Trace.TraceInformation("CustomErrors Enabled: {0}", HttpContext.Current.IsCustomErrorEnabled);
+                var commitId = Config.ValueOrDefault("appharbor.commit_id", "");
+                Trace.TraceInformation("Commit Id: {0}", commitId);
+
                 var cfg = BootstrapperSection.Instance;
 
                 if (cfg.MvcTrace.Enabled)
