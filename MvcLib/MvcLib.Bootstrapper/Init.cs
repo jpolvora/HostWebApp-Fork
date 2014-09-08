@@ -161,7 +161,7 @@ namespace MvcLib.Bootstrapper
 
             _initialized = true;
 
-            using (DisposableTimer.StartNew("RUNNING POST_START ..."))
+            using (DisposableTimer.StartNew("POST_START ..."))
             {
                 Trace.TraceInformation("Debugging Enabled: {0}", HttpContext.Current.IsDebuggingEnabled);
                 Trace.TraceInformation("CustomErrors Enabled: {0}", HttpContext.Current.IsCustomErrorEnabled);
