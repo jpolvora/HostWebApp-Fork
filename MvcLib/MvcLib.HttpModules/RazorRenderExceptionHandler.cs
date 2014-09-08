@@ -1,5 +1,6 @@
 using System;
 using System.Configuration;
+using System.Diagnostics;
 using System.Web;
 using MvcLib.Common;
 using MvcLib.Common.Mvc;
@@ -42,6 +43,7 @@ namespace MvcLib.HttpModules
                 StatusCode = Application.Response.StatusCode,
             };
 
+            Trace.TraceWarning("Rendering razor view: {0}", ErrorViewPath);
             var html = ViewRenderer.RenderView(ErrorViewPath, model);
             Application.Response.Write(html);
 
