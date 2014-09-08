@@ -37,7 +37,7 @@ namespace MvcLib.HttpModules
             return release;
         }
 
-        protected override void RenderException(CustomException exception)
+        protected override void RenderCustomException(CustomException exception)
         {
             //Application.Context.RewritePath(ErrorViewPath);
 

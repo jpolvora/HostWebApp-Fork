@@ -40,30 +40,26 @@ namespace MvcLib.Bootstrapper
         {
             using (DisposableTimer.StartNew("PRE_START"))
             {
+                var cfg = BootstrapperSection.Initialize();
+
+                //cria um text logger somente para o startup
+                //remove no post start
+                try
+                {
+                    _traceFileName = HostingEnvironment.MapPath(cfg.TraceOutput);
+                    if (File.Exists(_traceFileName))
+                        File.Delete(_traceFileName);
+
+                    var listener = new TextWriterTraceListener(_traceFileName, "StartupListener");
+
+                    Trace.Listeners.Add(listener);
+                }
+                catch { }
+
+
                 var executingAssembly = Assembly.GetExecutingAssembly();
                 Trace.TraceInformation("Entry Assembly: {0}", executingAssembly.GetName().Name);
 
-                var cfg = BootstrapperSection.Initialize();
-
-                if (Debugger.IsAttached || cfg.TraceOutput.IsNotNullOrWhiteSpace())
-                {
-                    try
-                    {
-                        var path = cfg.TraceOutput;
-                        if (!path.StartsWith("~"))
-                            path = "~" + path;
-
-                        _traceFileName = HostingEnvironment.MapPath(path);
-                        if (File.Exists(_traceFileName))
-                            File.Delete(_traceFileName);
-
-                        var listener = new TextWriterTraceListener(_traceFileName, "StartupListener");
-
-                        Trace.Listeners.Add(listener);
-                        Trace.AutoFlush = true;
-                    }
-                    catch { }
-                }
 
                 if (cfg.HttpModules.Trace.Enabled)
                 {
@@ -269,39 +265,33 @@ namespace MvcLib.Bootstrapper
                     Trace.TraceInformation("Cannot Configure RazorViewEngine: View Engine not found");
                 }
 
-                if (!Debugger.IsAttached)
+
+                Trace.Flush();
+                var listener = Trace.Listeners["StartupListener"] as TextWriterTraceListener;
+                if (listener != null)
                 {
-                    Trace.Flush();
-                    var listener = Trace.Listeners["StartupListener"] as TextWriterTraceListener;
-                    if (listener != null)
-                    {
-                        listener.Flush();
-                        listener.Close();
-                        Trace.Listeners.Remove(listener);
-                    }
-
-                    //envia log de startup por email
-
-                    try
-                    {
-                        if (File.Exists(_traceFileName))
-                        {
-                            using (var client = new SmtpClient())
-                            {
-                                var msg = new MailMessage(cfg.Mail.MailAdmin, cfg.Mail.MailDeveloper, "Start", "Attached log.");
-
-                                msg.Attachments.Add(new Attachment(_traceFileName));
-
-                                client.Send(msg);
-                            }
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        Trace.TraceError(ex.Message);
-                    }
+                    listener.Flush();
+                    listener.Close();
+                    Trace.Listeners.Remove(listener);
                 }
 
+                //envia log de startup por email
+
+                try
+                {
+                    if (!File.Exists(_traceFileName)) return;
+
+                    using (var client = new SmtpClient())
+                    {
+                        var msg = new MailMessage(cfg.Mail.MailAdmin, cfg.Mail.MailDeveloper, "Start", "Attached log.");
+                        msg.Attachments.Add(new Attachment(_traceFileName));
+                        client.Send(msg);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Trace.TraceError(ex.Message);
+                }
             }
         }
     }
