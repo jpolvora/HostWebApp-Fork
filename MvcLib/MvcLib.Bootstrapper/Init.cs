@@ -11,6 +11,7 @@ using System.Web;
 using System.Web.Hosting;
 using System.Web.Mvc;
 using System.Web.Routing;
+using System.Web.UI;
 using System.Web.WebPages;
 using Microsoft.Web.Infrastructure.DynamicModuleHelper;
 using MvcLib.Bootstrapper;
@@ -39,24 +40,30 @@ namespace MvcLib.Bootstrapper
 
         public static void PreStart()
         {
-            using (DisposableTimer.StartNew("PRE_START"))
-            {
-                var cfg = BootstrapperSection.Initialize();
+            var cfg = BootstrapperSection.Initialize();
 
-                //cria um text logger somente para o startup
-                //remove no post start
-                try
+            //cria um text logger somente para o startup
+            //remove no post start
+            try
+            {
+                _traceFileName = HostingEnvironment.MapPath(cfg.TraceOutput);
+                if (_traceFileName != null)
                 {
-                    _traceFileName = HostingEnvironment.MapPath(cfg.TraceOutput);
                     if (File.Exists(_traceFileName))
                         File.Delete(_traceFileName);
 
-                    var listener = new TextWriterTraceListener(_traceFileName, "StartupListener");
+                    //var listener = new TextWriterTraceListener(_traceFileName, "StartupListener");
+                    XmlWriterTraceListener listener = new XmlWriterTraceListener(_traceFileName, "StartupListener");
 
                     Trace.Listeners.Add(listener);
                 }
-                catch { }
+            }
+            catch
+            {
+            }
 
+            using (DisposableTimer.StartNew("PRE_START"))
+            {
                 var executingAssembly = Assembly.GetExecutingAssembly();
                 Trace.TraceInformation("Entry Assembly: {0}", executingAssembly.GetName().Name);
 
@@ -275,7 +282,7 @@ namespace MvcLib.Bootstrapper
             }
 
             Trace.Flush();
-            var listener = Trace.Listeners["StartupListener"] as TextWriterTraceListener;
+            var listener = Trace.Listeners["StartupListener"] as XmlWriterTraceListener;
             if (listener != null)
             {
                 listener.Flush();
@@ -305,8 +312,8 @@ namespace MvcLib.Bootstrapper
                                 Body = ""
                             };
 
-                            var alternate = AlternateView.CreateAlternateViewFromString(body,
-                                new ContentType("text/plain"));
+
+                            var alternate = AlternateView.CreateAlternateViewFromString(body, new ContentType("text/xml"));
                             msg.AlternateViews.Add(alternate);
 
                             //msg.Attachments.Add(new Attachment(_traceFileName));

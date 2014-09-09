@@ -11,14 +11,11 @@ namespace HostWebApp
 {
     public class Global : System.Web.HttpApplication
     {
-        private static string _rewriteBasePath;
         
 
         protected void Application_Start(object sender, EventArgs e)
         {
-            _rewriteBasePath = BootstrapperSection.Instance.DumpToLocal.Folder.TrimEnd('/');
-            if (!_rewriteBasePath.StartsWith("~"))
-                _rewriteBasePath = "~" + _rewriteBasePath;
+          
 
             AreaRegistration.RegisterAllAreas();
             FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);
@@ -35,26 +32,7 @@ namespace HostWebApp
 
         protected void Application_BeginRequest(object sender, EventArgs e)
         {
-            string path = Request.Url.AbsolutePath;
-
-            if (path.StartsWith(_rewriteBasePath.Substring(1)))
-                return;
-
-            string virtualPath = string.Format("{0}{1}", _rewriteBasePath, path);
-
-            if (string.IsNullOrWhiteSpace(VirtualPathUtility.GetFileName(virtualPath)))
-            {
-                return;
-            }
-
-            var physicalPath = Server.MapPath(virtualPath);
-
-            if (!File.Exists(physicalPath)) return;
-
-            string newpath = string.Format("{0}{1}", _rewriteBasePath.Substring(1), path);
-
-            Trace.TraceInformation("Rewriting path from '{0}' to '{1}", path, newpath);
-            Context.RewritePath(newpath);
+          
         }
 
         protected void Application_AuthenticateRequest(object sender, EventArgs e)
