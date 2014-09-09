@@ -7,7 +7,7 @@
         return;
     }
     const string html = "text/html";
-    bool requestingHtml = Request.AcceptTypes.Any(type =>
+    bool requestingHtml = Request.AcceptTypes == null || Request.AcceptTypes.Any(type =>
         html.Equals(type, StringComparison.OrdinalIgnoreCase));
 
     if (!requestingHtml)
