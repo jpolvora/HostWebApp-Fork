@@ -1,5 +1,5 @@
-﻿@using MvcLib.DbFileSystem
-@using ResponseExtensions = MvcLib.Common.Mvc.ResponseExtensions
+﻿@using Frankstein.DbFileSystem
+@using ResponseExtensions = Frankstein.Common.Mvc.ResponseExtensions
 
 @{
     var id = IsPost ? Request.Form["id"].AsInt(0) : UrlData[0].AsInt(0);

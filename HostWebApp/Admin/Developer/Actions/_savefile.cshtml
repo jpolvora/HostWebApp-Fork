@@ -1,9 +1,9 @@
 ﻿@using System.Text
-@using MvcLib.Common.Configuration
-@using MvcLib.DbFileSystem
-@using MvcLib.FsDump
-@using MvcLib.Kompiler
-@using ResponseExtensions = MvcLib.Common.Mvc.ResponseExtensions
+@using Frankstein.Common.Configuration
+@using Frankstein.DbFileSystem
+@using Frankstein.FsDump
+@using Frankstein.Kompiler
+@using ResponseExtensions = Frankstein.Common.Mvc.ResponseExtensions
 
 @{
     var id = Request.Form["id"].AsInt(0);
