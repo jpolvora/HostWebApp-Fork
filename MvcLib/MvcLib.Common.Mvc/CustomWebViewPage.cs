@@ -26,16 +26,24 @@ namespace MvcLib.Common.Mvc
 
             using (DisposableTimer.StartNew("CustomWebViewPage: " + this.VirtualPath))
             {
-                using (this.BeginChunk("div", VirtualPath, "section"))
+                using (this.BeginChunk("div", VirtualPath, "page"))
                 {
                     base.ExecutePageHierarchy();
                 }
             }
         }
 
+        public override HelperResult RenderPage(string path, params object[] data)
+        {
+            using (this.BeginChunk("div", path, "page"))
+            {
+                return base.RenderPage(path, data);
+            }
+        }
+
         public HelperResult RenderSectionEx(string name, bool required = false)
         {
-            using (this.BeginChunk("div", "RenderSection: " + name, "section"))
+            using (this.BeginChunk("div", name, "section"))
             {
                 return RenderSection(name, false);
             }
@@ -65,16 +73,24 @@ namespace MvcLib.Common.Mvc
 
             using (DisposableTimer.StartNew("CustomWebViewPage<" + typeof(T).Name + ">: " + this.VirtualPath))
             {
-                using (this.BeginChunk("div", VirtualPath, "section"))
+                using (this.BeginChunk("div", VirtualPath, "page"))
                 {
                     base.ExecutePageHierarchy();
                 }
             }
         }
 
+        public override HelperResult RenderPage(string path, params object[] data)
+        {
+            using (this.BeginChunk("div", path, "page"))
+            {
+                return base.RenderPage(path, data);
+            }
+        }
+
         public HelperResult RenderSectionEx(string name, bool required = false)
         {
-            using (this.BeginChunk("div", "RenderSection: " + name, "section"))
+            using (this.BeginChunk("div", name, "section"))
             {
                 return RenderSection(name, false);
             }
