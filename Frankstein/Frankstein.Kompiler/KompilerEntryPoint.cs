@@ -4,6 +4,8 @@ using System.Data.Entity;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
+using System.Web.WebPages;
+using System.Web.WebPages.Razor;
 using Frankstein.Common.Configuration;
 using Frankstein.PluginLoader;
 
@@ -120,6 +122,8 @@ namespace Frankstein.Kompiler
                     typeof(Microsoft.CSharp.RuntimeBinder.Binder).Assembly.Location, //Microsoft.CSharp
                     typeof(System.Web.HttpApplication).Assembly.Location,
                     typeof(Trace).Assembly.Location,
+                    typeof(WebPageExecutingBase).Assembly.Location,
+                    typeof(WebPageRazorHost).Assembly.Location,
                     typeof(System.ComponentModel.DataAnnotations.DataType).Assembly.Location,
                     typeof(DbContext).Assembly.Location,
                     typeof(CodeDomWrapper).Assembly.Location
