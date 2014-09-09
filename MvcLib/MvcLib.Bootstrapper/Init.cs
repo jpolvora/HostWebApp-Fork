@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net.Mail;
+using System.Net.Mime;
 using System.Reflection;
 using System.Text;
 using System.Web;
@@ -278,11 +279,7 @@ namespace MvcLib.Bootstrapper
                 }
 
                 //envia log de startup por email
-<<<<<<< HEAD
                 if (cfg.Mail.SendStartupLog && !Config.IsInDebugMode)
-=======
-                if (cfg.Mail.SendStartupLog)
->>>>>>> b7a9f8fb0cc3b8774ccc2bf228cf6db187f2d02e
                 {
                     try
                     {
@@ -292,7 +289,6 @@ namespace MvcLib.Bootstrapper
 
                         using (var client = new SmtpClient())
                         {
-<<<<<<< HEAD
                             var msg = new MailMessage(
                                 new MailAddress(cfg.Mail.MailAdmin, "Admin"),
                                 new MailAddress(cfg.Mail.MailDeveloper))
@@ -306,13 +302,6 @@ namespace MvcLib.Bootstrapper
                             var alternate = AlternateView.CreateAlternateViewFromString(body,
                                 new ContentType("text/plain"));
                             msg.AlternateViews.Add(alternate);
-=======
-                            var msg = new MailMessage(cfg.Mail.MailAdmin, cfg.Mail.MailDeveloper,
-                                cfg.Mail.MailAdmin + ": Application Start Log", body)
-                            {
-                                IsBodyHtml = false
-                            };
->>>>>>> b7a9f8fb0cc3b8774ccc2bf228cf6db187f2d02e
 
                             //msg.Attachments.Add(new Attachment(_traceFileName));
                             client.Send(msg);
