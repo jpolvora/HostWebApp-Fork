@@ -26,3 +26,35 @@ structure of your folders:
 
 Root
 	
+Pre Start
+=========
+* Leitura da SectionConfiguration MvcLib (web.config)
+	a) Em caso de erro, instância default será retornada.
+* Cria o arquivo de log inicialização
+* Carrega os módulos configurados
+	a) TracerHttpModule - Trace de mensagens úteis para debug em cada evento da Pipeline p/ todos os requests
+	b) CustomErrorHttpModule - Tratamento de Erros durante o Request. Envia email, renderiza uma página específica, etc.
+	c) WhiteSpaceModule - Aplica minificação Html (compressão)
+* Inicialização do banco de dados (DbFileSystem)
+	a) Depende da configuração do Initializer na seção EntityFramework (web.config).
+	b) Cria o banco se necessário
+	c) Aplica migrações se necessário
+* Inicializa e configura os componentes do Framework:
+	a) PluginLoader (Carrega assemblies/plugins)
+	b) VirtualPathProviders
+	c) Dump (Copia arquivos do banco de dados p/ App_Data e carrega o módulo PathRewriterHttpModule)
+	d) Kompiler (Adiciona referências, compila arquivos de acordo com a configuração)
+* Configura o Url Routing Module
+
+Application_Start (global.asax)
+  => Aplicação configura Configura filtros, rotas, bundles, etc.
+
+Post Start
+==========
+* Imprime mensagens de Debug
+* Adicione o MvcTracerFilter p/ diagnóstico
+* Imprime os módulos carregados
+* Imprime o RoutTable
+* Configura Razor View Engine (adiciona App_Data p/ a busca de views)
+* Envia log de inicialização por email.
+Fim
