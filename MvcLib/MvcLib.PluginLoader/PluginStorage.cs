@@ -63,7 +63,7 @@ namespace MvcLib.PluginLoader
                 }
                 catch (Exception ex)
                 {
-                    Trace.TraceInformation(ex.Message);
+                    Trace.TraceError(ex.Message);
                 }
             }
         }
@@ -73,7 +73,7 @@ namespace MvcLib.PluginLoader
             var entry = assembly.GetExportedTypes().FirstOrDefault(x => typeof(IPlugin).IsAssignableFrom(x));
             if (entry != null)
             {
-                Trace.TraceError("[PluginLoader]: Found implementation of IPlugin '{0}'", entry.FullName);
+                Trace.TraceInformation("[PluginLoader]: Found implementation of IPlugin '{0}'", entry.FullName);
                 IPlugin instance = null;
                 try
                 {
@@ -101,7 +101,7 @@ namespace MvcLib.PluginLoader
             }
             else
             {
-                Trace.TraceError("[PluginLoader]: Nothing to do Execute.");
+                Trace.TraceInformation("[PluginLoader]: Nothing to do Execute.");
             }
         }
 
