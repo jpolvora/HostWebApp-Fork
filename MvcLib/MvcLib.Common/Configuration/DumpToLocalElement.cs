@@ -18,11 +18,11 @@ namespace MvcLib.Common.Configuration
             set { this["deletefiles"] = value; }
         }
 
-        [ConfigurationProperty("copyalways", DefaultValue = false)]
-        public bool CopyAlways
+        [ConfigurationProperty("sync", DefaultValue = false)]
+        public bool Sync
         {
-            get { return (bool)this["copyalways"]; }
-            set { this["copyalways"] = value; }
+            get { return (bool)this["sync"]; }
+            set { this["sync"] = value; }
         }
     }
 }

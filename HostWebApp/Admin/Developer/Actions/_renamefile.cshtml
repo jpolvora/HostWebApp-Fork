@@ -1,4 +1,5 @@
 ﻿@using System.Data.Entity;
+@using MvcLib.Common.Configuration
 @using MvcLib.DbFileSystem
 @using MvcLib.FsDump
 @using ResponseExtensions = MvcLib.Common.Mvc.ResponseExtensions
@@ -17,14 +18,24 @@
             var fName = Path.GetFileNameWithoutExtension(newFileName);
             var fExtension = Path.GetExtension(newFileName);
 
+            var old = new DbFile()
+            {
+                VirtualPath = result.VirtualPath
+            };
+
             result.Name = fName;
             result.Extension = fExtension;
             result.VirtualPath = string.Format("{0}{1}", folderName, newFileName);
 
             ctx.SaveChanges();
+
+            if (BootstrapperSection.Instance.DumpToLocal.Sync)
+            {
+                DbToLocal.RemoveFromDisk(old);
+                DbToLocal.WriteToDisk(result, true);
+            }
             
-            DbToLocal.RemoveFromDisk(result);
-            DbToLocal.WriteToDisk(result, true);
+            
             
             ResponseExtensions.WriteAjax(Response, new { success = true });
             return;

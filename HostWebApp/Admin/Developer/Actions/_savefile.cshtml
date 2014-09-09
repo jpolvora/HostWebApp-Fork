@@ -32,7 +32,7 @@
                 //se for .cshtml, compila
                 generated = RazorCompiler.GenereateCode(text, "~" + result.VirtualPath);
 
-                if (generated.Length > 0 && BootstrapperSection.Instance.DumpToLocal.CopyAlways)
+                if (generated.Length > 0 && BootstrapperSection.Instance.DumpToLocal.Sync)
                 {
                     DbToLocal.WriteToDisk(result, true);
                 }

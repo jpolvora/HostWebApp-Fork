@@ -1,4 +1,5 @@
 ﻿@using System.Data.Entity;
+@using MvcLib.Common.Configuration
 @using MvcLib.DbFileSystem
 @using MvcLib.FsDump
 @using ResponseExtensions = MvcLib.Common.Mvc.ResponseExtensions
@@ -14,12 +15,14 @@
             ctx.DbFiles.Remove(result);
             ctx.SaveChanges();
 
-            foreach (var dbFile in result.Children)
+            if (BootstrapperSection.Instance.DumpToLocal.Sync)
             {
-                DbToLocal.RemoveFromDisk(dbFile);
+                foreach (var dbFile in result.Children)
+                {
+                    DbToLocal.RemoveFromDisk(dbFile);
+                }
+                DbToLocal.RemoveFromDisk(result);
             }
-            DbToLocal.RemoveFromDisk(result);
-            
 
             ResponseExtensions.WriteAjax(Response, new { success = true });
             return;
