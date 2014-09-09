@@ -47,52 +47,57 @@ namespace MvcLib.Bootstrapper
             try
             {
                 _traceFileName = HostingEnvironment.MapPath(cfg.TraceOutput);
-                if (_traceFileName != null)
+                if (!string.IsNullOrEmpty(_traceFileName))
                 {
                     if (File.Exists(_traceFileName))
                         File.Delete(_traceFileName);
 
                     var listener = new TextWriterTraceListener(_traceFileName, "StartupListener");
-                    
+
                     Trace.Listeners.Add(listener);
+
+                    Trace.TraceInformation("[Init]:StartupLog: {0}, '{1}'", listener, _traceFileName);
                 }
             }
             catch
             {
             }
 
-            using (DisposableTimer.StartNew("PRE_START"))
+            using (DisposableTimer.StartNew("[Init]:PRE_START"))
             {
                 var executingAssembly = Assembly.GetExecutingAssembly();
                 Trace.TraceInformation("Entry Assembly: {0}", executingAssembly.GetName().Name);
 
+                Trace.TraceInformation("cfg.HttpModules.Trace.Enabled = {0}", cfg.HttpModules.Trace.Enabled);
                 if (cfg.HttpModules.Trace.Enabled)
                 {
                     DynamicModuleUtility.RegisterModule(typeof(TracerHttpModule));
                 }
 
+                Trace.TraceInformation("cfg.StopMonitoring = {0}", cfg.StopMonitoring);
                 if (cfg.StopMonitoring)
                 {
                     HttpInternals.StopFileMonitoring();
                 }
 
+                Trace.TraceInformation("cfg.HttpModules.CustomError.Enabled = {0}", cfg.HttpModules.CustomError.Enabled);
                 if (cfg.HttpModules.CustomError.Enabled)
                 {
                     DynamicModuleUtility.RegisterModule(typeof(CustomErrorHttpModule));
                 }
 
+                Trace.TraceInformation("cfg.HttpModules.WhiteSpace.Enabled = {0}", cfg.HttpModules.WhiteSpace.Enabled);
                 if (cfg.HttpModules.WhiteSpace.Enabled)
                 {
                     DynamicModuleUtility.RegisterModule(typeof(WhitespaceModule));
                 }
-
-                DynamicModuleUtility.RegisterModule(typeof(PathRewriterHttpModule));
 
                 using (DisposableTimer.StartNew("DbFileContext"))
                 {
                     DbFileContext.Initialize();
                 }
 
+                Trace.TraceInformation("cfg.PluginLoader.Enabled = {0}", cfg.PluginLoader.Enabled);
                 if (cfg.PluginLoader.Enabled)
                 {
                     using (DisposableTimer.StartNew("PluginLoader"))
@@ -101,12 +106,13 @@ namespace MvcLib.Bootstrapper
                     }
                 }
 
+                Trace.TraceInformation("cfg.VirtualPathProviders.SubFolderVpp.Enabled = {0}", cfg.VirtualPathProviders.SubFolderVpp.Enabled);
                 if (cfg.VirtualPathProviders.SubFolderVpp.Enabled)
                 {
                     SubfolderVpp.SelfRegister();
                 }
 
-                //todo: Dependency Injection
+                Trace.TraceInformation("cfg.VirtualPathProviders.DbFileSystemVpp.Enabled = {0}", cfg.VirtualPathProviders.DbFileSystemVpp.Enabled);
                 if (cfg.VirtualPathProviders.DbFileSystemVpp.Enabled)
                 {
                     var customvpp = new CustomVirtualPathProvider()
@@ -114,14 +120,18 @@ namespace MvcLib.Bootstrapper
                     HostingEnvironment.RegisterVirtualPathProvider(customvpp);
                 }
 
+                Trace.TraceInformation("cfg.DumpToLocal.Enabled = {0}", cfg.DumpToLocal.Enabled);
                 if (cfg.DumpToLocal.Enabled)
                 {
+                    DynamicModuleUtility.RegisterModule(typeof(PathRewriterHttpModule));
+
                     using (DisposableTimer.StartNew("DumpToLocal"))
                     {
                         DbToLocal.Execute();
                     }
                 }
 
+                Trace.TraceInformation("cfg.Kompiler.Enabled = {0}", cfg.Kompiler.Enabled);
                 KompilerEntryPoint.AddReferences(
                     typeof(Controller),
                     typeof(WebPageRenderingBase),
@@ -138,6 +148,7 @@ namespace MvcLib.Bootstrapper
                     }
                 }
 
+                Trace.TraceInformation("cfg.InsertRoutes = {0}", cfg.InsertRoutes);
                 if (cfg.InsertRoutes)
                 {
                     var routes = RouteTable.Routes;
@@ -153,14 +164,6 @@ namespace MvcLib.Bootstrapper
                     routes.IgnoreRoute("Content/{*pathInfo}");
                     routes.IgnoreRoute("Scripts/{*pathInfo}");
                     routes.IgnoreRoute("Bundles/{*pathInfo}");
-
-                    //routes.MapRoute("MvcLib", "{controller}/{action}", new string[] { "" });
-
-
-                    if (cfg.TraceOutput.IsNotNullOrWhiteSpace())
-                    {
-                        //routes.MapHttpHandler<WebPagesRouteHandler>("~/dump.cshtml");
-                    }
                 }
             }
         }
@@ -173,18 +176,20 @@ namespace MvcLib.Bootstrapper
             _initialized = true;
 
             var cfg = BootstrapperSection.Instance;
-            using (DisposableTimer.StartNew("POST_START ..."))
+            using (DisposableTimer.StartNew("[Init]:POST_START ..."))
             {
                 Trace.TraceInformation("Debugging Enabled: {0}", HttpContext.Current.IsDebuggingEnabled);
                 Trace.TraceInformation("CustomErrors Enabled: {0}", HttpContext.Current.IsCustomErrorEnabled);
                 var commitId = Config.ValueOrDefault("appharbor.commit_id", "");
                 Trace.TraceInformation("Commit Id: {0}", commitId);
 
+                Trace.TraceInformation("cfg.MvcTrace.Enabled = {0}", cfg.MvcTrace.Enabled);
                 if (cfg.MvcTrace.Enabled)
                 {
                     GlobalFilters.Filters.Add(new MvcTracerFilter());
                 }
 
+                Trace.TraceInformation("cfg.Verbose = {0}", cfg.Verbose);
                 if (cfg.Verbose)
                 {
                     var application = HttpContext.Current.ApplicationInstance;
@@ -196,13 +201,11 @@ namespace MvcLib.Bootstrapper
                         Trace.TraceInformation("Module Loaded: {0}", module);
                     }
                     Trace.Unindent();
-                }
 
-                //dump routes
-                var routes = RouteTable.Routes;
+                    //dump routes
+                    var routes = RouteTable.Routes;
 
-                if (cfg.Verbose)
-                {
+
                     var i = routes.Count;
                     Trace.TraceInformation("Found {0} routes in RouteTable", i);
                     Trace.Indent();
@@ -292,6 +295,7 @@ namespace MvcLib.Bootstrapper
             }
 
             //envia log de startup por email
+            Trace.TraceInformation("cfg.Mail.SendStartupLog = {0}", cfg.Mail.SendStartupLog);
             if (cfg.Mail.SendStartupLog && !Config.IsInDebugMode)
             {
                 if (!File.Exists(_traceFileName)) return;
@@ -317,7 +321,6 @@ namespace MvcLib.Bootstrapper
                                 new ContentType("text/plain"));
                             msg.AlternateViews.Add(alternate);
 
-                            //msg.Attachments.Add(new Attachment(_traceFileName));
                             Trace.TraceInformation("Sending startup log email to {0}", cfg.Mail.MailDeveloper);
                             client.Send(msg);
                         }

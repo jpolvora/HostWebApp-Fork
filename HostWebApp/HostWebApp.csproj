@@ -764,9 +764,7 @@
     <Content Include="Admin\Developer\_Layout.cshtml" />
     <Content Include="Admin\Developer\_PageStart.cshtml" />
     <Content Include="Scripts\jquery-1.11.1.min.map" />
-    <Content Include="Views\Shared\customerror.cshtml" />
     <Content Include="Views\Web.config" />
-    <Content Include="Views\Shared\notfound.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Global.asax" />
@@ -829,7 +827,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Code\" />
-    <Folder Include="blog\" />
     <Folder Include="_plugins\" />
   </ItemGroup>
   <ItemGroup>

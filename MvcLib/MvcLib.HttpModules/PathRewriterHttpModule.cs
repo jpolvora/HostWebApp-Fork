@@ -15,6 +15,8 @@ namespace MvcLib.HttpModules
             _rewriteBasePath = BootstrapperSection.Instance.DumpToLocal.Folder.TrimEnd('/');
             if (!_rewriteBasePath.StartsWith("~"))
                 _rewriteBasePath = "~" + _rewriteBasePath;
+
+            Trace.TraceInformation("[PathRewriterHttpModule]: {0}", _rewriteBasePath);
         }
 
         public void Init(HttpApplication context)
