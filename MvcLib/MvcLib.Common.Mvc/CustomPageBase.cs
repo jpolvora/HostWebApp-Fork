@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using System.Web.WebPages;
 
 namespace MvcLib.Common.Mvc
@@ -30,7 +31,7 @@ namespace MvcLib.Common.Mvc
 
             using (DisposableTimer.StartNew("CustomPageBase: " + this.VirtualPath))
             {
-                using (this.BeginChunk("div", VirtualPath, "page"))
+                using (Output.BeginChunk("div", VirtualPath, "page"))
                 {
                     base.ExecutePageHierarchy();
                 }
@@ -44,10 +45,16 @@ namespace MvcLib.Common.Mvc
                 return RenderSection(name, required);
             }
 
-            using (this.BeginChunk("div", name, "section"))
+            var result = RenderSection(name, required);
+            
+            //encapsula o resultado da section num novo resultado
+            return new HelperResult(writer =>
             {
-                return RenderSection(name, required);
-            }
+                using (writer.BeginChunk("div", name, "section"))
+                {
+                    result.WriteTo(writer);
+                }
+            });
         }
     }
 }

@@ -26,7 +26,7 @@ namespace MvcLib.Common.Mvc
 
             using (DisposableTimer.StartNew("CustomWebViewPage: " + this.VirtualPath))
             {
-                using (this.BeginChunk("div", VirtualPath, "view"))
+                using (Output.BeginChunk("div", VirtualPath, "view"))
                 {
                     base.ExecutePageHierarchy();
                 }
@@ -39,10 +39,17 @@ namespace MvcLib.Common.Mvc
             {
                 return RenderSection(name, required);
             }
-            using (this.BeginChunk("div", name, "section"))
+
+            var result = RenderSection(name, required);
+
+            //encapsula o resultado da section num novo resultado
+            return new HelperResult(writer =>
             {
-                return RenderSection(name, required);
-            }
+                using (writer.BeginChunk("div", name, "section"))
+                {
+                    result.WriteTo(writer);
+                }
+            });
         }
     }
 
@@ -69,7 +76,7 @@ namespace MvcLib.Common.Mvc
 
             using (DisposableTimer.StartNew("CustomWebViewPage<" + typeof(T).Name + ">: " + this.VirtualPath))
             {
-                using (this.BeginChunk("div", VirtualPath, "view"))
+                using (Output.BeginChunk("div", VirtualPath, "view"))
                 {
                     base.ExecutePageHierarchy();
                 }
@@ -82,10 +89,17 @@ namespace MvcLib.Common.Mvc
             {
                 return RenderSection(name, required);
             }
-            using (this.BeginChunk("div", name, "section"))
+
+            var result = RenderSection(name, required);
+
+            //encapsula o resultado da section num novo resultado
+            return new HelperResult(writer =>
             {
-                return RenderSection(name, required);
-            }
+                using (writer.BeginChunk("div", name, "section"))
+                {
+                    result.WriteTo(writer);
+                }
+            });
         }
     }
 }

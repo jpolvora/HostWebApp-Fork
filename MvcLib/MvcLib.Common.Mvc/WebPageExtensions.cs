@@ -4,7 +4,6 @@ using System.Web;
 using System.Web.Caching;
 using System.Web.Hosting;
 using System.Web.Mvc;
-using System.Web.WebPages;
 
 namespace MvcLib.Common.Mvc
 {
@@ -34,36 +33,36 @@ namespace MvcLib.Common.Mvc
             return HttpRuntime.Cache[rootRelativePath] as string;
         }
 
-        public static Chunk BeginChunk(this WebPageBase page, string tag, string info, params string[] classes)
+        public static Chunk BeginChunk(this TextWriter writer, string tag, string virtualPath, params string[] classes)
         {
             if (string.IsNullOrWhiteSpace(tag))
                 throw new ArgumentNullException("tag");
 
-            TagBuilder tagBuilder = new TagBuilder(tag);
-            tagBuilder.Attributes["data-virtualpath"] = info.ToLowerInvariant();
+            var tagBuilder = new TagBuilder(tag);
+            tagBuilder.Attributes["data-virtualpath"] = virtualPath.ToLowerInvariant();
 
             foreach (var @class in classes)
             {
                 tagBuilder.AddCssClass(@class);
             }
 
-            return new Chunk(page, tagBuilder);
+            return new Chunk(writer, tagBuilder);
         }
 
         public class Chunk : IDisposable
         {
-            private readonly WebPageBase _page;
+            private readonly TextWriter _writer;
             private readonly TagBuilder _tagBuilder;
 
-            public Chunk(WebPageBase page, TagBuilder tagBuilder)
+            public Chunk(TextWriter writer, TagBuilder tagBuilder)
             {
-                _page = page;
+                _writer = writer;
                 _tagBuilder = tagBuilder;
 
 
                 if (tagBuilder == null) return;
 
-                page.Output.WriteLine(Environment.NewLine + tagBuilder.ToString(TagRenderMode.StartTag));
+                writer.WriteLine(Environment.NewLine + tagBuilder.ToString(TagRenderMode.StartTag));
                 tagBuilder.ToString(TagRenderMode.Normal);
             }
 
@@ -71,7 +70,7 @@ namespace MvcLib.Common.Mvc
             {
                 if (_tagBuilder == null) return;
 
-                _page.Output.WriteLine(Environment.NewLine + _tagBuilder.ToString(TagRenderMode.EndTag));
+                _writer.WriteLine(Environment.NewLine + _tagBuilder.ToString(TagRenderMode.EndTag));
             }
         }
     }
