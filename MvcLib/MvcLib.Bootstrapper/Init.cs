@@ -52,9 +52,8 @@ namespace MvcLib.Bootstrapper
                     if (File.Exists(_traceFileName))
                         File.Delete(_traceFileName);
 
-                    //var listener = new TextWriterTraceListener(_traceFileName, "StartupListener");
-                    XmlWriterTraceListener listener = new XmlWriterTraceListener(_traceFileName, "StartupListener");
-
+                    var listener = new TextWriterTraceListener(_traceFileName, "StartupListener");
+                    
                     Trace.Listeners.Add(listener);
                 }
             }
@@ -282,7 +281,7 @@ namespace MvcLib.Bootstrapper
             }
 
             Trace.Flush();
-            var listener = Trace.Listeners["StartupListener"] as XmlWriterTraceListener;
+            var listener = Trace.Listeners["StartupListener"] as TextWriterTraceListener;
             if (listener != null)
             {
                 listener.Flush();
@@ -312,8 +311,8 @@ namespace MvcLib.Bootstrapper
                                 Body = ""
                             };
 
-
-                            var alternate = AlternateView.CreateAlternateViewFromString(body, new ContentType("text/xml"));
+                            var alternate = AlternateView.CreateAlternateViewFromString(body,
+                                new ContentType("text/plain"));
                             msg.AlternateViews.Add(alternate);
 
                             //msg.Attachments.Add(new Attachment(_traceFileName));
