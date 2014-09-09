@@ -56,7 +56,7 @@ namespace MvcLib.Bootstrapper
 
                     Trace.Listeners.Add(listener);
 
-                    Trace.TraceInformation("[Bootstrapper]:StartupLog: {0}, '{1}'", listener, _traceFileName.Replace("\\", "/"));
+                    Trace.TraceInformation("[Bootstrapper]: StartupLog added: {0}", listener);
                 }
             }
             catch

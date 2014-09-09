@@ -23,7 +23,7 @@ namespace MvcLib.PluginLoader
 
             if (!AppDomain.CurrentDomain.IsFullyTrusted)
             {
-                Trace.TraceWarning("We are not in FULL TRUST! We must use private probing path in Web.Config");
+                Trace.TraceWarning("[PluginLoader]: We are not in FULL TRUST! We must use private probing path in Web.Config");
             }
         }
 
@@ -35,7 +35,7 @@ namespace MvcLib.PluginLoader
                 return;
             var name = args.LoadedAssembly.GetName().Name;
 
-            Trace.TraceInformation("Assembly Loaded... {0}", name);
+            Trace.TraceInformation("[PluginLoader]:Assembly Loaded... {0}", name);
 
             if (args.LoadedAssembly.Location.StartsWith(_pluginFolder.FullName, StringComparison.InvariantCultureIgnoreCase))
             {
@@ -74,7 +74,7 @@ namespace MvcLib.PluginLoader
             var assembly = FindAssembly(args.Name);
             if (assembly != null)
             {
-                Trace.TraceInformation("Assembly found and resolved: {0} = {1}", assembly.FullName, assembly.Location);
+                Trace.TraceInformation("[PluginLoader]:Assembly found and resolved: {0} = {1}", assembly.FullName, assembly.Location);
                 return assembly;
             }
             return null; //not found
@@ -94,7 +94,7 @@ namespace MvcLib.PluginLoader
             }
             catch (Exception ex)
             {
-                var msg = "ERRO LOADING ASSEMBLY: {0}: {1}".Fmt(fileName, ex);
+                var msg = "[PluginLoader]:ERRO LOADING ASSEMBLY: {0}: {1}".Fmt(fileName, ex);
                 Trace.TraceInformation(msg);
                 LogEvent.Raise(ex.Message, ex);
             }
@@ -120,13 +120,13 @@ namespace MvcLib.PluginLoader
                 }
                 catch (Exception ex)
                 {
-                    Trace.TraceError("Could not create instance from type '{0}'. {1}", entry, ex.Message);
+                    Trace.TraceError("[PluginLoader]:Could not create instance from type '{0}'. {1}", entry, ex.Message);
                 }
                 finally
                 {
                     if (instance != null)
                     {
-                        Trace.TraceInformation("Plugin name is {0}", instance.PluginName);
+                        Trace.TraceInformation("[PluginLoader]:Plugin name is {0}", instance.PluginName);
                         instance.Start();
                     }
                 }
