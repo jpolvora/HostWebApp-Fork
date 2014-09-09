@@ -110,6 +110,28 @@ namespace MvcLib.PluginLoader
             StoredAssemblies.Add(assembly.FullName, assembly);
             BuildManager.AddReferencedAssembly(assembly);
 
+            var entry = assembly.GetExportedTypes().FirstOrDefault(x => typeof(IPlugin).IsAssignableFrom(x));
+            if (entry != null)
+            {
+                IPlugin instance = null;
+                try
+                {
+                    instance = Activator.CreateInstance(entry) as IPlugin;
+                }
+                catch (Exception ex)
+                {
+                    Trace.TraceError("Could not create instance from type '{0}'. {1}", entry, ex.Message);
+                }
+                finally
+                {
+                    if (instance != null)
+                    {
+                        Trace.TraceInformation("Plugin name is {0}", instance.PluginName);
+                        instance.Start();
+                    }
+                }
+            }
+
             Trace.TraceInformation("[PluginLoader]:Plugin registered: {0}", assembly.FullName);
         }
 

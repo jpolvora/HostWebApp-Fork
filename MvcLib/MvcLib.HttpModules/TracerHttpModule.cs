@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Diagnostics;
-using System.IO;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
@@ -16,11 +15,7 @@ namespace MvcLib.HttpModules
 
         private const string Stopwatch = "_request:sw";
 
-        //private HttpApplication _application;
-
-        private static readonly string _rewriteBasePath;
         
-
         public void Dispose()
         {
         }
@@ -28,10 +23,6 @@ namespace MvcLib.HttpModules
         static TracerHttpModule()
         {
             EventsToTrace = BootstrapperSection.Instance.HttpModules.Trace.Events.Split(',');
-
-            _rewriteBasePath = BootstrapperSection.Instance.DumpToLocal.Folder.TrimEnd('/');
-            if (!_rewriteBasePath.StartsWith("~"))
-                _rewriteBasePath = "~" + _rewriteBasePath;
         }
 
         private static readonly string[] EventsToTrace = new string[0];
@@ -173,28 +164,6 @@ namespace MvcLib.HttpModules
 
             Trace.TraceInformation("[BeginRequest]:[{0}] {1} {2} {3}", rid, context.Request.HttpMethod,
                 context.Request.RawUrl, isAjax ? "Ajax: True" : "");
-
-
-            string path = application.Request.Url.AbsolutePath;
-
-            if (path.StartsWith(_rewriteBasePath.Substring(1)))
-                return;
-
-            string virtualPath = string.Format("{0}{1}", _rewriteBasePath, path);
-
-            if (string.IsNullOrWhiteSpace(VirtualPathUtility.GetFileName(virtualPath)))
-            {
-                return;
-            }
-
-            var physicalPath = application.Server.MapPath(virtualPath);
-
-            if (!File.Exists(physicalPath)) return;
-
-            string newpath = string.Format("{0}{1}", _rewriteBasePath.Substring(1), path);
-
-            Trace.TraceInformation("Rewriting path from '{0}' to '{1}", path, newpath);
-            context.RewritePath(newpath);
         }
 
         private static void OnEndRequest(HttpApplication application)

@@ -86,6 +86,8 @@ namespace MvcLib.Bootstrapper
                     DynamicModuleUtility.RegisterModule(typeof(WhitespaceModule));
                 }
 
+                DynamicModuleUtility.RegisterModule(typeof(PathRewriterHttpModule));
+
                 using (DisposableTimer.StartNew("DbFileContext"))
                 {
                     DbFileContext.Initialize();
@@ -104,20 +106,20 @@ namespace MvcLib.Bootstrapper
                     SubfolderVpp.SelfRegister();
                 }
 
-                if (cfg.DumpToLocal.Enabled)
-                {
-                    using (DisposableTimer.StartNew("DumpToLocal"))
-                    {
-                        DbToLocal.Execute();
-                    }
-                }
-
                 //todo: Dependency Injection
                 if (cfg.VirtualPathProviders.DbFileSystemVpp.Enabled)
                 {
                     var customvpp = new CustomVirtualPathProvider()
                         .AddImpl(new CachedDbServiceFileSystemProvider(new DefaultDbService(), new WebCacheWrapper()));
                     HostingEnvironment.RegisterVirtualPathProvider(customvpp);
+                }
+
+                if (cfg.DumpToLocal.Enabled)
+                {
+                    using (DisposableTimer.StartNew("DumpToLocal"))
+                    {
+                        DbToLocal.Execute();
+                    }
                 }
 
                 KompilerEntryPoint.AddReferences(
