@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Linq;
+using System.Runtime.Remoting.Channels;
 using System.Web;
 using System.Web.Mvc;
 using System.Web.WebPages;
@@ -92,7 +93,7 @@ namespace MvcLib.HttpModules
                 return;
 
             var rid = application.Context.Items[RequestId];
-            Trace.TraceInformation("[{0}]:[{1}] {2}, [{3}], {4}",
+            Trace.TraceInformation("[TracerHttpModule]:[{0}]:[{1}] {2}, [{3}], {4}",
                 application.Context.CurrentNotification, rid, application.Context.IsPostNotification ? "POST" : "PRE", application.Context.CurrentHandler,
                 application.User != null ? application.User.Identity.Name : "-");
 
@@ -187,7 +188,7 @@ namespace MvcLib.HttpModules
             StopTimer(application);
             Trace.Flush();
             var rid = application.Context.Items[RequestId];
-            Trace.TraceInformation("ERROR: [{0}]:[{1}] Evento {2}, Handler: [{3}], User: {4}", application.Context.CurrentNotification, rid, "Error: ", application.Context.CurrentHandler, application.User != null ? application.User.Identity.Name : "-");
+            Trace.TraceInformation("[TracerHttpModule]: Error at {0}, request {1}, Handler: {2}, Message:'{3}'", application.Context.CurrentNotification, rid, application.Context.CurrentHandler, application.Context.Error);
         }
 
         private static void StopTimer(HttpApplication application)
