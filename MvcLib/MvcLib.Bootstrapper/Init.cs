@@ -293,7 +293,7 @@ namespace MvcLib.Bootstrapper
                                 new MailAddress(cfg.Mail.MailAdmin, "Admin"),
                                 new MailAddress(cfg.Mail.MailDeveloper))
                             {
-                                Subject = "App Startup Log",
+                                Subject = "App Startup - Log",
                                 IsBodyHtml = false,
                                 BodyEncoding = Encoding.UTF8,
                                 Body =  ""
