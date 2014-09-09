@@ -39,7 +39,7 @@ namespace MvcLib.Common
             {
                 _callback.Invoke(ms);
             }
-            Trace.TraceInformation("[{0}], End Time: {1}ms", _msg, ms.ToString("##.000"));
+            Trace.TraceInformation("[{0}], Execution time: {1}ms", _msg, ms.ToString("##.000"));
             Trace.Unindent();
         }
     }

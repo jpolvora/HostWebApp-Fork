@@ -53,6 +53,8 @@ namespace MvcLib.PluginLoader
                             Trace.TraceInformation("Type exported: {0}", type.FullName);
                         }
                         Trace.Unindent();
+
+                        ExecutePlugin(args.LoadedAssembly);
                     }
                     else
                     {
@@ -63,6 +65,43 @@ namespace MvcLib.PluginLoader
                 {
                     Trace.TraceInformation(ex.Message);
                 }
+            }
+        }
+
+        private static void ExecutePlugin(Assembly assembly)
+        {
+            var entry = assembly.GetExportedTypes().FirstOrDefault(x => typeof(IPlugin).IsAssignableFrom(x));
+            if (entry != null)
+            {
+                Trace.TraceError("[PluginLoader]: Found implementation of IPlugin '{0}'", entry.FullName);
+                IPlugin instance = null;
+                try
+                {
+                    instance = Activator.CreateInstance(entry) as IPlugin;
+                }
+                catch (Exception ex)
+                {
+                    Trace.TraceError("[PluginLoader]:Could not create instance from type '{0}'. {1}", entry, ex.Message);
+                }
+                finally
+                {
+                    if (instance != null)
+                    {
+                        Trace.TraceInformation("[PluginLoader]: Executing Plugin: {0}", instance.PluginName);
+                        try
+                        {
+                            instance.Start();
+                        }
+                        catch (Exception ex)
+                        {
+                            Trace.TraceError(ex.Message);
+                        }
+                    }
+                }
+            }
+            else
+            {
+                Trace.TraceError("[PluginLoader]: Nothing to do Execute.");
             }
         }
 
@@ -109,28 +148,6 @@ namespace MvcLib.PluginLoader
 
             StoredAssemblies.Add(assembly.FullName, assembly);
             BuildManager.AddReferencedAssembly(assembly);
-
-            var entry = assembly.GetExportedTypes().FirstOrDefault(x => typeof(IPlugin).IsAssignableFrom(x));
-            if (entry != null)
-            {
-                IPlugin instance = null;
-                try
-                {
-                    instance = Activator.CreateInstance(entry) as IPlugin;
-                }
-                catch (Exception ex)
-                {
-                    Trace.TraceError("[PluginLoader]:Could not create instance from type '{0}'. {1}", entry, ex.Message);
-                }
-                finally
-                {
-                    if (instance != null)
-                    {
-                        Trace.TraceInformation("[PluginLoader]:Plugin name is {0}", instance.PluginName);
-                        instance.Start();
-                    }
-                }
-            }
 
             Trace.TraceInformation("[PluginLoader]:Plugin registered: {0}", assembly.FullName);
         }
