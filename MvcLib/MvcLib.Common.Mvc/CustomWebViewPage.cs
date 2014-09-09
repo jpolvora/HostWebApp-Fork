@@ -26,7 +26,7 @@ namespace MvcLib.Common.Mvc
 
             using (DisposableTimer.StartNew("CustomWebViewPage: " + this.VirtualPath))
             {
-                using (Output.BeginChunk("div", VirtualPath, "view"))
+                using (Output.BeginChunk("div", VirtualPath, false, "view"))
                 {
                     base.ExecutePageHierarchy();
                 }
@@ -45,7 +45,7 @@ namespace MvcLib.Common.Mvc
             //encapsula o resultado da section num novo resultado
             return new HelperResult(writer =>
             {
-                using (writer.BeginChunk("div", name, "section"))
+                using (writer.BeginChunk("div", name, true, "section"))
                 {
                     result.WriteTo(writer);
                 }
@@ -76,7 +76,7 @@ namespace MvcLib.Common.Mvc
 
             using (DisposableTimer.StartNew("CustomWebViewPage<" + typeof(T).Name + ">: " + this.VirtualPath))
             {
-                using (Output.BeginChunk("div", VirtualPath, "view"))
+                using (Output.BeginChunk("div", VirtualPath, false, "view"))
                 {
                     base.ExecutePageHierarchy();
                 }
@@ -95,7 +95,7 @@ namespace MvcLib.Common.Mvc
             //encapsula o resultado da section num novo resultado
             return new HelperResult(writer =>
             {
-                using (writer.BeginChunk("div", name, "section"))
+                using (writer.BeginChunk("div", name, true, "section"))
                 {
                     result.WriteTo(writer);
                 }
