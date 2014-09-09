@@ -70,18 +70,18 @@ namespace MvcLib.PluginLoader
 
         private static void ExecutePlugin(Assembly assembly)
         {
-            var entry = assembly.GetExportedTypes().FirstOrDefault(x => typeof(IPlugin).IsAssignableFrom(x));
-            if (entry != null)
+            var plugins = assembly.GetExportedTypes().Where(x => typeof(IPlugin).IsAssignableFrom(x));
+            foreach (var plugin in plugins)
             {
-                Trace.TraceInformation("[PluginLoader]: Found implementation of IPlugin '{0}'", entry.FullName);
+                Trace.TraceInformation("[PluginLoader]: Found implementation of IPlugin '{0}'", plugin.FullName);
                 IPlugin instance = null;
                 try
                 {
-                    instance = Activator.CreateInstance(entry) as IPlugin;
+                    instance = Activator.CreateInstance(plugin) as IPlugin;
                 }
                 catch (Exception ex)
                 {
-                    Trace.TraceError("[PluginLoader]:Could not create instance from type '{0}'. {1}", entry, ex.Message);
+                    Trace.TraceError("[PluginLoader]:Could not create instance from type '{0}'. {1}", plugin, ex.Message);
                 }
                 finally
                 {
@@ -90,7 +90,10 @@ namespace MvcLib.PluginLoader
                         Trace.TraceInformation("[PluginLoader]: Executing Plugin: {0}", instance.PluginName);
                         try
                         {
-                            instance.Start();
+                            using (DisposableTimer.StartNew(instance.PluginName))
+                            {
+                                instance.Start();
+                            }
                         }
                         catch (Exception ex)
                         {
@@ -98,10 +101,6 @@ namespace MvcLib.PluginLoader
                         }
                     }
                 }
-            }
-            else
-            {
-                Trace.TraceInformation("[PluginLoader]: Nothing to do Execute.");
             }
         }
 
