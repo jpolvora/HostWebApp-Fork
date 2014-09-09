@@ -95,9 +95,9 @@ namespace MvcLib.HttpModules
                 return;
 
             var rid = application.Context.Items[RequestId];
-            Trace.TraceInformation("[TracerHttpModule]:{0}, {1}, [{2}], {3}",
-                eventName, rid,
-                application.Context.CurrentHandler, application.User != null ? application.User.Identity.Name : "-");
+            Trace.TraceInformation("[TracerHttpModule]:{0}, rid: [{1}], [{2}], {3}",
+                eventName, rid, application.Context.CurrentHandler,
+                application.User != null ? application.User.Identity.Name : "-");
 
             switch (application.Context.CurrentNotification)
             {

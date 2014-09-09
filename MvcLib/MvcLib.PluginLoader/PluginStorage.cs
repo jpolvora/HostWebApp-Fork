@@ -46,10 +46,12 @@ namespace MvcLib.PluginLoader
 
                     if (types.Any())
                     {
+                        Trace.Indent();
                         foreach (var type in types)
                         {
                             Trace.TraceInformation("Type exported: {0}", type.FullName);
                         }
+                        Trace.Unindent();
                     }
                     else
                     {
