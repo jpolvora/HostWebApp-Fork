@@ -6,6 +6,7 @@ using System.Net.Mail;
 using System.Net.Mime;
 using System.Reflection;
 using System.Text;
+using System.Threading;
 using System.Web;
 using System.Web.Hosting;
 using System.Web.Mvc;
@@ -163,14 +164,13 @@ namespace MvcLib.Bootstrapper
 
             _initialized = true;
 
+            var cfg = BootstrapperSection.Instance;
             using (DisposableTimer.StartNew("POST_START ..."))
             {
                 Trace.TraceInformation("Debugging Enabled: {0}", HttpContext.Current.IsDebuggingEnabled);
                 Trace.TraceInformation("CustomErrors Enabled: {0}", HttpContext.Current.IsCustomErrorEnabled);
                 var commitId = Config.ValueOrDefault("appharbor.commit_id", "");
                 Trace.TraceInformation("Commit Id: {0}", commitId);
-
-                var cfg = BootstrapperSection.Instance;
 
                 if (cfg.MvcTrace.Enabled)
                 {
@@ -272,51 +272,53 @@ namespace MvcLib.Bootstrapper
                 {
                     Trace.TraceInformation("Cannot Configure RazorViewEngine: View Engine not found");
                 }
+            }
 
+            Trace.Flush();
+            var listener = Trace.Listeners["StartupListener"] as TextWriterTraceListener;
+            if (listener != null)
+            {
+                listener.Flush();
+                listener.Close();
+                Trace.Listeners.Remove(listener);
+            }
 
-                Trace.Flush();
-                var listener = Trace.Listeners["StartupListener"] as TextWriterTraceListener;
-                if (listener != null)
-                {
-                    listener.Flush();
-                    listener.Close();
-                    Trace.Listeners.Remove(listener);
-                }
-
-                //envia log de startup por email
-                if (cfg.Mail.SendStartupLog && !Config.IsInDebugMode)
+            //envia log de startup por email
+            if (cfg.Mail.SendStartupLog && !Config.IsInDebugMode)
+            {
+                if (!File.Exists(_traceFileName)) return;
+                ThreadPool.QueueUserWorkItem(state =>
                 {
                     try
                     {
-                        if (!File.Exists(_traceFileName)) return;
-                        var txt = File.ReadAllText(_traceFileName);
-                        var body = txt + "\r\n";
+                        var body = File.ReadAllText(_traceFileName);
 
                         using (var client = new SmtpClient())
                         {
                             var msg = new MailMessage(
                                 new MailAddress(cfg.Mail.MailAdmin, "Admin"),
-                                new MailAddress(cfg.Mail.MailDeveloper))
+                                new MailAddress(cfg.Mail.MailDeveloper, "Developer"))
                             {
-                                Subject = "App Startup Log",
+                                Subject = "App Startup Log: " + DateTime.Now,
                                 IsBodyHtml = false,
                                 BodyEncoding = Encoding.UTF8,
-                                Body =  ""
+                                Body = ""
                             };
-                            
+
                             var alternate = AlternateView.CreateAlternateViewFromString(body,
                                 new ContentType("text/plain"));
                             msg.AlternateViews.Add(alternate);
 
                             //msg.Attachments.Add(new Attachment(_traceFileName));
+                            Trace.TraceInformation("Sending startup log email to {0}", cfg.Mail.MailDeveloper);
                             client.Send(msg);
                         }
                     }
                     catch (Exception ex)
                     {
-                        Trace.TraceError(ex.Message);
+                        Trace.TraceError("Error sending startup log email: {0}", ex.Message);
                     }
-                }
+                });
             }
         }
     }
