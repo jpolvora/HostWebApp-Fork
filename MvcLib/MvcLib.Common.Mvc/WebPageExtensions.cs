@@ -41,13 +41,13 @@ namespace MvcLib.Common.Mvc
             var tagBuilder = new TagBuilder(tag);
             if (isSection)
             {
-                tagBuilder.Attributes["data-virtualpath"] = info.TrimStart('~').ToLowerInvariant();
+                tagBuilder.Attributes["data-section"] = info.ToLowerInvariant();
             }
             else
             {
-                tagBuilder.Attributes["data-section"] = info.ToLowerInvariant();
+                tagBuilder.Attributes["data-virtualpath"] = info.TrimStart('~').ToLowerInvariant();
             }
-            
+
 
             foreach (var @class in classes)
             {

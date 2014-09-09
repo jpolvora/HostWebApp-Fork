@@ -17,5 +17,12 @@ namespace MvcLib.Common.Configuration
             get { return (bool)this["deletefiles"]; }
             set { this["deletefiles"] = value; }
         }
+
+        [ConfigurationProperty("copyalways", DefaultValue = false)]
+        public bool CopyAlways
+        {
+            get { return (bool)this["copyalways"]; }
+            set { this["copyalways"] = value; }
+        }
     }
 }

@@ -1,4 +1,5 @@
 ﻿@using System.Text
+@using MvcLib.Common.Configuration
 @using MvcLib.DbFileSystem
 @using MvcLib.FsDump
 @using MvcLib.Kompiler
@@ -31,7 +32,7 @@
                 //se for .cshtml, compila
                 generated = RazorCompiler.GenereateCode(text, "~" + result.VirtualPath);
 
-                if (generated.Length > 0)
+                if (generated.Length > 0 && BootstrapperSection.Instance.DumpToLocal.CopyAlways)
                 {
                     DbToLocal.WriteToDisk(result, true);
                 }
