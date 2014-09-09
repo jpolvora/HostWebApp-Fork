@@ -10,7 +10,11 @@ namespace MvcLib.Common
         public static T ValueOrDefault<T>(string key, T defaultValue)
         {
             var cfgValue = ConfigurationManager.AppSettings[key];
+<<<<<<< HEAD
             if (BootstrapperSection.Instance.Verbose)
+=======
+            if (Debugger.IsAttached)
+>>>>>>> b7a9f8fb0cc3b8774ccc2bf228cf6db187f2d02e
             {
                 Trace.TraceInformation("[Config]: Value for '{0}' is '{1}' (default is {2})", key, cfgValue, defaultValue);
             }
