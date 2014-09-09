@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
+using MvcLib.Common.Configuration;
 using MvcLib.DbFileSystem;
 
 namespace HostWebApp.Migrations
@@ -13,7 +14,7 @@ namespace HostWebApp.Migrations
     {
         public Configuration()
         {
-            ContextKey = GetType().BaseType.Name;
+            ContextKey = BootstrapperSection.Instance.DbFileContext.MigrationKey;
         }
     }
 }
