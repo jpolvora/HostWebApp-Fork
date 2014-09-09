@@ -33,8 +33,9 @@ namespace MvcLib.PluginLoader
         {
             if (args.LoadedAssembly.GlobalAssemblyCache)
                 return;
+            var name = args.LoadedAssembly.GetName().Name;
 
-            Trace.TraceInformation("Assembly Loaded... {0}", args.LoadedAssembly.Location);
+            Trace.TraceInformation("Assembly Loaded... {0}", name);
 
             if (args.LoadedAssembly.Location.StartsWith(_pluginFolder.FullName, StringComparison.InvariantCultureIgnoreCase))
             {
@@ -55,8 +56,7 @@ namespace MvcLib.PluginLoader
                     }
                     else
                     {
-                        Trace.TraceInformation("No types exported by Assembly: '{0}'",
-                            args.LoadedAssembly.GetName().Name);
+                        Trace.TraceInformation("No types exported by Assembly: '{0}'", name);
                     }
                 }
                 catch (Exception ex)
@@ -71,11 +71,11 @@ namespace MvcLib.PluginLoader
             if (args.RequestingAssembly != null)
                 return args.RequestingAssembly;
 
-            var ass = FindAssembly(args.Name);
-            if (ass != null)
+            var assembly = FindAssembly(args.Name);
+            if (assembly != null)
             {
-                Trace.TraceInformation("Assembly found and resolved: {0} = {1}", ass.FullName, ass.Location);
-                return ass;
+                Trace.TraceInformation("Assembly found and resolved: {0} = {1}", assembly.FullName, assembly.Location);
+                return assembly;
             }
             return null; //not found
         }
