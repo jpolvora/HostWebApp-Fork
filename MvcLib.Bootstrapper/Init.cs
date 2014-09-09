@@ -3,7 +3,6 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net.Mail;
-using System.Net.Mime;
 using System.Reflection;
 using System.Web;
 using System.Web.Hosting;
@@ -32,35 +31,31 @@ namespace MvcLib.Bootstrapper
 {
     public class Init
     {
+        private static string _traceFileName;
         private static bool _initialized;
 
         public static void PreStart()
         {
             using (DisposableTimer.StartNew("PRE_START"))
             {
-                var executingAssembly = Assembly.GetExecutingAssembly();
-                Trace.TraceInformation("Entry Assembly: {0}", executingAssembly.GetName().Name);
-
                 var cfg = BootstrapperSection.Initialize();
 
-                if (Debugger.IsAttached || cfg.TraceOutput.IsNotNullOrWhiteSpace())
+                //cria um text logger somente para o startup
+                //remove no post start
+                try
                 {
-                    try
-                    {
-                        var path = cfg.TraceOutput;
-                        if (!path.StartsWith("~"))
-                            path = "~" + path;
-                        var traceOutput = HostingEnvironment.MapPath(path);
-                        if (File.Exists(traceOutput))
-                            File.Delete(traceOutput);
+                    _traceFileName = HostingEnvironment.MapPath(cfg.TraceOutput);
+                    if (File.Exists(_traceFileName))
+                        File.Delete(_traceFileName);
 
-                        var listener = new TextWriterTraceListener(traceOutput, "StartupListener");
+                    var listener = new TextWriterTraceListener(_traceFileName, "StartupListener");
 
-                        Trace.Listeners.Add(listener);
-                        Trace.AutoFlush = true;
-                    }
-                    catch { }
+                    Trace.Listeners.Add(listener);
                 }
+                catch { }
+
+                var executingAssembly = Assembly.GetExecutingAssembly();
+                Trace.TraceInformation("Entry Assembly: {0}", executingAssembly.GetName().Name);
 
                 if (cfg.HttpModules.Trace.Enabled)
                 {
@@ -166,8 +161,13 @@ namespace MvcLib.Bootstrapper
 
             _initialized = true;
 
-            using (DisposableTimer.StartNew("RUNNING POST_START ..."))
+            using (DisposableTimer.StartNew("POST_START ..."))
             {
+                Trace.TraceInformation("Debugging Enabled: {0}", HttpContext.Current.IsDebuggingEnabled);
+                Trace.TraceInformation("CustomErrors Enabled: {0}", HttpContext.Current.IsCustomErrorEnabled);
+                var commitId = Config.ValueOrDefault("appharbor.commit_id", "");
+                Trace.TraceInformation("Commit Id: {0}", commitId);
+
                 var cfg = BootstrapperSection.Instance;
 
                 if (cfg.MvcTrace.Enabled)
@@ -198,30 +198,6 @@ namespace MvcLib.Bootstrapper
                     {
                         var route = (Route)routeBase;
                         Trace.TraceInformation("Handler: {0} at URL: {1}", route.RouteHandler, route.Url);
-                    }
-                }
-
-                if (!Debugger.IsAttached)
-                {
-                    Trace.Flush();
-                    Trace.Listeners.Remove("StartupListener");
-                    //envia log de startup por email
-                    try
-                    {
-                        using (var client = new SmtpClient())
-                        {
-                            var file = HostingEnvironment.MapPath(cfg.TraceOutput);
-
-                            var msg = new MailMessage("Admin", cfg.Mail.MailDeveloper);
-                            
-                            msg.Attachments.Add(new Attachment(file));
-
-                            client.Send(msg);
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        Trace.TraceError(ex.Message);
                     }
                 }
 
@@ -288,6 +264,43 @@ namespace MvcLib.Bootstrapper
                 else
                 {
                     Trace.TraceInformation("Cannot Configure RazorViewEngine: View Engine not found");
+                }
+
+
+                Trace.Flush();
+                var listener = Trace.Listeners["StartupListener"] as TextWriterTraceListener;
+                if (listener != null)
+                {
+                    listener.Flush();
+                    listener.Close();
+                    Trace.Listeners.Remove(listener);
+                }
+
+                //envia log de startup por email
+                if (cfg.Mail.SendStartupLog)
+                {
+                    try
+                    {
+                        if (!File.Exists(_traceFileName)) return;
+                        var txt = File.ReadAllText(_traceFileName);
+                        var body = txt + "\r\n";
+
+                        using (var client = new SmtpClient())
+                        {
+                            var msg = new MailMessage(cfg.Mail.MailAdmin, cfg.Mail.MailDeveloper,
+                                cfg.Mail.MailAdmin + ": Application Start Log", body)
+                            {
+                                IsBodyHtml = false
+                            };
+
+                            //msg.Attachments.Add(new Attachment(_traceFileName));
+                            client.Send(msg);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Trace.TraceError(ex.Message);
+                    }
                 }
             }
         }

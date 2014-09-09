@@ -2,6 +2,7 @@ using System;
 using System.Configuration;
 using System.Diagnostics;
 using System.Net.Mail;
+using System.Threading;
 using System.Web;
 using MvcLib.Common;
 using MvcLib.Common.Configuration;
@@ -21,10 +22,35 @@ namespace MvcLib.HttpModules
             var status = exception.GetHttpCode();
             if (status < 500) return;
             LogEvent.Raise(exception.Message, exception.GetBaseException());
-            using (var smptClient = new SmtpClient())
+
+            var cfg = BootstrapperSection.Instance;
+
+            if (cfg.Mail.SendExceptionToDeveloper)
             {
-                //todo: Enviar async
-                smptClient.Send("Admin", BootstrapperSection.Instance.Mail.MailDeveloper, "Exception " + status, exception.ToString());
+                Trace.TraceInformation("[RazorRenderExceptionHandler]: Preparing to send email to developer");
+                string body = exception.GetHtmlErrorMessage();
+                string subject = exception.Message;
+                ThreadPool.QueueUserWorkItem(x =>
+                {
+                    try
+                    {
+                        using (var client = new SmtpClient())
+                        {
+                            var msg = new MailMessage(cfg.Mail.MailAdmin, cfg.Mail.MailDeveloper, subject, body)
+                            {
+                                IsBodyHtml = true
+                            };
+
+                            client.Send(msg);
+                            Trace.TraceInformation("[RazorRenderExceptionHandler]: Email was sent to {0}", cfg.Mail.MailDeveloper);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Trace.TraceError("[RazorRenderExceptionHandler]: Failed to send email. {0}", ex.Message);
+                    }
+                });
+
             }
         }
 
@@ -37,10 +63,11 @@ namespace MvcLib.HttpModules
             return release;
         }
 
-        protected override void RenderException(CustomException exception)
+        protected override void RenderCustomException(CustomException exception)
         {
             //Application.Context.RewritePath(ErrorViewPath);
 
+            Trace.TraceInformation("[RazorRenderExceptionHandler]: Rendering Custom Exception");
             var model = new ErrorModel()
             {
                 Message = exception.Message,

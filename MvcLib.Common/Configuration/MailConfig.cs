@@ -1,4 +1,5 @@
-﻿using System.Configuration;
+﻿using System;
+using System.Configuration;
 
 namespace MvcLib.Common.Configuration
 {
@@ -16,6 +17,20 @@ namespace MvcLib.Common.Configuration
         {
             get { return (string)this["developer"]; }
             set { this["developer"] = value; }
+        }
+
+        [ConfigurationProperty("sendstartuplog", DefaultValue = false)]
+        public bool SendStartupLog
+        {
+            get { return (Boolean)this["sendstartuplog"]; }
+            set { this["sendstartuplog"] = value; }
+        }
+
+        [ConfigurationProperty("sendexceptiontodeveloper", DefaultValue = false)]
+        public bool SendExceptionToDeveloper
+        {
+            get { return (Boolean)this["sendexceptiontodeveloper"]; }
+            set { this["sendexceptiontodeveloper"] = value; }
         }
     }
 }
