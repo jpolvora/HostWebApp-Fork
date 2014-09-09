@@ -30,7 +30,7 @@
             if (result.Extension.Equals(".cshtml", StringComparison.OrdinalIgnoreCase))
             {
                 //se for .cshtml, compila
-                generated = RazorCompiler.GenereateCode(text, "~" + result.VirtualPath);
+                generated = RazorCompiler.ParseRazor(text, "~" + result.VirtualPath);
 
                 if (generated.Length > 0 && BootstrapperSection.Instance.DumpToLocal.Sync)
                 {
