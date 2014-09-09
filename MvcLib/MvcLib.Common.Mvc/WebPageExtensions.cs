@@ -40,14 +40,14 @@ namespace MvcLib.Common.Mvc
             if (!string.IsNullOrEmpty(tag))
             {
                 tagBuilder = new TagBuilder(tag);
-                tagBuilder.Attributes["data-virtualpath"] = VirtualPathUtility.ToAbsolute(page.VirtualPath);
+                tagBuilder.Attributes["data-virtualpath"] = VirtualPathUtility.ToAbsolute(info);
 
                 foreach (var @class in classes)
                 {
                     tagBuilder.AddCssClass(@class);
                 }
             }
-            return new Chunk(page, tagBuilder, info);
+            return new Chunk(page, tagBuilder);
         }
 
 
@@ -56,13 +56,11 @@ namespace MvcLib.Common.Mvc
         {
             private readonly WebPageBase _page;
             private readonly TagBuilder _tagBuilder;
-            private readonly string _info;
 
-            public Chunk(WebPageBase page, TagBuilder tagBuilder, string info)
+            public Chunk(WebPageBase page, TagBuilder tagBuilder)
             {
                 _page = page;
                 _tagBuilder = tagBuilder;
-                _info = info;
 
 
                 if (tagBuilder == null) return;

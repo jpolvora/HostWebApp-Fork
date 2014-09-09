@@ -22,7 +22,7 @@ namespace MvcLib.Common.Mvc
 
         public override void ExecutePageHierarchy()
         {
-            if (IsAjax || string.IsNullOrWhiteSpace(Layout))
+            if (IsAjax)
             {
                 base.ExecutePageHierarchy();
                 return;
@@ -37,19 +37,16 @@ namespace MvcLib.Common.Mvc
             }
         }
 
-        public override HelperResult RenderPage(string path, params object[] data)
-        {
-            using (this.BeginChunk("div", path, "page"))
-            {
-                return base.RenderPage(path, data);
-            }
-        }
-
         public HelperResult RenderSectionEx(string name, bool required = false)
         {
+            if (IsAjax)
+            {
+                return RenderSection(name, required);
+            }
+
             using (this.BeginChunk("div", name, "section"))
             {
-                return RenderSection(name, false);
+                return RenderSection(name, required);
             }
         }
     }
