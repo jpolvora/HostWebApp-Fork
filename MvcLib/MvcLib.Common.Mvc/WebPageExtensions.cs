@@ -40,7 +40,7 @@ namespace MvcLib.Common.Mvc
                 throw new ArgumentNullException("tag");
 
             TagBuilder tagBuilder = new TagBuilder(tag);
-            tagBuilder.Attributes["data-virtualpath"] = VirtualPathUtility.ToAbsolute(info).ToLowerInvariant();
+            tagBuilder.Attributes["data-virtualpath"] = info.ToLowerInvariant();
 
             foreach (var @class in classes)
             {
