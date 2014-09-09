@@ -24,7 +24,7 @@ namespace MvcLib.Common.Mvc
                 return;
             }
 
-            using (DisposableTimer.StartNew(GetType().Name))
+            using (DisposableTimer.StartNew("CustomWebViewPage: " + this.VirtualPath))
             {
                 using (this.BeginChunk("div", VirtualPath, "section"))
                 {
@@ -63,7 +63,7 @@ namespace MvcLib.Common.Mvc
                 return;
             }
 
-            using (DisposableTimer.StartNew(GetType().Name))
+            using (DisposableTimer.StartNew("CustomWebViewPage<" + typeof(T).Name + ">: " + this.VirtualPath))
             {
                 using (this.BeginChunk("div", VirtualPath, "section"))
                 {

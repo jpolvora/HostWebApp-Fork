@@ -28,7 +28,7 @@ namespace MvcLib.Common.Mvc
                 return;
             }
 
-            using (DisposableTimer.StartNew(GetType().Name))
+            using (DisposableTimer.StartNew("CustomPageBase: " + this.VirtualPath))
             {
                 using (this.BeginChunk("div", VirtualPath, "section"))
                 {
