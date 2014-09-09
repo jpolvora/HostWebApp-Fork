@@ -133,12 +133,14 @@ namespace MvcLib.Bootstrapper
 
                 Trace.TraceInformation("[Bootstrapper]:cfg.Kompiler.Enabled = {0}", cfg.Kompiler.Enabled);
                 KompilerEntryPoint.AddReferences(
-                    typeof(Controller),
-                    typeof(WebPageRenderingBase),
-                    typeof(WebCacheWrapper),
-                    typeof(ViewRenderer),
-                    typeof(DbToLocal),
-                    typeof(ErrorModel));
+                    typeof(Controller), //mvc
+                    typeof(WebPageRenderingBase), //webpages
+                    typeof(WebCacheWrapper), // mvclib.common
+                    typeof(ViewRenderer), //mvclib.common.mvc
+                    typeof(DbToLocal), //mvclib.fsdump
+                    typeof(IPlugin), //mvclib.pluginloader
+                    typeof(DbFileContext), //mvclib.dbfilesystem
+                    typeof(ErrorModel)); //mvclib.httpmodules
 
                 if (cfg.Kompiler.Enabled)
                 {
