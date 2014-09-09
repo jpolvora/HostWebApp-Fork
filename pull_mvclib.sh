@@ -1,2 +1,2 @@
-git fetch MvcLib master
-git subtree pull --prefix=MvcLib MvcLib master --squash
+git fetch Frankstein master
+git subtree pull --prefix=Frankstein Frankstein master --squash
