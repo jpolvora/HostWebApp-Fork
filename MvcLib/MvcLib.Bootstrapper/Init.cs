@@ -313,12 +313,12 @@ namespace MvcLib.Bootstrapper
                             {
                                 Subject = "App Startup Log: " + DateTime.Now,
                                 IsBodyHtml = false,
-                                BodyEncoding = Encoding.UTF8,
-                                Body = ""
+                                BodyEncoding = Encoding.ASCII
                             };
 
                             var alternate = AlternateView.CreateAlternateViewFromString(body,
                                 new ContentType("text/plain"));
+                            
                             msg.AlternateViews.Add(alternate);
 
                             Trace.TraceInformation("[Bootstrapper]:Sending startup log email to {0}", cfg.Mail.MailDeveloper);
