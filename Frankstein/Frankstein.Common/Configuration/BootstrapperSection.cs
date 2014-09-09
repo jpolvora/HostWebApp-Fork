@@ -13,17 +13,17 @@ namespace Frankstein.Common.Configuration
         {
             try
             {
-                Instance = (BootstrapperSection)ConfigurationManager.GetSection("MvcLib");
+                Instance = (BootstrapperSection)ConfigurationManager.GetSection("Frankstein");
             }
             catch (Exception ex)
             {
-                Trace.TraceInformation("Exception Reading MvcLib section configuration: {0}", ex.Message);
+                Trace.TraceInformation("Exception Reading Frankstein section configuration: {0}", ex.Message);
             }
             finally
             {
                 if (Instance == null)
                 {
-                    Trace.TraceInformation("MvcLib section loaded with default values");
+                    Trace.TraceInformation("Frankstein section loaded with default values");
                     Instance = new BootstrapperSection()
                     {
                         DbFileContext = new DbFileContextElement(),
@@ -46,7 +46,7 @@ namespace Frankstein.Common.Configuration
                     };
 
                 }
-                Trace.TraceInformation("Reading MvcLib section configuration: {0}", Instance != null);
+                Trace.TraceInformation("Reading Frankstein section configuration: {0}", Instance != null);
             }
             return Instance;
         }
