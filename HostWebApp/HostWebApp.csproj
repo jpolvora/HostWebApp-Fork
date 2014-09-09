@@ -828,41 +828,41 @@
     <Folder Include="_plugins\" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="$(SolutionDir)\MvcLib\MvcLib.Bootstrapper\MvcLib.Bootstrapper.csproj">
+    <ProjectReference Include="..\Frankstein\Frankstein.Bootstrapper\Frankstein.Bootstrapper.csproj">
       <Project>{741f4607-7d76-481f-9d5e-015fbb95aa84}</Project>
-      <Name>MvcLib.Bootstrapper</Name>
+      <Name>Frankstein.Bootstrapper</Name>
     </ProjectReference>
-    <ProjectReference Include="$(SolutionDir)\MvcLib\MvcLib.Common.Mvc\MvcLib.Common.Mvc.csproj">
+    <ProjectReference Include="..\Frankstein\Frankstein.Common.Mvc\Frankstein.Common.Mvc.csproj">
       <Project>{4550bc11-b931-4872-87fd-726957542efa}</Project>
-      <Name>MvcLib.Common.Mvc</Name>
+      <Name>Frankstein.Common.Mvc</Name>
     </ProjectReference>
-    <ProjectReference Include="$(SolutionDir)\MvcLib\MvcLib.Common\MvcLib.Common.csproj">
+    <ProjectReference Include="..\Frankstein\Frankstein.Common\Frankstein.Common.csproj">
       <Project>{7ea8cab5-30b9-4069-a8c5-d553ca4016b0}</Project>
-      <Name>MvcLib.Common</Name>
+      <Name>Frankstein.Common</Name>
     </ProjectReference>
-    <ProjectReference Include="..\MvcLib\MvcLib.CustomVPP\MvcLib.CustomVPP.csproj">
-      <Project>{6c33542a-e1a8-4487-8639-6b44d527847a}</Project>
-      <Name>MvcLib.CustomVPP</Name>
-    </ProjectReference>
-    <ProjectReference Include="$(SolutionDir)\MvcLib\MvcLib.DbFileSystem\MvcLib.DbFileSystem.csproj">
+    <ProjectReference Include="..\Frankstein\Frankstein.DbFileSystem\Frankstein.DbFileSystem.csproj">
       <Project>{969929c3-2898-49b8-9ec8-de7a28884524}</Project>
-      <Name>MvcLib.DbFileSystem</Name>
+      <Name>Frankstein.DbFileSystem</Name>
     </ProjectReference>
-    <ProjectReference Include="$(SolutionDir)\MvcLib\MvcLib.FsDump\MvcLib.FsDump.csproj">
+    <ProjectReference Include="..\Frankstein\Frankstein.FsDump\Frankstein.FsDump.csproj">
       <Project>{3971d9ad-bb07-4675-babf-471be04e2490}</Project>
-      <Name>MvcLib.FsDump</Name>
+      <Name>Frankstein.FsDump</Name>
     </ProjectReference>
-    <ProjectReference Include="$(SolutionDir)\MvcLib\MvcLib.HttpModules\MvcLib.HttpModules.csproj">
+    <ProjectReference Include="..\Frankstein\Frankstein.HttpModules\Frankstein.HttpModules.csproj">
       <Project>{061afd8c-defa-4ac6-8cb5-e9a4def11d40}</Project>
-      <Name>MvcLib.HttpModules</Name>
+      <Name>Frankstein.HttpModules</Name>
     </ProjectReference>
-    <ProjectReference Include="$(SolutionDir)\MvcLib\MvcLib.Kompiler\MvcLib.Kompiler.csproj">
+    <ProjectReference Include="..\Frankstein\Frankstein.Kompiler\Frankstein.Kompiler.csproj">
       <Project>{03b91668-cf22-48fb-8853-82abfa6e2a27}</Project>
-      <Name>MvcLib.Kompiler</Name>
+      <Name>Frankstein.Kompiler</Name>
     </ProjectReference>
-    <ProjectReference Include="$(SolutionDir)\MvcLib\MvcLib.PluginLoader\MvcLib.PluginLoader.csproj">
+    <ProjectReference Include="..\Frankstein\Frankstein.PluginLoader\Frankstein.PluginLoader.csproj">
       <Project>{ffbe8285-9c7a-41f6-bf1e-58de5cac726d}</Project>
-      <Name>MvcLib.PluginLoader</Name>
+      <Name>Frankstein.PluginLoader</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Frankstein\Frankstein.VirtualPathProviders\Frankstein.VirtualPathProviders.csproj">
+      <Project>{6c33542a-e1a8-4487-8639-6b44d527847a}</Project>
+      <Name>Frankstein.VirtualPathProviders</Name>
     </ProjectReference>
   </ItemGroup>
   <PropertyGroup>

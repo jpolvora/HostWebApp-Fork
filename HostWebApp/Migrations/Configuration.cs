@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-using MvcLib.Common.Configuration;
-using MvcLib.DbFileSystem;
+﻿using Frankstein.Common.Configuration;
+using Frankstein.DbFileSystem;
 
 namespace HostWebApp.Migrations
 {

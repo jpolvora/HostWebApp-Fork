@@ -14,23 +14,23 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{5F99E9
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SubTree_MvcLib", "SubTree_MvcLib", "{42293AF8-1211-4E32-8B48-1C7C473B5900}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MvcLib.Bootstrapper", "MvcLib\MvcLib.Bootstrapper\MvcLib.Bootstrapper.csproj", "{741F4607-7D76-481F-9D5E-015FBB95AA84}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Frankstein.Bootstrapper", "Frankstein\Frankstein.Bootstrapper\Frankstein.Bootstrapper.csproj", "{741F4607-7D76-481F-9D5E-015FBB95AA84}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MvcLib.Common", "MvcLib\MvcLib.Common\MvcLib.Common.csproj", "{7EA8CAB5-30B9-4069-A8C5-D553CA4016B0}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Frankstein.Common", "Frankstein\Frankstein.Common\Frankstein.Common.csproj", "{7EA8CAB5-30B9-4069-A8C5-D553CA4016B0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MvcLib.Common.Mvc", "MvcLib\MvcLib.Common.Mvc\MvcLib.Common.Mvc.csproj", "{4550BC11-B931-4872-87FD-726957542EFA}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Frankstein.Common.Mvc", "Frankstein\Frankstein.Common.Mvc\Frankstein.Common.Mvc.csproj", "{4550BC11-B931-4872-87FD-726957542EFA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MvcLib.CustomVPP", "MvcLib\MvcLib.CustomVPP\MvcLib.CustomVPP.csproj", "{6C33542A-E1A8-4487-8639-6B44D527847A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Frankstein.VirtualPathProviders", "Frankstein\Frankstein.VirtualPathProviders\Frankstein.VirtualPathProviders.csproj", "{6C33542A-E1A8-4487-8639-6B44D527847A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MvcLib.DbFileSystem", "MvcLib\MvcLib.DbFileSystem\MvcLib.DbFileSystem.csproj", "{969929C3-2898-49B8-9EC8-DE7A28884524}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Frankstein.DbFileSystem", "Frankstein\Frankstein.DbFileSystem\Frankstein.DbFileSystem.csproj", "{969929C3-2898-49B8-9EC8-DE7A28884524}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MvcLib.FsDump", "MvcLib\MvcLib.FsDump\MvcLib.FsDump.csproj", "{3971D9AD-BB07-4675-BABF-471BE04E2490}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Frankstein.FsDump", "Frankstein\Frankstein.FsDump\Frankstein.FsDump.csproj", "{3971D9AD-BB07-4675-BABF-471BE04E2490}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MvcLib.HttpModules", "MvcLib\MvcLib.HttpModules\MvcLib.HttpModules.csproj", "{061AFD8C-DEFA-4AC6-8CB5-E9A4DEF11D40}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Frankstein.HttpModules", "Frankstein\Frankstein.HttpModules\Frankstein.HttpModules.csproj", "{061AFD8C-DEFA-4AC6-8CB5-E9A4DEF11D40}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MvcLib.Kompiler", "MvcLib\MvcLib.Kompiler\MvcLib.Kompiler.csproj", "{03B91668-CF22-48FB-8853-82ABFA6E2A27}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Frankstein.Kompiler", "Frankstein\Frankstein.Kompiler\Frankstein.Kompiler.csproj", "{03B91668-CF22-48FB-8853-82ABFA6E2A27}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MvcLib.PluginLoader", "MvcLib\MvcLib.PluginLoader\MvcLib.PluginLoader.csproj", "{FFBE8285-9C7A-41F6-BF1E-58DE5CAC726D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Frankstein.PluginLoader", "Frankstein\Frankstein.PluginLoader\Frankstein.PluginLoader.csproj", "{FFBE8285-9C7A-41F6-BF1E-58DE5CAC726D}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{6AA9AACA-367B-4B44-BF08-6AD8C2E0F2B7}"
 	ProjectSection(SolutionItems) = preProject
