@@ -122,13 +122,13 @@ namespace MvcLib.HttpModules
                         }
                         else
                         {
-                            Trace.TraceInformation("Executing ProcessRequest of Handler {0}", application.Context.CurrentHandler);
+                            Trace.TraceInformation("[TracerHttpModule]:Executing ProcessRequest of Handler {0}", application.Context.CurrentHandler);
                         }
                     }
                     break;
                 case RequestNotification.ReleaseRequestState:
                     {
-                        Trace.TraceInformation("Response Filter: {0}", application.Context.Response.Filter);
+                        Trace.TraceInformation("[TracerHttpModule]:Response Filter: {0}", application.Context.Response.Filter);
                         break;
                     }
                 case RequestNotification.EndRequest:
@@ -157,7 +157,7 @@ namespace MvcLib.HttpModules
 
             if (context.Items.Contains("IIS_WasUrlRewritten") || context.Items.Contains("HTTP_X_ORIGINAL_URL"))
             {
-                Trace.TraceInformation("Url was rewriten from '{0}' to '{1}'",
+                Trace.TraceInformation("[TracerHttpModule]:Url was rewriten from '{0}' to '{1}'",
                     context.Request.ServerVariables["HTTP_X_ORIGINAL_URL"],
                     context.Request.ServerVariables["SCRIPT_NAME"]);
             }

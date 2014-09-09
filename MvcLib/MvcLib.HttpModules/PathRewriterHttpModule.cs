@@ -16,7 +16,7 @@ namespace MvcLib.HttpModules
             if (!_rewriteBasePath.StartsWith("~"))
                 _rewriteBasePath = "~" + _rewriteBasePath;
 
-            Trace.TraceInformation("[PathRewriterHttpModule]: {0}", _rewriteBasePath);
+            Trace.TraceInformation("[PathRewriterHttpModule]: '{0}'", _rewriteBasePath);
         }
 
         public void Init(HttpApplication context)
@@ -44,7 +44,7 @@ namespace MvcLib.HttpModules
 
             string newpath = string.Format("{0}{1}", _rewriteBasePath.Substring(1), path);
 
-            Trace.TraceInformation("Rewriting path from '{0}' to '{1}", path, newpath);
+            Trace.TraceInformation("[PathRewriterHttpModule]:Rewriting path from '{0}' to '{1}'", path, newpath);
             application.Context.RewritePath(newpath);
         }
 
