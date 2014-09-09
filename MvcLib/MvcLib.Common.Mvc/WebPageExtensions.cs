@@ -33,13 +33,21 @@ namespace MvcLib.Common.Mvc
             return HttpRuntime.Cache[rootRelativePath] as string;
         }
 
-        public static Chunk BeginChunk(this TextWriter writer, string tag, string virtualPath, params string[] classes)
+        public static Chunk BeginChunk(this TextWriter writer, string tag, string info, bool isSection, params string[] classes)
         {
             if (string.IsNullOrWhiteSpace(tag))
                 throw new ArgumentNullException("tag");
 
             var tagBuilder = new TagBuilder(tag);
-            tagBuilder.Attributes["data-virtualpath"] = virtualPath.ToLowerInvariant();
+            if (isSection)
+            {
+                tagBuilder.Attributes["data-virtualpath"] = info.TrimStart('~').ToLowerInvariant();
+            }
+            else
+            {
+                tagBuilder.Attributes["data-section"] = info.ToLowerInvariant();
+            }
+            
 
             foreach (var @class in classes)
             {
