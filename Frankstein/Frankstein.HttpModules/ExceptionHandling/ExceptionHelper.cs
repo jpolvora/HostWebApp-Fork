@@ -3,21 +3,21 @@ using System.Diagnostics;
 using System.Web;
 using System.Web.WebPages;
 
-namespace Frankstein.HttpModules
+namespace Frankstein.HttpModules.ExceptionHandling
 {
-    public class ExceptionHandler<TException> : IDisposable
+    public class ExceptionHelper<TException> : IDisposable
         where TException : Exception
     {
         protected readonly HttpApplication Application;
         protected readonly string ErrorViewPath;
         protected readonly Action<HttpException> LogAction;
 
-        public ExceptionHandler(HttpApplication application, string errorViewPath)
+        public ExceptionHelper(HttpApplication application, string errorViewPath)
             : this(application, errorViewPath, exception => Trace.TraceError(exception.Message))
         {
         }
 
-        public ExceptionHandler(HttpApplication application, string errorViewPath, Action<HttpException> logAction)
+        public ExceptionHelper(HttpApplication application, string errorViewPath, Action<HttpException> logAction)
         {
             Application = application;
             ErrorViewPath = errorViewPath;
@@ -36,7 +36,7 @@ namespace Frankstein.HttpModules
 
             var rootException = httpException.GetBaseException();
 
-            Trace.TraceError("[ExceptionHandler]: {0}", rootException.Message);
+            Trace.TraceError("[ExceptionHelper]: {0}", rootException.Message);
 
             if (IsProduction())
             {

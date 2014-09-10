@@ -1,4 +1,4 @@
-﻿@if (Request.IsLocal)
+﻿@if (Request.IsAuthenticated)
 {
     @IsRazorWebPage.ToString()
     @ServerInfo.GetHtml()

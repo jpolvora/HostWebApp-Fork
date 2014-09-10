@@ -8,11 +8,11 @@ using Frankstein.Common;
 using Frankstein.Common.Configuration;
 using Frankstein.Common.Mvc;
 
-namespace Frankstein.HttpModules
+namespace Frankstein.HttpModules.ExceptionHandling
 {
-    public class RazorRenderExceptionHandler : ExceptionHandler<CustomException>
+    public class RazorRenderExceptionHelper : ExceptionHelper<CustomException>
     {
-        public RazorRenderExceptionHandler(HttpApplication application, string errorViewPath)
+        public RazorRenderExceptionHelper(HttpApplication application, string errorViewPath)
             : base(application, errorViewPath, LogActionEx)
         {
         }
@@ -26,7 +26,7 @@ namespace Frankstein.HttpModules
             if (cfg.Mail.SendExceptionToDeveloper &&
                 (HttpContext.Current == null || !HttpContext.Current.IsDebuggingEnabled))
             {
-                Trace.TraceInformation("[RazorRenderExceptionHandler]: Preparing to send email to developer");
+                Trace.TraceInformation("[RazorRenderExceptionHelper]: Preparing to send email to developer");
                 string body = exception.GetHtmlErrorMessage();
                 if (string.IsNullOrWhiteSpace(body))
                     body = exception.ToString();
@@ -44,13 +44,13 @@ namespace Frankstein.HttpModules
                             };
                             
                             client.Send(msg);
-                            Trace.TraceInformation("[RazorRenderExceptionHandler]: Email was sent to {0}",
+                            Trace.TraceInformation("[RazorRenderExceptionHelper]: Email was sent to {0}",
                                 cfg.Mail.MailDeveloper);
                         }
                     }
                     catch (Exception ex)
                     {
-                        Trace.TraceError("[RazorRenderExceptionHandler]: Failed to send email. {0}", ex.Message);
+                        Trace.TraceError("[RazorRenderExceptionHelper]: Failed to send email. {0}", ex.Message);
                         LogEvent.Raise(exception.Message, exception.GetBaseException());
                     }
                 });
@@ -74,7 +74,7 @@ namespace Frankstein.HttpModules
         {
             //Application.Context.RewritePath(ErrorViewPath);
 
-            Trace.TraceInformation("[RazorRenderExceptionHandler]: Rendering Custom Exception");
+            Trace.TraceInformation("[RazorRenderExceptionHelper]: Rendering Custom Exception");
             var model = new ErrorModel()
             {
                 Message = exception.Message,

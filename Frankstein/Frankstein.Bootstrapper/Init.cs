@@ -20,6 +20,7 @@ using Frankstein.Common.Mvc;
 using Frankstein.DbFileSystem;
 using Frankstein.FsDump;
 using Frankstein.HttpModules;
+using Frankstein.HttpModules.ExceptionHandling;
 using Frankstein.Kompiler;
 using Frankstein.PluginLoader;
 using Frankstein.VirtualPathProviders;

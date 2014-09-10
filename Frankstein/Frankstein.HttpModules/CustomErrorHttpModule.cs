@@ -1,6 +1,7 @@
 using System;
 using System.Web;
 using Frankstein.Common.Configuration;
+using Frankstein.HttpModules.ExceptionHandling;
 
 namespace Frankstein.HttpModules
 {
@@ -29,7 +30,7 @@ namespace Frankstein.HttpModules
             //  <error statusCode="500" path="/500.cshtml" responseMode="ExecuteURL"/>
             //</httpErrors>
 
-            using (var razorhelper = new RazorRenderExceptionHandler(sender as HttpApplication, _errorViewPath))
+            using (var razorhelper = new RazorRenderExceptionHelper(sender as HttpApplication, _errorViewPath))
             {
                 razorhelper.HandleError();
             }
