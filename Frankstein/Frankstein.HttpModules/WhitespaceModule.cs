@@ -47,7 +47,7 @@ namespace Frankstein.HttpModules
             private readonly MemoryStream _cache;
             private readonly static HtmlMinifier _minifier = new HtmlMinifier(new HtmlMinificationSettings
             {
-                WhitespaceMinificationMode = WhitespaceMinificationMode.Aggressive,
+                WhitespaceMinificationMode = WhitespaceMinificationMode.Medium,
                 RemoveRedundantAttributes = false
             });
 

@@ -60,6 +60,8 @@ namespace Frankstein.Kompiler
                 return sb.ToString();
             }
 
+            Trace.TraceInformation("[CodeDomWrapper]: Compilation SUCCESS.");
+
             var file = result.PathToAssembly;
             buffer = File.ReadAllBytes(file);
 
