@@ -44,7 +44,7 @@ namespace Frankstein.DbFileSystem
         {
             Configuration.LazyLoadingEnabled = false;
             Configuration.ProxyCreationEnabled = false;
-            Configuration.AutoDetectChangesEnabled = false;
+            //Configuration.AutoDetectChangesEnabled = false;
 
             if (Verbose)
             {
