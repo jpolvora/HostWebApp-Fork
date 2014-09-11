@@ -1,4 +1,7 @@
-﻿// Because sometimes you need to style the cursor's line.
+// CodeMirror, copyright (c) by Marijn Haverbeke and others
+// Distributed under an MIT license: http://codemirror.net/LICENSE
+
+// Because sometimes you need to style the cursor's line.
 //
 // Adds an option 'styleActiveLine' which, when enabled, gives the
 // active line's wrapping <div> the CSS class "CodeMirror-activeline",
@@ -46,7 +49,9 @@
   function updateActiveLines(cm, ranges) {
     var active = [];
     for (var i = 0; i < ranges.length; i++) {
-      var line = cm.getLineHandleVisualStart(ranges[i].head.line);
+      var range = ranges[i];
+      if (!range.empty()) continue;
+      var line = cm.getLineHandleVisualStart(range.head.line);
       if (active[active.length - 1] != line) active.push(line);
     }
     if (sameArray(cm.state.activeLines, active)) return;

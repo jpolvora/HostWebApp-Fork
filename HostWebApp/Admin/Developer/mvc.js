@@ -587,6 +587,67 @@ public class Shell \n\
         }
     },
 
+    openText: function(title, text, mode) {
+        var self = this;
+        var widgetName = title;
+        var panel = self.getTabpanel();
+        var widget = this.getTabByWidgetName(widgetName) || Ext.widget('panel', {
+            _widgetName: widgetName,
+            title: title,
+            layout: {
+                align: 'stretch',
+                pack: 'center',
+                type: 'fit'
+            },
+            plain: true,
+            border: 0,
+            bodyPadding: 0,
+            padding: 0,
+            items: [
+             {
+                 xtype: 'textareafield',
+                 bodyPadding: 0,
+                 margin: 0,
+                 region: 'center',
+                 anchor: '100%'
+             }
+            ],
+          
+            listeners: {
+                afterrender: function () {
+                    var txt = widget.query('textareafield')[0];
+                    txt.setValue(text);
+                    var txtArea = txt.inputEl.dom;
+
+                    var editor = CodeMirror.fromTextArea(txtArea, {
+                        mode: mode || 'clike',
+                        autofocus: true,
+                        indentWithTabs: true,
+                        indentUnit: 4,
+                        lineNumbers: true,
+                        matchBrackets: true,
+                        autoCloseBrackets: true,
+                        matchTags: true,
+                        styleActiveLine: true,
+                        theme: 'eclipse'
+                    });
+
+                    widget._editor = editor;
+
+                    editor.setSize('100%', '100%');
+                }
+            }
+        });
+
+        if (widget && (widget instanceof Ext.panel.Panel)) {
+            if (this.tabExists(widgetName)) {
+                panel.setActiveTab(widget);
+            } else {
+                this.createTab(widget);
+            }
+        }
+    },
+
     //opens the selectedfile
     openFile: function (treeItem) {
         var self = this;
@@ -629,7 +690,7 @@ public class Shell \n\
                     var text = response.responseText;
                     var txt = widget.down('textareafield');
 
-                    txt.setValue(text);
+                    txt.setValue(text.trim());
 
                     var extension = title.substring(title.lastIndexOf(".") + 1);
                     var m;
@@ -765,7 +826,7 @@ public class Shell \n\
         if (!tab) tab = self.getActiveTab();
 
         if (tab && tab._changed) {
-            var txt = tab._editor.getValue();
+            var txt = tab._editor.getValue().trim();
             //alert(utf8_to_b64(txt));
             tab.el.mask("Salvando...");
             Ext.Ajax.request({
@@ -775,7 +836,8 @@ public class Shell \n\
                     isHidden: tab._isHidden,
                     content: utf8_to_b64(txt)
                 },
-                success: function () {
+                success: function (response) {
+                    console.log(arguments);
                     var store = Ext.getStore('FilesStore');
                     var record = store.getNodeById(tab._widgetName);
                     record.remove();
@@ -784,6 +846,11 @@ public class Shell \n\
                     self.writeOutput("Info", "Arquivo salvo com sucesso");
                     tab._changed = false;
                     tab.setTitle(tab.title.substring(0, tab.title.length - 2));
+
+                    var obj = Ext.decode(response.responseText);
+                    if (obj.generated) {
+                        self.openText('generated: ' + tab._widgetName, obj.generated, 'clike');
+                    }
                 },
                 callback: function (opt, success) {
                     tab.el.unmask();

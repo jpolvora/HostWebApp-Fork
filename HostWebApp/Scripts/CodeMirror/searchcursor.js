@@ -1,4 +1,7 @@
-﻿(function(mod) {
+// CodeMirror, copyright (c) by Marijn Haverbeke and others
+// Distributed under an MIT license: http://codemirror.net/LICENSE
+
+(function(mod) {
   if (typeof exports == "object" && typeof module == "object") // CommonJS
     mod(require("../../lib/codemirror"));
   else if (typeof define == "function" && define.amd) // AMD
@@ -104,7 +107,7 @@
             var from = Pos(pos.line, cut);
             for (var ln = pos.line + 1, i = 1; i < last; ++i, ++ln)
               if (target[i] != fold(doc.getLine(ln))) return;
-            if (doc.getLine(ln).slice(0, origTarget[last].length) != target[last]) return;
+            if (fold(doc.getLine(ln).slice(0, origTarget[last].length)) != target[last]) return;
             return {from: from, to: Pos(ln, origTarget[last].length)};
           }
         };
