@@ -1,7 +1,12 @@
 ﻿using System;
+using System.Diagnostics;
+using System.Web.Compilation;
 using System.Web.Mvc;
 using System.Web.Optimization;
+using System.Web.Razor;
+using System.Web.Razor.Generator;
 using System.Web.Routing;
+using System.Web.WebPages;
 using System.Web.WebPages.Razor;
 
 namespace HostWebApp
@@ -17,6 +22,11 @@ namespace HostWebApp
 
             //WebPageRazorHost.AddGlobalImport("MyApp");
             //WebPageRazorHost.AddGlobalImport("MyApp.Models");
+            //RazorBuildProvider.CodeGenerationCompleted += RazorBuildProviderOnCodeGenerationCompleted;
+            //BuildProvider.RegisterBuildProvider(".csmd", typeof(RazorBuildProvider));
+            //RazorCodeLanguage.Languages.Add("csmd", new CSharpRazorCodeLanguage());
+            //WebPageHttpHandler.RegisterExtension("csmd");
+
         }
 
         protected void Session_Start(object sender, EventArgs e)
