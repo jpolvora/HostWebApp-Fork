@@ -40,6 +40,7 @@ namespace Frankstein.HttpModules
                 virtualPath = string.Format("{0}{1}", _rewriteBasePath, "/default.cshtml");
                 if (HostingEnvironment.VirtualPathProvider.FileExists(virtualPath))
                 {
+                    Trace.TraceInformation("[PathRewriterHttpModule]:Rewriting path from '{0}' to '{1}'", path, virtualPath);
                     application.Context.RewritePath(virtualPath);
                 }
                 return; //fallback to mvc
