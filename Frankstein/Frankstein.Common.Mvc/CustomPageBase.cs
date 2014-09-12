@@ -22,14 +22,15 @@ namespace Frankstein.Common.Mvc
 
         public override void ExecutePageHierarchy()
         {
-            if (IsAjax)
-            {
-                base.ExecutePageHierarchy();
-                return;
-            }
-
             using (DisposableTimer.StartNew("CustomPageBase: " + this.VirtualPath))
             {
+                if (IsAjax || string.IsNullOrWhiteSpace(Layout))
+                {
+                    base.ExecutePageHierarchy();
+                    return;
+                }
+
+
                 using (Output.BeginChunk("div", VirtualPath, false, "page"))
                 {
                     base.ExecutePageHierarchy();
@@ -39,7 +40,7 @@ namespace Frankstein.Common.Mvc
 
         public HelperResult RenderSectionEx(string name, bool required = false)
         {
-            if (IsAjax)
+            if (IsAjax || string.IsNullOrWhiteSpace(Layout))
             {
                 return RenderSection(name, required);
             }
