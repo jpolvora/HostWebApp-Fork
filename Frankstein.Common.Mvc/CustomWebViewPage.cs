@@ -18,14 +18,14 @@ namespace Frankstein.Common.Mvc
 
         public override void ExecutePageHierarchy()
         {
-            if (IsAjax)
-            {
-                base.ExecutePageHierarchy();
-                return;
-            }
-
             using (DisposableTimer.StartNew("CustomWebViewPage: " + this.VirtualPath))
             {
+                if (IsAjax || string.IsNullOrWhiteSpace(Layout))
+                {
+                    base.ExecutePageHierarchy();
+                    return;
+                }
+
                 using (Output.BeginChunk("div", VirtualPath, false, "view"))
                 {
                     base.ExecutePageHierarchy();
@@ -35,22 +35,26 @@ namespace Frankstein.Common.Mvc
 
         public HelperResult RenderSectionEx(string name, bool required = false)
         {
-            if (IsAjax)
-            {
-                return RenderSection(name, required);
-            }
-
             var result = RenderSection(name, required);
 
             if (result == null)
                 return null;
 
+            var page = this;
+
             //encapsula o resultado da section num novo resultado
             return new HelperResult(writer =>
             {
-                using (writer.BeginChunk("div", name, true, "section"))
+                using (writer.BeginChunk("div", string.Format("{0}_{1}", page.VirtualPath, name), true, "section"))
                 {
-                    result.WriteTo(writer);
+                    try
+                    {
+                        result.WriteTo(writer);
+                    }
+                    catch
+                    {
+                        //já foi renderizado
+                    }
                 }
             });
         }
@@ -71,14 +75,14 @@ namespace Frankstein.Common.Mvc
 
         public override void ExecutePageHierarchy()
         {
-            if (IsAjax)
-            {
-                base.ExecutePageHierarchy();
-                return;
-            }
-
             using (DisposableTimer.StartNew("CustomWebViewPage<" + typeof(T).Name + ">: " + this.VirtualPath))
             {
+                if (IsAjax || string.IsNullOrWhiteSpace(Layout))
+                {
+                    base.ExecutePageHierarchy();
+                    return;
+                }
+
                 using (Output.BeginChunk("div", VirtualPath, false, "view"))
                 {
                     base.ExecutePageHierarchy();
@@ -88,23 +92,26 @@ namespace Frankstein.Common.Mvc
 
         public HelperResult RenderSectionEx(string name, bool required = false)
         {
-            if (IsAjax)
-            {
-                return RenderSection(name, required);
-            }
-
             var result = RenderSection(name, required);
-
 
             if (result == null)
                 return null;
 
+            var page = this;
+
             //encapsula o resultado da section num novo resultado
             return new HelperResult(writer =>
             {
-                using (writer.BeginChunk("div", name, true, "section"))
+                using (writer.BeginChunk("div", string.Format("{0}_{1}", page.VirtualPath, name), true, "section"))
                 {
-                    result.WriteTo(writer);
+                    try
+                    {
+                        result.WriteTo(writer);
+                    }
+                    catch
+                    {
+                        //já foi renderizado
+                    }
                 }
             });
         }
