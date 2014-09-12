@@ -35,22 +35,26 @@ namespace Frankstein.Common.Mvc
 
         public HelperResult RenderSectionEx(string name, bool required = false)
         {
-            if (IsAjax || string.IsNullOrWhiteSpace(Layout))
-            {
-                return RenderSection(name, required);
-            }
-
             var result = RenderSection(name, required);
 
             if (result == null)
                 return null;
 
+            var page = this;
+
             //encapsula o resultado da section num novo resultado
             return new HelperResult(writer =>
             {
-                using (writer.BeginChunk("div", name, true, "section"))
+                using (writer.BeginChunk("div", string.Format("{0}_{1}", page.VirtualPath, name), true, "section"))
                 {
-                    result.WriteTo(writer);
+                    try
+                    {
+                        result.WriteTo(writer);
+                    }
+                    catch
+                    {
+                        //já foi renderizado
+                    }
                 }
             });
         }
@@ -88,23 +92,26 @@ namespace Frankstein.Common.Mvc
 
         public HelperResult RenderSectionEx(string name, bool required = false)
         {
-            if (IsAjax || string.IsNullOrWhiteSpace(Layout))
-            {
-                return RenderSection(name, required);
-            }
-
             var result = RenderSection(name, required);
-
 
             if (result == null)
                 return null;
 
+            var page = this;
+
             //encapsula o resultado da section num novo resultado
             return new HelperResult(writer =>
             {
-                using (writer.BeginChunk("div", name, true, "section"))
+                using (writer.BeginChunk("div", string.Format("{0}_{1}", page.VirtualPath, name), true, "section"))
                 {
-                    result.WriteTo(writer);
+                    try
+                    {
+                        result.WriteTo(writer);
+                    }
+                    catch
+                    {
+                        //já foi renderizado
+                    }
                 }
             });
         }
