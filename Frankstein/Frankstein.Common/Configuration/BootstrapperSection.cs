@@ -90,6 +90,13 @@ namespace Frankstein.Common.Configuration
             set { this["traceoutput"] = value; }
         }
 
+        [ConfigurationProperty("appname", DefaultValue = "Frankstein")]
+        public string AppName
+        {
+            get { return (string)this["appname"]; }
+            set { this["appname"] = value; }
+        }
+
         [ConfigurationProperty("httpmodules")]
         public HttpModulesElement HttpModules
         {
