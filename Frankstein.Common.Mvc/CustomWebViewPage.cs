@@ -42,6 +42,9 @@ namespace Frankstein.Common.Mvc
 
             var result = RenderSection(name, required);
 
+            if (result == null)
+                return null;
+
             //encapsula o resultado da section num novo resultado
             return new HelperResult(writer =>
             {
@@ -91,6 +94,10 @@ namespace Frankstein.Common.Mvc
             }
 
             var result = RenderSection(name, required);
+
+
+            if (result == null)
+                return null;
 
             //encapsula o resultado da section num novo resultado
             return new HelperResult(writer =>
