@@ -55,6 +55,10 @@
     <Compile Include="DbFileContextConfig.cs" />
     <Compile Include="DbFileContextMigrationInitializer.cs" />
     <Compile Include="DbFileContextMigrationConfiguration.cs" />
+    <Compile Include="EF\DecimalMappingAttribute.cs" />
+    <Compile Include="EF\DecimalMappingAttributeConvention.cs" />
+    <Compile Include="EF\MapToCharAttribute.cs" />
+    <Compile Include="EF\MapToCharAttributeConvention.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
