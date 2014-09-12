@@ -1,13 +1,19 @@
 ﻿using System;
 using System.Data.Entity;
+using System.Data.Entity.ModelConfiguration.Conventions;
 using System.Diagnostics;
+using System.Threading;
+using Frankstein.Common;
 using Frankstein.Common.Configuration;
+using Frankstein.DbFileSystem.EF;
 
 namespace Frankstein.DbFileSystem
 {
     public class DbFileContext : DbContext
     {
         private static bool _initialized;
+
+        protected string Modifier { get; private set; }
 
         public DbSet<DbFile> DbFiles { get; set; }
 
@@ -44,7 +50,8 @@ namespace Frankstein.DbFileSystem
         {
             Configuration.LazyLoadingEnabled = false;
             Configuration.ProxyCreationEnabled = false;
-            //Configuration.AutoDetectChangesEnabled = false;
+
+            Modifier = Thread.CurrentPrincipal != null ? Thread.CurrentPrincipal.Identity.Name : "";
 
             if (Verbose)
             {
@@ -64,6 +71,12 @@ namespace Frankstein.DbFileSystem
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
+            modelBuilder.Conventions.Remove<OneToManyCascadeDeleteConvention>();
+            modelBuilder.Conventions.Remove<ManyToManyCascadeDeleteConvention>();
+
+            modelBuilder.Conventions.Add(new MapToCharAttributeConvention());
+            modelBuilder.Conventions.Add(new DecimalMappingAttributeConvention());
+
             base.OnModelCreating(modelBuilder);
         }
 
@@ -83,6 +96,8 @@ namespace Frankstein.DbFileSystem
                         auditable.Entity.Modified = DateTime.UtcNow;
                         break;
                 }
+
+                auditable.Entity.Modifier = Modifier.Truncate(100);
             }
 
             return base.SaveChanges();

@@ -21,6 +21,11 @@ namespace Frankstein.DbFileSystem
             }
 
         }
+
+        [StringLength(100)]
+        public string Modifier { get; set; }
+
+        public bool Status { get; set; }
     }
 
     public abstract class AuditableEntity<TKey> : AuditableEntity

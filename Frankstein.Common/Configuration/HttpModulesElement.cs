@@ -24,5 +24,12 @@ namespace Frankstein.Common.Configuration
             get { return (WhiteSpaceElement)this["whitespace"]; }
             set { this["whitespace"] = value; }
         }
+
+        [ConfigurationProperty("pathrewriter")]
+        public PathRewriter PathRewriter
+        {
+            get { return (PathRewriter)this["pathrewriter"]; }
+            set { this["pathrewriter"] = value; }
+        }
     }
 }

@@ -92,6 +92,12 @@ namespace Frankstein.Bootstrapper
                     DynamicModuleUtility.RegisterModule(typeof(WhitespaceModule));
                 }
 
+                Trace.TraceInformation("[Bootstrapper]:cfg.HttpModules.PathRewriter.Enabled = {0}", cfg.HttpModules.PathRewriter.Enabled);
+                if (cfg.HttpModules.PathRewriter.Enabled)
+                {
+                    DynamicModuleUtility.RegisterModule(typeof(PathRewriterHttpModule));
+                }
+
                 using (DisposableTimer.StartNew("DbFileContext"))
                 {
                     DbFileContext.Initialize();
@@ -123,8 +129,6 @@ namespace Frankstein.Bootstrapper
                 Trace.TraceInformation("[Bootstrapper]:cfg.DumpToLocal.Enabled = {0}", cfg.DumpToLocal.Enabled);
                 if (cfg.DumpToLocal.Enabled)
                 {
-                    DynamicModuleUtility.RegisterModule(typeof(PathRewriterHttpModule));
-
                     using (DisposableTimer.StartNew("DumpToLocal"))
                     {
                         DbToLocal.Execute();
