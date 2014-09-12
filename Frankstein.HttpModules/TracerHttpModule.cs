@@ -94,9 +94,9 @@ namespace Frankstein.HttpModules
                 return;
 
             var rid = application.Context.Items[RequestId];
-            Trace.TraceInformation("[TracerHttpModule]:{0}, rid: [{1}], [{2}], {3}",
+            Trace.TraceInformation("[TracerHttpModule]:{0}, rid: [{1}], [{2}], {3} {4}",
                 eventName, rid, application.Context.CurrentHandler,
-                application.User != null ? application.User.Identity.Name : "-");
+                application.User != null ? application.User.Identity.Name : "-", application.Context.Response.StatusCode);
 
             switch (application.Context.CurrentNotification)
             {
@@ -162,8 +162,8 @@ namespace Frankstein.HttpModules
                     context.Request.ServerVariables["SCRIPT_NAME"]);
             }
 
-            Trace.TraceInformation("[BeginRequest]:[{0}] {1} {2} {3}", rid, context.Request.HttpMethod,
-                context.Request.RawUrl, isAjax ? "Ajax: True" : "");
+            Trace.TraceInformation("[BeginRequest]:[{0}] {1} {2} {3} [{4}]", rid, context.Request.HttpMethod,
+                context.Request.RawUrl, isAjax ? "Ajax: True" : "", context.Request.UrlReferrer);
         }
 
         private static void OnEndRequest(HttpApplication application)

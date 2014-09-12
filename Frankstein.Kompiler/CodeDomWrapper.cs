@@ -23,6 +23,7 @@ namespace Frankstein.Kompiler
 
         public string CompileFromSource(Dictionary<string, string> files, out byte[] buffer)
         {
+            Trace.TraceInformation("[CodeDomWrapper]: Starting compilation");
             if (files == null)
                 throw new ArgumentNullException("files");
 
@@ -50,6 +51,7 @@ namespace Frankstein.Kompiler
 
             if (result.Errors.HasErrors)
             {
+                Trace.TraceWarning("[CodeDomWrapper]: Compilation has errors.");
                 var sb = new StringBuilder();
                 foreach (CompilerError error in result.Errors)
                 {
@@ -57,6 +59,8 @@ namespace Frankstein.Kompiler
                 }
                 return sb.ToString();
             }
+
+            Trace.TraceInformation("[CodeDomWrapper]: Compilation SUCCESS.");
 
             var file = result.PathToAssembly;
             buffer = File.ReadAllBytes(file);

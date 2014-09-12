@@ -20,6 +20,7 @@ using Frankstein.Common.Mvc;
 using Frankstein.DbFileSystem;
 using Frankstein.FsDump;
 using Frankstein.HttpModules;
+using Frankstein.HttpModules.ExceptionHandling;
 using Frankstein.Kompiler;
 using Frankstein.PluginLoader;
 using Frankstein.VirtualPathProviders;
@@ -62,7 +63,7 @@ namespace Frankstein.Bootstrapper
             {
             }
 
-            using (DisposableTimer.StartNew("[Bootstrapper]:PRE_START"))
+            using (DisposableTimer.StartNew("[Bootstrapper]:Frankstein PRE_START"))
             {
                 var executingAssembly = Assembly.GetExecutingAssembly();
                 Trace.TraceInformation("[Bootstrapper]:Entry Assembly: {0}", executingAssembly.GetName().Name);
@@ -177,7 +178,7 @@ namespace Frankstein.Bootstrapper
             _initialized = true;
 
             var cfg = BootstrapperSection.Instance;
-            using (DisposableTimer.StartNew("[Bootstrapper]:POST_START ..."))
+            using (DisposableTimer.StartNew("[Bootstrapper]:Frankstein POST_START"))
             {
                 Trace.TraceInformation("[Bootstrapper]:Debugging Enabled: {0}", HttpContext.Current.IsDebuggingEnabled);
                 Trace.TraceInformation("[Bootstrapper]:CustomErrors Enabled: {0}", HttpContext.Current.IsCustomErrorEnabled);
