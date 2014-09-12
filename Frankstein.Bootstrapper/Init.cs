@@ -317,14 +317,14 @@ namespace Frankstein.Bootstrapper
                                 new MailAddress(cfg.Mail.MailAdmin, "Admin"),
                                 new MailAddress(cfg.Mail.MailDeveloper, "Developer"))
                             {
-                                Subject = "App Startup Log: " + DateTime.Now,
+                                Subject = string.Format("App Startup Log: {0} at {1} ", cfg.AppName, DateTime.Now),
                                 IsBodyHtml = false,
                                 BodyEncoding = Encoding.ASCII
                             };
 
                             var alternate = AlternateView.CreateAlternateViewFromString(body,
                                 new ContentType("text/plain"));
-                            
+
                             msg.AlternateViews.Add(alternate);
 
                             Trace.TraceInformation("[Bootstrapper]:Sending startup log email to {0}", cfg.Mail.MailDeveloper);

@@ -31,7 +31,7 @@ namespace Frankstein.HttpModules.ExceptionHandling
                 if (string.IsNullOrWhiteSpace(body))
                     body = exception.ToString();
 
-                string subject = exception.Message;
+                string subject = string.Format("Exception for app: {0}, at {1}", cfg.AppName, DateTime.Now);
                 ThreadPool.QueueUserWorkItem(x =>
                 {
                     try
@@ -42,7 +42,7 @@ namespace Frankstein.HttpModules.ExceptionHandling
                             {
                                 IsBodyHtml = true
                             };
-                            
+
                             client.Send(msg);
                             Trace.TraceInformation("[RazorRenderExceptionHelper]: Email was sent to {0}",
                                 cfg.Mail.MailDeveloper);
