@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using System.IO;
 using System.Web;
+using System.Web.Hosting;
 using Frankstein.Common.Configuration;
 
 namespace Frankstein.HttpModules
@@ -23,7 +24,7 @@ namespace Frankstein.HttpModules
             context.BeginRequest += (s, e) => ContextOnBeginRequest(context);
         }
 
-        private void ContextOnBeginRequest(HttpApplication application)
+        private static void ContextOnBeginRequest(HttpApplication application)
         {
             string path = application.Request.Url.AbsolutePath;
 
@@ -32,14 +33,19 @@ namespace Frankstein.HttpModules
 
             string virtualPath = string.Format("{0}{1}", _rewriteBasePath, path);
 
-            if (string.IsNullOrWhiteSpace(VirtualPathUtility.GetFileName(virtualPath)))
+            var virtualFileName = VirtualPathUtility.GetFileName(virtualPath);
+            var extension = VirtualPathUtility.GetExtension(virtualFileName);
+            if (string.IsNullOrWhiteSpace(extension))
             {
-                return;
+                virtualPath = string.Format("{0}{1}", _rewriteBasePath, "/default.cshtml");
+                if (HostingEnvironment.VirtualPathProvider.FileExists(virtualPath))
+                {
+                    application.Context.RewritePath(virtualPath);
+                }
+                return; //fallback to mvc
             }
 
-            var physicalPath = application.Server.MapPath(virtualPath);
-
-            if (!File.Exists(physicalPath)) return;
+            if (!HostingEnvironment.VirtualPathProvider.FileExists(virtualPath)) return; //fallback to mvc
 
             string newpath = string.Format("{0}{1}", _rewriteBasePath.Substring(1), path);
 
