@@ -44,7 +44,7 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="FluentCommandLineParser">
-      <HintPath>..\packages\FluentCommandLineParser.1.2.2\lib\net35\FluentCommandLineParser.dll</HintPath>
+      <HintPath>$(SolutionDir)\packages\FluentCommandLineParser.1.2.2\lib\net35\FluentCommandLineParser.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations">
