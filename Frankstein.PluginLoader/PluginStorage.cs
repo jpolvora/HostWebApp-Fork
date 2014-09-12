@@ -70,7 +70,7 @@ namespace Frankstein.PluginLoader
 
         private static void ExecutePlugin(Assembly assembly)
         {
-            var plugins = assembly.GetExportedTypes().Where(x => typeof(IPlugin).IsAssignableFrom(x));
+            var plugins = assembly.GetExportedTypes().Where(x => typeof(IPlugin).IsAssignableFrom(x)  && x.IsClass && !x.IsAbstract);
             foreach (var plugin in plugins)
             {
                 Trace.TraceInformation("[PluginLoader]: Found implementation of IPlugin '{0}'", plugin.FullName);
