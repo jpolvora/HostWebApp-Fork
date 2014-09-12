@@ -87,14 +87,15 @@ namespace Frankstein.PluginLoader
                 {
                     if (instance != null)
                     {
-                        Trace.TraceInformation("[PluginLoader]: Executing Plugin: {0}", instance.PluginName);
+                        Trace.TraceInformation("[PluginLoader]: Trying to Execute Plugin: {0}", instance.PluginName);
                         try
                         {
                             using (DisposableTimer.StartNew(instance.PluginName))
                             {
                                 instance.Start();
                             }
-                        }
+							Trace.TraceInformation("[PluginLoader]: SUCCESS Executing Plugin: {0}", instance.PluginName);
+                        }						
                         catch (Exception ex)
                         {
                             Trace.TraceError(ex.Message);
