@@ -1,4 +1,7 @@
+using System;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Web;
 using System.Web.Hosting;
@@ -28,59 +31,82 @@ namespace Frankstein.HttpModules
         {
             string path = application.Request.Url.AbsolutePath.TrimEnd('/');
 
-            //se o path nÃ£o precisa ser reescrito
+            //se o path não precisa ser reescrito
             if (path.StartsWith(_rewriteBasePath.Substring(1)))
                 return;
 
-            string virtualPath = string.Format("{0}/{1}", _rewriteBasePath, path);
-
-            var virtualFileName = VirtualPathUtility.GetFileName(virtualPath);
-            var extension = VirtualPathUtility.GetExtension(virtualFileName);
-            if (string.IsNullOrWhiteSpace(extension))
+            var isDirectory = string.IsNullOrEmpty(Path.GetExtension(application.Request.Url.AbsolutePath));
+            if (isDirectory)
             {
-                const string defaultcshtml = "default.cshtml";
-                var found = false;
-                //compatibilidade com webpages url routing
-                var segments = application.Request.Url.Segments.Reverse();
-                foreach (var segment in segments)
-                {
-                    var file = segment.Trim('/') + ".cshtml";
-                    if (file.Length < 7)
-                        file = defaultcshtml;
-                    
-                    virtualPath = string.Format("{0}/{1}", _rewriteBasePath, file);
-                    if (HostingEnvironment.VirtualPathProvider.FileExists(virtualPath))
-                    {
-                        found = true;
-                        break;
-                    }
-                }
-                if (!found)
-                {
-                    virtualPath = string.Format("{0}/{1}", _rewriteBasePath, defaultcshtml);
-                    if (HostingEnvironment.VirtualPathProvider.FileExists(virtualPath))
-                    {
-                        Trace.TraceInformation("[PathRewriterHttpModule]:Rewriting path from '{0}' to '{1}'", path,
-                            virtualPath);
-                        application.Context.RewritePath(virtualPath);
-                    }
-                    return; //fallback to mvc
-                }
-                Trace.TraceInformation("[PathRewriterHttpModule]:Rewriting path from '{0}' to '{1}'", path,
-                    virtualPath);
-                application.Context.RewritePath(virtualPath);
+                if (CheckSegments(application.Context, application.Request.Url))
+                    return;
             }
-
-            if (!HostingEnvironment.VirtualPathProvider.FileExists(virtualPath)) return; //fallback to mvc
-
-            string newpath = string.Format("{0}{1}", _rewriteBasePath.Substring(1), path);
-
-            Trace.TraceInformation("[PathRewriterHttpModule]:Rewriting path from '{0}' to '{1}'", path, newpath);
-            application.Context.RewritePath(newpath);
+            else
+            {
+                if (CheckFullPath(application.Context, application.Request.Url))
+                    return;
+            }
         }
 
         public void Dispose()
         {
+        }
+
+        static void RewritePath(HttpContext context, string originalPath, string virtualPath)
+        {
+            context.RewritePath(virtualPath);
+            Trace.TraceInformation("[PathRewriterHttpModule]:Rewriting path from '{0}' to '{1}'", originalPath, virtualPath);
+        }
+
+
+        static bool CheckFullPath(HttpContext context, Uri uri)
+        {
+            var virtualPath = string.Format("{0}/{1}", _rewriteBasePath, uri.AbsolutePath.Trim('/'));
+
+            if (HostingEnvironment.VirtualPathProvider.FileExists(virtualPath))
+            {
+                RewritePath(context, uri.AbsolutePath, virtualPath);
+                return true;
+            }
+            return false;
+        }
+
+        static bool CheckSegments(HttpContext context, Uri uri)
+        {
+            //compatibilidade com webpages url routing
+
+            const string defaultcshtml = "default.cshtml";
+            var segs = uri.Segments;
+            var count = segs.Count();
+
+            var paths = new List<string>();
+            for (var i = 0; i < count; i++)
+            {
+                var directory = string.Join("", segs, 0, count - i);
+                paths.Add(VirtualPathUtility.AppendTrailingSlash(directory));
+            }
+
+            foreach (var path in paths)
+            {
+                //tentativa 1
+                string virtualPath = string.Format("{0}/{1}/{2}", _rewriteBasePath.TrimEnd('/'), path.Trim('/'), defaultcshtml);
+                if (HostingEnvironment.VirtualPathProvider.FileExists(virtualPath))
+                {
+                    RewritePath(context, uri.AbsolutePath, virtualPath);
+                    return true;
+                }
+                //tentativa 2
+                var newPath = path.TrimEnd('/') + ".cshtml";
+                virtualPath = string.Format("{0}/{1}", _rewriteBasePath.TrimEnd('/'), newPath.Trim('/'));
+                if (HostingEnvironment.VirtualPathProvider.FileExists(virtualPath))
+                {
+                    RewritePath(context, uri.AbsolutePath, virtualPath);
+                    return true;
+                }
+            }
+
+
+            return false;
         }
     }
 }
