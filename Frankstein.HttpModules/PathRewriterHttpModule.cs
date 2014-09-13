@@ -26,24 +26,49 @@ namespace Frankstein.HttpModules
 
         private static void ContextOnBeginRequest(HttpApplication application)
         {
-            string path = application.Request.Url.AbsolutePath;
+            string path = application.Request.Url.AbsolutePath.TrimEnd('/');
 
+            //se o path não precisa ser reescrito
             if (path.StartsWith(_rewriteBasePath.Substring(1)))
                 return;
 
-            string virtualPath = string.Format("{0}{1}", _rewriteBasePath, path);
+            string virtualPath = string.Format("{0}/{1}", _rewriteBasePath, path);
 
             var virtualFileName = VirtualPathUtility.GetFileName(virtualPath);
             var extension = VirtualPathUtility.GetExtension(virtualFileName);
             if (string.IsNullOrWhiteSpace(extension))
             {
-                virtualPath = string.Format("{0}{1}", _rewriteBasePath, "/default.cshtml");
-                if (HostingEnvironment.VirtualPathProvider.FileExists(virtualPath))
+                const string defaultcshtml = "default.cshtml";
+                var found = false;
+                //compatibilidade com webpages url routing
+                var segments = application.Request.Url.Segments.Reverse();
+                foreach (var segment in segments)
                 {
-                    Trace.TraceInformation("[PathRewriterHttpModule]:Rewriting path from '{0}' to '{1}'", path, virtualPath);
-                    application.Context.RewritePath(virtualPath);
+                    var file = segment.Trim('/') + ".cshtml";
+                    if (file.Length < 7)
+                        file = defaultcshtml;
+                    
+                    virtualPath = string.Format("{0}/{1}", _rewriteBasePath, file);
+                    if (HostingEnvironment.VirtualPathProvider.FileExists(virtualPath))
+                    {
+                        found = true;
+                        break;
+                    }
                 }
-                return; //fallback to mvc
+                if (!found)
+                {
+                    virtualPath = string.Format("{0}/{1}", _rewriteBasePath, defaultcshtml);
+                    if (HostingEnvironment.VirtualPathProvider.FileExists(virtualPath))
+                    {
+                        Trace.TraceInformation("[PathRewriterHttpModule]:Rewriting path from '{0}' to '{1}'", path,
+                            virtualPath);
+                        application.Context.RewritePath(virtualPath);
+                    }
+                    return; //fallback to mvc
+                }
+                Trace.TraceInformation("[PathRewriterHttpModule]:Rewriting path from '{0}' to '{1}'", path,
+                    virtualPath);
+                application.Context.RewritePath(virtualPath);
             }
 
             if (!HostingEnvironment.VirtualPathProvider.FileExists(virtualPath)) return; //fallback to mvc
