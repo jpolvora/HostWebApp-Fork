@@ -52,10 +52,13 @@ namespace Frankstein.HttpModules
         {
         }
 
-        static void RewritePath(HttpContext context, string originalPath, string virtualPath)
+        static void RewritePath(HttpContext context, Uri original, string virtualPath)
         {
-            context.RewritePath(virtualPath);
-            Trace.TraceInformation("[PathRewriterHttpModule]:Rewriting path from '{0}' to '{1}'", originalPath, virtualPath);
+            //var finalPath = virtualPath;
+            //var pathInfo = original.Segments[original.Segments.Count() - 1];
+
+            context.RewritePath(virtualPath, false);
+            Trace.TraceInformation("[PathRewriterHttpModule]:Rewriting path from '{0}' to '{1}'", original.AbsolutePath, virtualPath);
         }
 
 
@@ -65,7 +68,7 @@ namespace Frankstein.HttpModules
 
             if (HostingEnvironment.VirtualPathProvider.FileExists(virtualPath))
             {
-                RewritePath(context, uri.AbsolutePath, virtualPath);
+                RewritePath(context, uri, virtualPath);
                 return true;
             }
             return false;
@@ -74,6 +77,8 @@ namespace Frankstein.HttpModules
         static bool CheckSegments(HttpContext context, Uri uri)
         {
             //compatibilidade com webpages url routing
+
+            string finalRewrite = string.Format("{0}/{1}", _rewriteBasePath.TrimEnd('/'), uri.AbsolutePath).Trim('/');
 
             const string defaultcshtml = "default.cshtml";
             var segs = uri.Segments;
@@ -92,7 +97,7 @@ namespace Frankstein.HttpModules
                 string virtualPath = string.Format("{0}/{1}/{2}", _rewriteBasePath.TrimEnd('/'), path.Trim('/'), defaultcshtml);
                 if (HostingEnvironment.VirtualPathProvider.FileExists(virtualPath))
                 {
-                    RewritePath(context, uri.AbsolutePath, virtualPath);
+                    RewritePath(context, uri, finalRewrite);
                     return true;
                 }
                 //tentativa 2
@@ -100,7 +105,7 @@ namespace Frankstein.HttpModules
                 virtualPath = string.Format("{0}/{1}", _rewriteBasePath.TrimEnd('/'), newPath.Trim('/'));
                 if (HostingEnvironment.VirtualPathProvider.FileExists(virtualPath))
                 {
-                    RewritePath(context, uri.AbsolutePath, virtualPath);
+                    RewritePath(context, uri, finalRewrite);
                     return true;
                 }
             }
