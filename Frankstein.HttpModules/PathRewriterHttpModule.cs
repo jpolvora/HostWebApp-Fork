@@ -1,5 +1,5 @@
 using System.Diagnostics;
-using System.IO;
+using System.Linq;
 using System.Web;
 using System.Web.Hosting;
 using Frankstein.Common.Configuration;
@@ -28,7 +28,7 @@ namespace Frankstein.HttpModules
         {
             string path = application.Request.Url.AbsolutePath.TrimEnd('/');
 
-            //se o path não precisa ser reescrito
+            //se o path nÃ£o precisa ser reescrito
             if (path.StartsWith(_rewriteBasePath.Substring(1)))
                 return;
 
