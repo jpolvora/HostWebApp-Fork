@@ -6,6 +6,7 @@ using System.Linq;
 using System.Reflection;
 using System.Web.Compilation;
 using Frankstein.Common;
+using Frankstein.Common.Configuration;
 
 namespace Frankstein.PluginLoader
 {
@@ -70,6 +71,8 @@ namespace Frankstein.PluginLoader
 
         private static void ExecutePlugin(Assembly assembly)
         {
+            if (!BootstrapperSection.Instance.PluginLoader.Enabled) return;
+
             var plugins = assembly.GetExportedTypes().Where(x => typeof(IPlugin).IsAssignableFrom(x)  && x.IsClass && !x.IsAbstract);
             foreach (var plugin in plugins)
             {
