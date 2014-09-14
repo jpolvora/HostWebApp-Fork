@@ -1,11 +1,11 @@
 ﻿using System;
+using System.Configuration;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
 using Fclp;
 using Frankstein.Common;
-using Frankstein.Common.Configuration;
 using Frankstein.DbFileSystem;
 
 namespace ConsoleApplication1
@@ -16,19 +16,8 @@ namespace ConsoleApplication1
 
         //recomendado executar este programa no diretório raiz do projeto
         static void Main(string[] args)
-        {
-            foreach (var s in args)
-            {
-                Console.Write(s + ";");
-            }
-            
-            args = args.Extend(true, "teste");
-            foreach (var s in args)
-            {
-                Console.Write(s + ";");
-            }
-
-            var setDir = BootstrapperSection.Instance.DumpToLocal.Folder;
+        { 
+            var setDir = ConfigurationManager.AppSettings["dumpdir"];
 
             var p = new FluentCommandLineParser();
             p.Setup<string>('d', "dir")
@@ -74,7 +63,7 @@ namespace ConsoleApplication1
                 Console.WriteLine("2: Local To Db");
 
                 var option = Console.ReadKey();
-                Console.WriteLine("Opção escolhida: {0} ", option);
+                Console.WriteLine("Opção escolhida: {0} ", option.Key);
                 Console.WriteLine();
                 bool ok = false;
                 switch (option.Key)

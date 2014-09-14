@@ -41,11 +41,17 @@ namespace Frankstein.HttpModules
                 var isDirectory = string.IsNullOrEmpty(Path.GetExtension(application.Request.Url.AbsolutePath));
                 if (isDirectory)
                 {
-                    CheckSegments(application.Context, application.Request.Url);
+                    if (!HostingEnvironment.VirtualPathProvider.DirectoryExists(application.Request.Url.AbsolutePath))
+                    {
+                        CheckSegments(application.Context, application.Request.Url);
+                    }
                 }
                 else
                 {
-                    CheckFullPath(application.Context, application.Request.Url);
+                    if (!HostingEnvironment.VirtualPathProvider.FileExists(application.Request.Url.AbsolutePath))
+                    {
+                        CheckFullPath(application.Context, application.Request.Url);
+                    }
                 }
             }
         }
