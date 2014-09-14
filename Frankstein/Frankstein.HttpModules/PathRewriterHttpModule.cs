@@ -50,9 +50,14 @@ namespace Frankstein.HttpModules
                 var isDirectory = string.IsNullOrEmpty(Path.GetExtension(application.Request.Url.AbsolutePath));
                 if (isDirectory)
                 {
-                    if (!HostingEnvironment.VirtualPathProvider.DirectoryExists(application.Request.Url.AbsolutePath))
+                    if (string.IsNullOrWhiteSpace(path) ||
+                        !HostingEnvironment.VirtualPathProvider.DirectoryExists(application.Request.Url.AbsolutePath))
                     {
                         CheckSegments(application.Context, application.Request.Url);
+                    }
+                    else
+                    {
+                        RewritePath(application.Context, application.Request.Url, path);
                     }
                 }
                 else
