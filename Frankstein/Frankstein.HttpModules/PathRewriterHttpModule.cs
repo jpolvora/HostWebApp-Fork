@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Web;
 using System.Web.Hosting;
+using Frankstein.Common;
 using Frankstein.Common.Configuration;
 
 namespace Frankstein.HttpModules
@@ -19,7 +20,7 @@ namespace Frankstein.HttpModules
             if (!_rewriteBasePath.StartsWith("~"))
                 _rewriteBasePath = "~" + _rewriteBasePath;
 
-            Trace.TraceInformation("[PathRewriterHttpModule]: '{0}'", _rewriteBasePath);
+            Trace.TraceInformation("[PathRewriterHttpModule]: Initialized with basepath: '{0}'", _rewriteBasePath);
         }
 
         public void Init(HttpApplication context)
@@ -29,22 +30,23 @@ namespace Frankstein.HttpModules
 
         private static void ContextOnBeginRequest(HttpApplication application)
         {
-            string path = application.Request.Url.AbsolutePath.TrimEnd('/');
-
-            //se o path não precisa ser reescrito
-            if (path.StartsWith(_rewriteBasePath.Substring(1)))
-                return;
-
-            var isDirectory = string.IsNullOrEmpty(Path.GetExtension(application.Request.Url.AbsolutePath));
-            if (isDirectory)
+            using (DisposableTimer.StartNew("Checking path for rewriting"))
             {
-                if (CheckSegments(application.Context, application.Request.Url))
+                string path = application.Request.Url.AbsolutePath.TrimEnd('/');
+
+                //se o path não precisa ser reescrito
+                if (path.StartsWith(_rewriteBasePath.TrimStart('~')))
                     return;
-            }
-            else
-            {
-                if (CheckFullPath(application.Context, application.Request.Url))
-                    return;
+
+                var isDirectory = string.IsNullOrEmpty(Path.GetExtension(application.Request.Url.AbsolutePath));
+                if (isDirectory)
+                {
+                    CheckSegments(application.Context, application.Request.Url);
+                }
+                else
+                {
+                    CheckFullPath(application.Context, application.Request.Url);
+                }
             }
         }
 
@@ -62,23 +64,21 @@ namespace Frankstein.HttpModules
         }
 
 
-        static bool CheckFullPath(HttpContext context, Uri uri)
+        static void CheckFullPath(HttpContext context, Uri uri)
         {
             var virtualPath = string.Format("{0}/{1}", _rewriteBasePath, uri.AbsolutePath.Trim('/'));
 
             if (HostingEnvironment.VirtualPathProvider.FileExists(virtualPath))
             {
                 RewritePath(context, uri, virtualPath);
-                return true;
             }
-            return false;
         }
 
-        static bool CheckSegments(HttpContext context, Uri uri)
+        static void CheckSegments(HttpContext context, Uri uri)
         {
             //compatibilidade com webpages url routing
 
-            string finalRewrite = string.Format("{0}/{1}", _rewriteBasePath.TrimEnd('/'), uri.AbsolutePath).Trim('/');
+            string finalRewrite = string.Format("{0}/{1}", _rewriteBasePath, uri.AbsolutePath).Trim('/');
 
             const string defaultcshtml = "default.cshtml";
             var segs = uri.Segments;
@@ -94,11 +94,11 @@ namespace Frankstein.HttpModules
             foreach (var path in paths)
             {
                 //tentativa 1
-                string virtualPath = string.Format("{0}/{1}/{2}", _rewriteBasePath.TrimEnd('/'), path.Trim('/'), defaultcshtml);
+                string virtualPath = string.Format("{0}/{1}/{2}", _rewriteBasePath, path.Trim('/'), defaultcshtml);
                 if (HostingEnvironment.VirtualPathProvider.FileExists(virtualPath))
                 {
                     RewritePath(context, uri, finalRewrite);
-                    return true;
+                    return;
                 }
                 //tentativa 2
                 var newPath = path.TrimEnd('/') + ".cshtml";
@@ -106,12 +106,9 @@ namespace Frankstein.HttpModules
                 if (HostingEnvironment.VirtualPathProvider.FileExists(virtualPath))
                 {
                     RewritePath(context, uri, finalRewrite);
-                    return true;
+                    return;
                 }
             }
-
-
-            return false;
         }
     }
 }
