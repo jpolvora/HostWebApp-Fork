@@ -89,6 +89,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Authentication\DbPrincipal.cs" />
+    <Compile Include="Authentication\IDbUser.cs" />
+    <Compile Include="Authentication\PrincipalExtensions.cs" />
     <Compile Include="CustomException.cs" />
     <Compile Include="CustomPageBase.cs" />
     <Compile Include="CustomWebViewPage.cs" />
