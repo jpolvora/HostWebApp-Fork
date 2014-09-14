@@ -13,10 +13,13 @@ namespace Frankstein.HttpModules
     public class PathRewriterHttpModule : IHttpModule
     {
         private static readonly string _rewriteBasePath;
+        private static readonly string[] _excludePaths;
 
         static PathRewriterHttpModule()
         {
-            _rewriteBasePath = BootstrapperSection.Instance.DumpToLocal.Folder.TrimEnd('/');
+            _rewriteBasePath = BootstrapperSection.Instance.DumpToLocal.Folder.TrimEnd('/').ToLowerInvariant();
+            _excludePaths = BootstrapperSection.Instance.HttpModules.PathRewriter.IgnorePaths.Split(';');
+
             if (!_rewriteBasePath.StartsWith("~"))
                 _rewriteBasePath = "~" + _rewriteBasePath;
 
@@ -32,11 +35,17 @@ namespace Frankstein.HttpModules
         {
             using (DisposableTimer.StartNew("Checking path for rewriting"))
             {
-                string path = application.Request.Url.AbsolutePath.TrimEnd('/');
+                string path = application.Request.Url.AbsolutePath.TrimEnd('/').ToLowerInvariant();
 
                 //se o path não precisa ser reescrito
                 if (path.StartsWith(_rewriteBasePath.TrimStart('~')))
                     return;
+
+                foreach (var excludePath in _excludePaths)
+                {
+                    if (path.StartsWith(excludePath, StringComparison.OrdinalIgnoreCase))
+                        return;
+                }
 
                 var isDirectory = string.IsNullOrEmpty(Path.GetExtension(application.Request.Url.AbsolutePath));
                 if (isDirectory)
