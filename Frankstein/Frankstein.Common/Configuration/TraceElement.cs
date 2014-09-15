@@ -10,5 +10,12 @@ namespace Frankstein.Common.Configuration
             get { return (string)this["events"]; }
             set { this["events"] = value; }
         }
+
+        [ConfigurationProperty("verbose", DefaultValue = false)]
+        public bool Verbose
+        {
+            get { return (bool)this["verbose"]; }
+            set { this["verbose"] = value; }
+        }
     }
 }
