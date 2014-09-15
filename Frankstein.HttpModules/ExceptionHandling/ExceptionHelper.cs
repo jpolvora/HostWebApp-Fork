@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Threading;
 using System.Web;
 using System.Web.WebPages;
 
@@ -30,6 +31,12 @@ namespace Frankstein.HttpModules.ExceptionHandling
             var response = Application.Response;
 
             Exception ex = server.GetLastError();
+            if (ex is ThreadAbortException)
+            {
+                //Esta exception é lançada quando utiliza-se Response.Redirect(url, true).
+                //O correto é Response.REdirect(url, false); CompleteRequest()
+                return;
+            }
 
             HttpException httpException = ex as HttpException
                 ?? new HttpException("Generic exception...", ex);
