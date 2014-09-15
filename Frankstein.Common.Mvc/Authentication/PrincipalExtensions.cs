@@ -9,7 +9,9 @@ namespace Frankstein.Common.Mvc.Authentication
             if (principal is DbPrincipal<T>)
                 return (DbPrincipal<T>)principal;
 
-            return new DbPrincipal<T>(principal.Identity, new T());
+            var identity = principal != null ? principal.Identity : new GenericIdentity("");
+
+            return new DbPrincipal<T>(identity, new T());
         }
     }
 }
