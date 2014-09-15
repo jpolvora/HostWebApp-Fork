@@ -35,6 +35,7 @@ namespace Frankstein.HttpModules.ExceptionHandling
             {
                 //Esta exception é lançada quando utiliza-se Response.Redirect(url, true).
                 //O correto é Response.REdirect(url, false); CompleteRequest()
+                Trace.TraceInformation("Ignoring Thread abort: " + ex.Message);
                 return;
             }
 
