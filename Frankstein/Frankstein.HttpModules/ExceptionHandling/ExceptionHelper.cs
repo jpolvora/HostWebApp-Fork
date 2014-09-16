@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Threading;
 using System.Web;
 using System.Web.WebPages;
+using Frankstein.Common.Mvc;
 
 namespace Frankstein.HttpModules.ExceptionHandling
 {
@@ -67,7 +68,18 @@ namespace Frankstein.HttpModules.ExceptionHandling
             switch (statusCode)
             {
                 case 401: break;
-                case 403: break;
+                case 403:
+                    {
+                        if (Application.Request.IsAuthenticated && Application.Response.StatusCode == 403)
+                        {
+                            bool isAjax = Application.Request.IsAjaxRequest();
+                            if (!isAjax)
+                            {
+                                Application.Response.Write("Você está autenticado mas não possui permissões para acessar este recurso");
+                            }
+                        }
+                        break;
+                    };
                 case 404:
                     break; //IIS will handle 404
                 case 500:
