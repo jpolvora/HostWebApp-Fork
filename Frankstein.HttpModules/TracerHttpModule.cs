@@ -3,7 +3,6 @@ using System.Diagnostics;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
-using System.Web.WebPages;
 using Frankstein.Common.Configuration;
 using Frankstein.Common.Mvc;
 
@@ -19,31 +18,14 @@ namespace Frankstein.HttpModules
 
         public void Dispose()
         {
+            StopTimer(HttpContext.Current.ApplicationInstance);
         }
 
         static TracerHttpModule()
         {
-            EventsToTrace = BootstrapperSection.Instance.HttpModules.Trace.Events.Split(',');
+            EventsToTrace = BootstrapperSection.Instance.HttpModules.Trace.Events.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
             Verbose = BootstrapperSection.Instance.HttpModules.Trace.Verbose;
         }
-
-        //static bool MustLog(string eventName)
-        //{
-        //    if (!Verbose)
-        //        return false;
-
-        //    if (EventsToTrace.Length == 0)
-        //        return true;
-
-        //    if (EventsToTrace.Any(x => x.IsEmpty()))
-        //        return true;
-
-        //    foreach (var x in EventsToTrace)
-        //    {
-        //        if (x.Equals(eventName, StringComparison.OrdinalIgnoreCase)) return true;
-        //    }
-        //    return false;
-        //}
 
         public void Init(HttpApplication on)
         {
@@ -216,18 +198,23 @@ namespace Frankstein.HttpModules
 
         private static void TraceNotification(HttpApplication application, string eventName)
         {
+            var context = application.Context;
+            var isPost = context.IsPostNotification;
+            var postString = isPost ? "[POST]" : "[PRE]";
+
             var rid = application.Context.Items[RequestId];
-            Trace.TraceInformation("[TracerHttpModule]:{0}, rid: [{1}], [{2}], {3} {4}",
-                eventName, rid, application.Context.CurrentHandler,
+            Trace.TraceInformation("[TracerHttpModule]:{0}, {1}, rid: [{2}], [{3}], {4} {5}",
+                postString, eventName, rid, application.Context.CurrentHandler,
                 application.User != null ? application.User.Identity.Name : "-", application.Context.Response.StatusCode);
 
-            switch (application.Context.CurrentNotification)
+
+            switch (context.CurrentNotification)
             {
                 case RequestNotification.PreExecuteRequestHandler:
                     {
                         //will call ProcessRequest of IHttpHandler
 
-                        var mvcHandler = application.Context.Handler as MvcHandler;
+                        var mvcHandler = context.Handler as MvcHandler;
                         if (mvcHandler != null)
                         {
                             var controller = mvcHandler.RequestContext.RouteData.GetRequiredString("controller");
@@ -240,13 +227,13 @@ namespace Frankstein.HttpModules
                         }
                         else
                         {
-                            Trace.TraceInformation("[TracerHttpModule]:Executing ProcessRequest of Handler {0}", application.Context.CurrentHandler);
+                            Trace.TraceInformation("[TracerHttpModule]:Executing ProcessRequest of Handler {0}", context.CurrentHandler);
                         }
                     }
                     break;
                 case RequestNotification.ReleaseRequestState:
                     {
-                        Trace.TraceInformation("[TracerHttpModule]:Response Filter: {0}", application.Context.Response.Filter);
+                        Trace.TraceInformation("[TracerHttpModule]:Response Filter ({0}): {1}", postString, context.Response.Filter);
                         break;
                     }
             }
@@ -287,7 +274,7 @@ namespace Frankstein.HttpModules
 
             if (!Verbose)
                 return;
-            
+
             var rid = application.Context.Items[RequestId];
             Trace.TraceInformation("[TracerHttpModule]: Error at {0}, request {1}, Handler: {2}, Message:'{3}'",
                 application.Context.CurrentNotification, rid, application.Context.CurrentHandler,

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Frankstein.Common.Mvc
+namespace Frankstein.Common
 {
     public class CustomException : Exception
     {

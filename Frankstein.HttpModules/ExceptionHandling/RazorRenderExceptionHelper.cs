@@ -10,7 +10,8 @@ using Frankstein.Common.Mvc;
 
 namespace Frankstein.HttpModules.ExceptionHandling
 {
-    public class RazorRenderExceptionHelper : ExceptionHelper<CustomException>
+    public class RazorRenderExceptionHelper<TException> : ExceptionHelper<TException>
+        where TException : Exception
     {
         public RazorRenderExceptionHelper(HttpApplication application, string errorViewPath)
             : base(application, errorViewPath, LogActionEx)
@@ -70,7 +71,7 @@ namespace Frankstein.HttpModules.ExceptionHandling
             return release;
         }
 
-        protected override void RenderCustomException(CustomException exception)
+        protected override void RenderCustomException(TException exception)
         {
             //Application.Context.RewritePath(ErrorViewPath);
 

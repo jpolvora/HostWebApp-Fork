@@ -98,6 +98,10 @@
       <Project>{7ea8cab5-30b9-4069-a8c5-d553ca4016b0}</Project>
       <Name>Frankstein.Common</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Frankstein.Common.Configuration\Frankstein.Common.Configuration.csproj">
+      <Project>{5bf3a6d6-db75-41ee-9c84-bbfb37f03ea0}</Project>
+      <Name>Frankstein.Common.Configuration</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Frankstein.DbFileSystem\Frankstein.DbFileSystem.csproj">
       <Project>{969929c3-2898-49b8-9ec8-de7a28884524}</Project>
       <Name>Frankstein.DbFileSystem</Name>
