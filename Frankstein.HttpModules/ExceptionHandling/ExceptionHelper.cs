@@ -61,6 +61,8 @@ namespace Frankstein.HttpModules.ExceptionHandling
 
             switch (statusCode)
             {
+                case 401: break;
+                case 403: break;
                 case 404:
                     break; //IIS will handle 404
                 case 500:
@@ -83,6 +85,10 @@ namespace Frankstein.HttpModules.ExceptionHandling
                             }
                         }
                         break; //IIS will handle 500
+                    }
+                default:
+                    {
+                        break;
                     }
             }
         }
