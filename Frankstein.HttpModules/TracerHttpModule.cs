@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Linq;
+using System.Text;
 using System.Web;
 using System.Web.Mvc;
 using Frankstein.Common.Configuration;
@@ -11,20 +12,18 @@ namespace Frankstein.HttpModules
     public class TracerHttpModule : IHttpModule
     {
         private const string RequestId = "_request:id";
+        private const string SbKey = "_traceStrBuilder";
 
         private const string Stopwatch = "_request:sw";
         private static readonly string[] EventsToTrace = new string[0];
         private static readonly bool Verbose;
-
-        public void Dispose()
-        {
-            StopTimer(HttpContext.Current.ApplicationInstance);
-        }
+        private static readonly bool Bufferize;
 
         static TracerHttpModule()
         {
             EventsToTrace = BootstrapperSection.Instance.HttpModules.Trace.Events.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
             Verbose = BootstrapperSection.Instance.HttpModules.Trace.Verbose;
+            Bufferize = BootstrapperSection.Instance.HttpModules.Trace.Bufferize;
         }
 
         public void Init(HttpApplication on)
@@ -37,51 +36,51 @@ namespace Frankstein.HttpModules
 
             if (EventsToTrace.Contains("AuthenticateRequest") || EventsToTrace.Length == 0)
             {
-                Trace.TraceInformation("Subscribing to 'AuthenticateRequest' event");
+                TraceToBuffer("Subscribing to 'AuthenticateRequest' event");
                 on.AuthenticateRequest += (sender, args) => TraceNotification(on, "AuthenticateRequest");
             }
 
             if (EventsToTrace.Contains("PostAuthenticateRequest") || EventsToTrace.Length == 0)
             {
-                Trace.TraceInformation("Subscribing to 'PostAuthenticateRequest' event");
+                TraceToBuffer("Subscribing to 'PostAuthenticateRequest' event");
                 on.PostAuthenticateRequest += (sender, args) => TraceNotification(on, "PostAuthenticateRequest");
             }
 
             if (EventsToTrace.Contains("AuthorizeRequest") || EventsToTrace.Length == 0)
             {
-                Trace.TraceInformation("Subscribing to 'AuthorizeRequest' event");
+                TraceToBuffer("Subscribing to 'AuthorizeRequest' event");
                 on.AuthorizeRequest += (sender, args) => TraceNotification(on, "AuthorizeRequest");
             }
 
             if (EventsToTrace.Contains("PostAuthorizeRequest") || EventsToTrace.Length == 0)
             {
-                Trace.TraceInformation("Subscribing to 'PostAuthorizeRequest' event");
+                TraceToBuffer("Subscribing to 'PostAuthorizeRequest' event");
                 on.PostAuthorizeRequest += (sender, args) => TraceNotification(on, "PostAuthorizeRequest");
             }
 
             if (EventsToTrace.Contains("ResolveRequestCache") || EventsToTrace.Length == 0)
             {
-                Trace.TraceInformation("Subscribing to 'ResolveRequestCache' event");
+                TraceToBuffer("Subscribing to 'ResolveRequestCache' event");
                 on.ResolveRequestCache += (sender, args) => TraceNotification(on, "ResolveRequestCache");
             }
 
             if (EventsToTrace.Contains("PostResolveRequestCache") || EventsToTrace.Length == 0)
             {
-                Trace.TraceInformation("Subscribing to 'PostResolveRequestCache' event");
+                TraceToBuffer("Subscribing to 'PostResolveRequestCache' event");
                 //MVC Routing module remaps the handler here.
                 on.PostResolveRequestCache += (sender, args) => TraceNotification(on, "PostResolveRequestCache");
             }
 
             if (EventsToTrace.Contains("MapRequestHandler") || EventsToTrace.Length == 0)
             {
-                Trace.TraceInformation("Subscribing to 'MapRequestHandler' event");
+                TraceToBuffer("Subscribing to 'MapRequestHandler' event");
                 //only iis7
                 on.MapRequestHandler += (sender, args) => TraceNotification(on, "MapRequestHandler");
             }
 
             if (EventsToTrace.Contains("PostMapRequestHandler") || EventsToTrace.Length == 0)
             {
-                Trace.TraceInformation("Subscribing to 'PostMapRequestHandler' event");
+                TraceToBuffer("Subscribing to 'PostMapRequestHandler' event");
 
                 //An appropriate handler is selected based on the file-name extension of the requested resource. 
                 //The handler can be a native-code module such as the IIS 7.0 StaticFileModule or a managed-code module
@@ -91,57 +90,57 @@ namespace Frankstein.HttpModules
 
             if (EventsToTrace.Contains("AcquireRequestState") || EventsToTrace.Length == 0)
             {
-                Trace.TraceInformation("Subscribing to 'AcquireRequestState' event");
+                TraceToBuffer("Subscribing to 'AcquireRequestState' event");
                 on.AcquireRequestState += (sender, args) => TraceNotification(on, "AcquireRequestState");
             }
 
             if (EventsToTrace.Contains("PostAcquireRequestState") || EventsToTrace.Length == 0)
             {
-                Trace.TraceInformation("Subscribing to 'PostAcquireRequestState' event");
+                TraceToBuffer("Subscribing to 'PostAcquireRequestState' event");
                 on.PostAcquireRequestState += (sender, args) => TraceNotification(on, "PostAcquireRequestState");
             }
 
             if (EventsToTrace.Contains("PreRequestHandlerExecute") || EventsToTrace.Length == 0)
             {
-                Trace.TraceInformation("Subscribing to 'PreRequestHandlerExecute' event");
+                TraceToBuffer("Subscribing to 'PreRequestHandlerExecute' event");
                 on.PreRequestHandlerExecute += (sender, args) => TraceNotification(on, "PreRequestHandlerExecute");
             }
 
             if (EventsToTrace.Contains("PostRequestHandlerExecute") || EventsToTrace.Length == 0)
             {
-                Trace.TraceInformation("Subscribing to 'PostRequestHandlerExecute' event");
+                TraceToBuffer("Subscribing to 'PostRequestHandlerExecute' event");
                 //after Call the ProcessRequest of IHttpHandler
                 on.PostRequestHandlerExecute += (sender, args) => TraceNotification(on, "PostRequestHandlerExecute");
             }
 
             if (EventsToTrace.Contains("ReleaseRequestState") || EventsToTrace.Length == 0)
             {
-                Trace.TraceInformation("Subscribing to 'ReleaseRequestState' event");
+                TraceToBuffer("Subscribing to 'ReleaseRequestState' event");
                 on.ReleaseRequestState += (sender, args) => TraceNotification(on, "ReleaseRequestState");
             }
 
             if (EventsToTrace.Contains("PostReleaseRequestState") || EventsToTrace.Length == 0)
             {
-                Trace.TraceInformation("Subscribing to 'PostReleaseRequestState' event");
+                TraceToBuffer("Subscribing to 'PostReleaseRequestState' event");
                 //Perform response filtering if the Filter property is defined.
                 on.PostReleaseRequestState += (sender, args) => TraceNotification(on, "PostReleaseRequestState");
             }
 
             if (EventsToTrace.Contains("UpdateRequestCache") || EventsToTrace.Length == 0)
             {
-                Trace.TraceInformation("Subscribing to 'UpdateRequestCache' event");
+                TraceToBuffer("Subscribing to 'UpdateRequestCache' event");
                 on.UpdateRequestCache += (sender, args) => TraceNotification(on, "UpdateRequestCache");
             }
 
             if (EventsToTrace.Contains("PostUpdateRequestCache") || EventsToTrace.Length == 0)
             {
-                Trace.TraceInformation("Subscribing to 'PostUpdateRequestCache' event");
+                TraceToBuffer("Subscribing to 'PostUpdateRequestCache' event");
                 on.PostUpdateRequestCache += (sender, args) => TraceNotification(on, "PostUpdateRequestCache");
             }
 
             if (EventsToTrace.Contains("LogRequest") || EventsToTrace.Length == 0)
             {
-                Trace.TraceInformation("Subscribing to 'LogRequest' event");
+                TraceToBuffer("Subscribing to 'LogRequest' event");
                 //The MapRequestHandler, LogRequest, and PostLogRequest events are supported only if the application 
                 //is running in Integrated mode in IIS 7.0 and with the .NET Framework 3.0 or later.
                 on.LogRequest += (sender, args) => TraceNotification(on, "LogRequest"); //iis7
@@ -149,19 +148,19 @@ namespace Frankstein.HttpModules
 
             if (EventsToTrace.Contains("PostLogRequest") || EventsToTrace.Length == 0)
             {
-                Trace.TraceInformation("Subscribing to 'PostLogRequest' event");
+                TraceToBuffer("Subscribing to 'PostLogRequest' event");
                 on.PostLogRequest += (sender, args) => TraceNotification(on, "PostLogRequest"); //iis7
             }
 
             if (EventsToTrace.Contains("PreSendRequestHeaders") || EventsToTrace.Length == 0)
             {
-                Trace.TraceInformation("Subscribing to 'PreSendRequestHeaders' event");
+                TraceToBuffer("Subscribing to 'PreSendRequestHeaders' event");
                 on.PreSendRequestHeaders += (sender, args) => TraceNotification(on, "PreSendRequestHeaders");
             }
 
             if (EventsToTrace.Contains("PreSendRequestContent") || EventsToTrace.Length == 0)
             {
-                Trace.TraceInformation("Subscribing to 'PreSendRequestContent' event");
+                TraceToBuffer("Subscribing to 'PreSendRequestContent' event");
                 on.PreSendRequestContent += (sender, args) => TraceNotification(on, "PreSendRequestContent");
             }
         }
@@ -175,6 +174,9 @@ namespace Frankstein.HttpModules
 
             context.Items[Stopwatch] = System.Diagnostics.Stopwatch.StartNew();
 
+            var sb = new StringBuilder();
+            context.Items[SbKey] = sb;
+
             bool isAjax = context.Request.IsAjaxRequest();
 
             if (isAjax)
@@ -186,12 +188,12 @@ namespace Frankstein.HttpModules
             {
                 if (context.Items.Contains("IIS_WasUrlRewritten") || context.Items.Contains("HTTP_X_ORIGINAL_URL"))
                 {
-                    Trace.TraceInformation("[TracerHttpModule]:Url was rewriten from '{0}' to '{1}'",
+                    TraceToBuffer("[TracerHttpModule]:Url was rewriten from '{0}' to '{1}'",
                         context.Request.ServerVariables["HTTP_X_ORIGINAL_URL"],
                         context.Request.ServerVariables["SCRIPT_NAME"]);
                 }
 
-                Trace.TraceInformation("[BeginRequest]:[{0}] {1} {2} {3} [{4}]", rid, context.Request.HttpMethod,
+                TraceToBuffer("[BeginRequest]:[{0}] {1} {2} {3} [{4}]", rid, context.Request.HttpMethod,
                     context.Request.RawUrl, isAjax ? "Ajax: True" : "", context.Request.UrlReferrer);
             }
         }
@@ -203,10 +205,9 @@ namespace Frankstein.HttpModules
             var postString = isPost ? "[POST]" : "[PRE]";
 
             var rid = application.Context.Items[RequestId];
-            Trace.TraceInformation("[TracerHttpModule]:{0}, {1}, rid: [{2}], [{3}], {4} {5}",
+            TraceToBuffer("[TracerHttpModule]:{0}, {1}, rid: [{2}], [{3}], {4} {5}",
                 postString, eventName, rid, application.Context.CurrentHandler,
                 application.User != null ? application.User.Identity.Name : "-", application.Context.Response.StatusCode);
-
 
             switch (context.CurrentNotification)
             {
@@ -221,19 +222,19 @@ namespace Frankstein.HttpModules
                             var action = mvcHandler.RequestContext.RouteData.GetRequiredString("action");
                             var area = mvcHandler.RequestContext.RouteData.DataTokens["area"];
 
-                            Trace.TraceInformation(
+                            TraceToBuffer(
                                 "Entering MVC Pipeline. Area: '{0}', Controller: '{1}', Action: '{2}'", area,
                                 controller, action);
                         }
                         else
                         {
-                            Trace.TraceInformation("[TracerHttpModule]:Executing ProcessRequest of Handler {0}", context.CurrentHandler);
+                            TraceToBuffer("[TracerHttpModule]:Executing ProcessRequest of Handler {0}", context.CurrentHandler);
                         }
                     }
                     break;
                 case RequestNotification.ReleaseRequestState:
                     {
-                        Trace.TraceInformation("[TracerHttpModule]:Response Filter ({0}): {1}", postString, context.Response.Filter);
+                        TraceToBuffer("[TracerHttpModule]:Response Filter ({0}): {1}", postString, context.Response.Filter);
                         break;
                     }
             }
@@ -242,7 +243,8 @@ namespace Frankstein.HttpModules
         private static void OnEndRequest(HttpApplication application)
         {
             StopTimer(application);
-            Trace.Flush();
+            
+            FlushBuffer();
 
             if (!Verbose)
                 return;
@@ -254,23 +256,16 @@ namespace Frankstein.HttpModules
             var msg = string.Format("[EndRequest]:[{0}], Content-Type: {1}, Status: {2}, Render: {3}, url: {4}",
                 rid, context.Response.ContentType, context.Response.StatusCode, GetTime(application),
                 context.Request.Url);
-            Trace.TraceInformation(msg);
 
-            if (context.Request.IsAuthenticated && context.Response.StatusCode == 403)
-            {
-                bool isAjax = context.Request.IsAjaxRequest();
-                if (!isAjax)
-                {
-                    context.Response.Write("Você está autenticado mas não possui permissões para acessar este recurso");
-                }
-            }
+            TraceToBuffer(msg);
+            FlushBuffer();
         }
 
         private static void OnError(object sender)
         {
             var application = (HttpApplication)sender;
             StopTimer(application);
-            Trace.Flush();
+            FlushBuffer();
 
             if (!Verbose)
                 return;
@@ -279,6 +274,8 @@ namespace Frankstein.HttpModules
             Trace.TraceInformation("[TracerHttpModule]: Error at {0}, request {1}, Handler: {2}, Message:'{3}'",
                 application.Context.CurrentNotification, rid, application.Context.CurrentHandler,
                 application.Context.Error);
+
+            FlushBuffer();
         }
 
         private static void StopTimer(HttpApplication application)
@@ -300,6 +297,65 @@ namespace Frankstein.HttpModules
                 return ts;
             }
             return -1;
+        }
+
+        static void TraceToBuffer(string str, params object[] args)
+        {
+            if (!Bufferize)
+            {
+                if (args.Length == 0)
+                    Trace.TraceInformation(str);
+                else
+                    Trace.TraceInformation(str, args);
+
+                return;
+            }
+
+            var context = HttpContext.Current;
+            if (context == null)
+            {
+                return;
+            }
+
+            var sb = context.Items[SbKey] as StringBuilder;
+            if (sb == null)
+                return;
+
+            if (args.Length == 0)
+                sb.AppendLine(str);
+            else
+                sb.AppendLine(string.Format(str, args));
+        }
+
+        static void FlushBuffer()
+        {
+            if (!Bufferize)
+            {
+                Trace.Flush();
+                return;
+            }
+
+            var context = HttpContext.Current;
+            if (context == null)
+            {
+                return;
+            }
+
+            var sb = context.Items[SbKey] as StringBuilder;
+            if (sb == null)
+                return;
+
+            var lines = sb.ToString().Split(Environment.NewLine.ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
+
+            foreach (var line in lines)
+            {
+                Trace.TraceInformation(line);
+            }
+
+        }
+
+        public void Dispose()
+        {
         }
     }
 }
