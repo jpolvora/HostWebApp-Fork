@@ -36,7 +36,7 @@ namespace Frankstein.Common.Mvc
         /// Causes stop executing page hierarchy and redirect without throwing ThreadAbortException
         /// </summary>
         /// <param name="extraQuery"></param>
-        public void StopAndRedirectSafeToDefaultUrl(string extraQuery)
+        public void StopAndRedirectSafeToDefaultUrl(string extraQuery = "")
         {
             if (_stoped)
                 return;
@@ -97,7 +97,6 @@ namespace Frankstein.Common.Mvc
         public override void Execute()
         {
             //actually this is never called
-            throw new NotImplementedException();
         }
 
         private bool _stoped;
@@ -117,7 +116,7 @@ namespace Frankstein.Common.Mvc
             _stoped = true;
         }
 
-        public void StopAndRedirectSafeToDefaultUrl(string extraQuery)
+        public void StopAndRedirectSafeToDefaultUrl(string extraQuery = "")
         {
             if (_stoped)
                 return;

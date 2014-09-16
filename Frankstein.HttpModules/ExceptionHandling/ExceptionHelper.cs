@@ -53,6 +53,11 @@ namespace Frankstein.HttpModules.ExceptionHandling
                 server.ClearError(); //limpar o erro para exibir a página customizada
             }
 
+            if (response.StatusCode == 302)
+            {
+                server.ClearError();
+                return;
+            }
             var statusCode = httpException.GetHttpCode();
 
             //setar o statuscode para que o IIS selecione a view correta (no web.config)

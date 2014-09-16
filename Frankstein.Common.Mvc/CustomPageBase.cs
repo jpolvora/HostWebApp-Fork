@@ -33,19 +33,21 @@ namespace Frankstein.Common.Mvc
             this.PageData[Stop] = true;
             this.Context.RedirectSafe(url);
             _stoped = true;
+            Response.End();
         }
 
         /// <summary>
         /// Causes stop executing page hierarchy and redirect without throwing ThreadAbortException
         /// </summary>
         /// <param name="extraQuery"></param>
-        public void StopAndRedirectSafeToDefaultUrl(string extraQuery)
+        public void StopAndRedirectSafeToDefaultUrl(string extraQuery = "")
         {
             if (_stoped)
                 return;
             this.PageData[Stop] = true;
             this.Context.RedirectSafeToDefault(extraQuery);
             _stoped = true;
+            Response.End();
         }
 
         public override void ExecutePageHierarchy()
