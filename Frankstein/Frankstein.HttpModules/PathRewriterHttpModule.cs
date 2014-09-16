@@ -33,39 +33,37 @@ namespace Frankstein.HttpModules
 
         private static void ContextOnBeginRequest(HttpApplication application)
         {
-            using (DisposableTimer.StartNew("Checking path for rewriting"))
+
+            string path = application.Request.Url.AbsolutePath.TrimEnd('/').ToLowerInvariant();
+
+            //se o path não precisa ser reescrito
+            if (path.StartsWith(_rewriteBasePath.TrimStart('~')))
+                return;
+
+            foreach (var excludePath in _excludePaths)
             {
-                string path = application.Request.Url.AbsolutePath.TrimEnd('/').ToLowerInvariant();
-
-                //se o path não precisa ser reescrito
-                if (path.StartsWith(_rewriteBasePath.TrimStart('~')))
+                if (path.StartsWith(excludePath, StringComparison.OrdinalIgnoreCase))
                     return;
+            }
 
-                foreach (var excludePath in _excludePaths)
+            var isDirectory = string.IsNullOrEmpty(Path.GetExtension(application.Request.Url.AbsolutePath));
+            if (isDirectory)
+            {
+                if (string.IsNullOrWhiteSpace(path) ||
+                    !HostingEnvironment.VirtualPathProvider.DirectoryExists(application.Request.Url.AbsolutePath))
                 {
-                    if (path.StartsWith(excludePath, StringComparison.OrdinalIgnoreCase))
-                        return;
-                }
-
-                var isDirectory = string.IsNullOrEmpty(Path.GetExtension(application.Request.Url.AbsolutePath));
-                if (isDirectory)
-                {
-                    if (string.IsNullOrWhiteSpace(path) ||
-                        !HostingEnvironment.VirtualPathProvider.DirectoryExists(application.Request.Url.AbsolutePath))
-                    {
-                        CheckSegments(application.Context, application.Request.Url);
-                    }
-                    else
-                    {
-                        RewritePath(application.Context, application.Request.Url, path);
-                    }
+                    CheckSegments(application.Context, application.Request.Url);
                 }
                 else
                 {
-                    if (!HostingEnvironment.VirtualPathProvider.FileExists(application.Request.Url.AbsolutePath))
-                    {
-                        CheckFullPath(application.Context, application.Request.Url);
-                    }
+                    RewritePath(application.Context, application.Request.Url, path);
+                }
+            }
+            else
+            {
+                if (!HostingEnvironment.VirtualPathProvider.FileExists(application.Request.Url.AbsolutePath))
+                {
+                    CheckFullPath(application.Context, application.Request.Url);
                 }
             }
         }
@@ -80,7 +78,7 @@ namespace Frankstein.HttpModules
             //var pathInfo = original.Segments[original.Segments.Count() - 1];
 
             context.RewritePath(virtualPath, false);
-            Trace.TraceInformation("[PathRewriterHttpModule]:Rewriting path from '{0}' to '{1}'", original.AbsolutePath, virtualPath);
+            Trace.TraceInformation("[PathRewriterHttpModule]:Path Rewritten from '{0}' to '{1}'", original.AbsolutePath, virtualPath);
         }
 
 
