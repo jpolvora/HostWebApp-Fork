@@ -17,5 +17,12 @@ namespace Frankstein.Common.Configuration
             get { return (string)this["errorviewpath"]; }
             set { this["errorviewpath"] = value; }
         }
+
+        [ConfigurationProperty("userazor", DefaultValue = false)]
+        public bool UseRazor
+        {
+            get { return (bool)this["userazor"]; }
+            set { this["userazor"] = value; }
+        }
     }
 }

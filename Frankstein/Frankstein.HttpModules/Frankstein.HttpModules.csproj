@@ -76,6 +76,7 @@
   <ItemGroup>
     <Compile Include="ExceptionHandling\ExceptionHelper.cs" />
     <Compile Include="CustomErrorHttpModule.cs" />
+    <Compile Include="ExceptionHandling\ExceptionHelperFactory.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ExceptionHandling\RazorRenderExceptionHelper.cs" />
     <Compile Include="PathRewriterHttpModule.cs" />
@@ -95,6 +96,10 @@
     <ProjectReference Include="..\Frankstein.Common\Frankstein.Common.csproj">
       <Project>{7ea8cab5-30b9-4069-a8c5-d553ca4016b0}</Project>
       <Name>Frankstein.Common</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Frankstein.Common.Configuration\Frankstein.Common.Configuration.csproj">
+      <Project>{5bf3a6d6-db75-41ee-9c84-bbfb37f03ea0}</Project>
+      <Name>Frankstein.Common.Configuration</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

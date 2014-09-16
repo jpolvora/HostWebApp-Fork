@@ -1,31 +1,37 @@
 using System;
 using System.Web;
-using Frankstein.Common.Configuration;
+using Frankstein.Common;
+using Frankstein.Common.Mvc;
 using Frankstein.HttpModules.ExceptionHandling;
 
 namespace Frankstein.HttpModules
 {
     public class CustomErrorHttpModule : IHttpModule
     {
-        private string _errorViewPath;
-
         public void Init(HttpApplication context)
         {
             context.Error += OnError;
-
-            _errorViewPath = BootstrapperSection.Instance.HttpModules.CustomError.ErrorViewPath;
         }
 
-        void OnError(object sender, EventArgs args)
+        static void OnError(object sender, EventArgs args)
         {
+            /*
+                sample web.config entry
+             */
             //<httpErrors errorMode="Custom" existingResponse="Auto" defaultResponseMode="ExecuteURL">
-            //  <remove statusCode="404"/>
-            //  <error statusCode="404" path="/404.cshtml" responseMode="ExecuteURL"/>
-            //  <remove statusCode="500"/>
-            //  <error statusCode="500" path="/500.cshtml" responseMode="ExecuteURL"/>
+            //  <remove statusCode="403" />
+            //  <error statusCode="403" path="/403.cshtml" responseMode="ExecuteURL" />
+            //  <remove statusCode="404" />
+            //  <error statusCode="404" path="/404.cshtml" responseMode="ExecuteURL" />
+            //  <remove statusCode="500" />
+            //  <error statusCode="500" path="/500.cshtml" responseMode="ExecuteURL" />
             //</httpErrors>
 
-            using (var razorhelper = new RazorRenderExceptionHelper(sender as HttpApplication, _errorViewPath))
+            var application = sender as HttpApplication;
+            if (application == null)
+                return;
+
+            using (var razorhelper = ExceptionHelperFactory<CustomException>.Create(application))
             {
                 razorhelper.HandleError();
             }
@@ -34,7 +40,5 @@ namespace Frankstein.HttpModules
         public void Dispose()
         {
         }
-
-
     }
 }
