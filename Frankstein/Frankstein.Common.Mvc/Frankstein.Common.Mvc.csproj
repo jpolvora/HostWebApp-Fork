@@ -103,6 +103,7 @@
     <Compile Include="ExtJs\ExtJsUpdater.cs" />
     <Compile Include="ExtJs\Lambda.cs" />
     <Compile Include="Helpers.cs" />
+    <Compile Include="HttpContextExtensions.cs" />
     <Compile Include="HttpHandlerExtensions.cs" />
     <Compile Include="HttpHandlerRouteHandler.cs" />
     <Compile Include="HttpHandlers\MinifyHandler.cs" />
