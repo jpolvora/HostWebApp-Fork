@@ -11,14 +11,9 @@ namespace Frankstein.HttpModules
 
         public void Init(HttpApplication context)
         {
-            context.BeginRequest += OnBeginRequest;
             context.Error += OnError;
 
             _errorViewPath = BootstrapperSection.Instance.HttpModules.CustomError.ErrorViewPath;
-        }
-
-        static void OnBeginRequest(object sender, EventArgs eventArgs)
-        {
         }
 
         void OnError(object sender, EventArgs args)
