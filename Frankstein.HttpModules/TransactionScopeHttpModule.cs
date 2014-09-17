@@ -13,18 +13,19 @@ namespace Frankstein.HttpModules
 
         public void Init(HttpApplication context)
         {
-            context.BeginRequest += ContextOnBeginRequest;
+            //changed from BeginRequest to AuthenticateRequest in order to avoid TransactionTimeOut
+            context.AuthenticateRequest += ContextOnAuthenticateRequest;
             context.Error += ContextOnError;
             context.EndRequest += ContextOnEndRequest;
         }
 
-        private static void ContextOnBeginRequest(object sender, EventArgs eventArgs)
+        private static void ContextOnAuthenticateRequest(object sender, EventArgs eventArgs)
         {
             var app = (HttpApplication)sender;
             var context = app.Context;
             var timeout = TimeSpan.FromSeconds(BootstrapperSection.Instance.HttpModules.TransactionScope.TimeOut);
             if (context.IsDebuggingEnabled)
-                timeout = TimeSpan.MaxValue;
+                timeout = TimeSpan.FromMinutes(60);
 
             var scope = new TransactionScope(TransactionScopeOption.Required, new TransactionOptions()
             {
@@ -54,10 +55,10 @@ namespace Frankstein.HttpModules
             //completes the current request scope if there's not errors pending
             var scope = GetTransactionScope(context);
 
-            var requestId = context.GetRequestId();
             if (scope != null)
             {
-                Trace.TraceInformation("Commiting transaction for request {0}", requestId);
+                var requestId = context.GetRequestId();
+                Trace.TraceInformation("Commiting transaction for request [{0}]", requestId);
                 scope.Complete();
             }
         }
