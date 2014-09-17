@@ -31,5 +31,12 @@ namespace Frankstein.Common.Configuration
             get { return (PathRewriter)this["pathrewriter"]; }
             set { this["pathrewriter"] = value; }
         }
+
+        [ConfigurationProperty("transactionscope")]
+        public TransactionScopeElement TransactionScope
+        {
+            get { return (TransactionScopeElement)this["transactionscope"]; }
+            set { this["transactionscope"] = value; }
+        }
     }
 }

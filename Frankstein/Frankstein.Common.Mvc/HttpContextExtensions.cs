@@ -6,9 +6,26 @@ namespace Frankstein.Common.Mvc
 {
     public static class HttpContextExtensions
     {
+        public static string GetRequestId(this HttpContext context)
+        {
+            var httpContext = context ?? HttpContext.Current;
+            if (context == null)
+                return Guid.NewGuid().ToString("N");
+
+            return httpContext.Request.GetHashCode().ToString();
+        }
+
+        public static string GetRequestId(this HttpContextBase context)
+        {
+            if (context == null)
+                return GetRequestId(HttpContext.Current);
+
+            return context.Request.GetHashCode().ToString();
+        }
+
         public static void RedirectSafeToDefault(this HttpContext context, string extraQuery = null)
         {
-            string url = FormsAuthentication.DefaultUrl;    
+            string url = FormsAuthentication.DefaultUrl;
             if (!string.IsNullOrEmpty(extraQuery))
                 url += "?" + extraQuery;
             RedirectSafe(context, url);

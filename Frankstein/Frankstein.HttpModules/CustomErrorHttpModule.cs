@@ -31,9 +31,9 @@ namespace Frankstein.HttpModules
             if (application == null)
                 return;
 
-            using (var razorhelper = ExceptionHelperFactory<CustomException>.Create(application))
+            using (var helper = ExceptionHelperFactory<CustomException>.Create(application))
             {
-                razorhelper.HandleError();
+                helper.HandleError();
             }
         }
 

@@ -174,18 +174,17 @@ namespace Frankstein.HttpModules
                 context.Response.SuppressFormsAuthenticationRedirect = true;
             }
 
-            if (Verbose)
+            if (context.Items.Contains("IIS_WasUrlRewritten") || context.Items.Contains("HTTP_X_ORIGINAL_URL"))
             {
-                if (context.Items.Contains("IIS_WasUrlRewritten") || context.Items.Contains("HTTP_X_ORIGINAL_URL"))
-                {
-                    TraceToBuffer("[TracerHttpModule]:Url was rewriten from '{0}' to '{1}'",
-                        context.Request.ServerVariables["HTTP_X_ORIGINAL_URL"],
-                        context.Request.ServerVariables["SCRIPT_NAME"]);
-                }
-
-                TraceToBuffer("[BeginRequest]:[{0}] {1} {2} {3} [{4}]", context.Timestamp.ToString("T"), context.Request.HttpMethod,
-                    context.Request.RawUrl, isAjax ? "Ajax: True" : "", context.Request.UrlReferrer);
+                Trace.TraceInformation("[TracerHttpModule]:Url was rewriten from '{0}' to '{1}'",
+                    context.Request.ServerVariables["HTTP_X_ORIGINAL_URL"],
+                    context.Request.ServerVariables["SCRIPT_NAME"]);
             }
+
+            var rid = context.GetRequestId();
+
+            Trace.TraceInformation("[BeginRequest]:[{0}] {1} {2} {3} [{4}]", rid, context.Request.HttpMethod,
+                context.Request.RawUrl, isAjax ? "Ajax: True" : "", context.Request.UrlReferrer);
         }
 
         private static void TraceNotification(HttpApplication application, string eventName)
@@ -194,7 +193,8 @@ namespace Frankstein.HttpModules
             var isPost = context.IsPostNotification;
             var postString = isPost ? "[POST]" : "[PRE]";
 
-            var rid = HttpContext.Current.Timestamp.ToString("T");
+            var rid = context.GetRequestId();
+
             TraceToBuffer("[TracerHttpModule]:{0}, {1}, rid: [{2}], [{3}], {4} {5}",
                 postString, eventName, rid, application.Context.CurrentHandler,
                 application.User != null ? application.User.Identity.Name : "-", application.Context.Response.StatusCode);
@@ -232,36 +232,28 @@ namespace Frankstein.HttpModules
 
         private static void OnEndRequest(HttpApplication application)
         {
-            FlushBuffer();
-
-            if (!Verbose)
-                return;
-
             var context = application.Context;
 
-            var rid = HttpContext.Current.Timestamp;
-            var elapsed = DateTime.Now - rid;
-            
+            var rid = context.GetRequestId();
+            var elapsed = DateTime.Now - HttpContext.Current.Timestamp; ;
+
             var strf = String.Format("{0:ss\\.fffff}", elapsed);
 
-            var msg = string.Format("[EndRequest]:[{0}], Content-Type: {1}, Status: {2}, Render: {3}, url: {4}",
+            var msg = string.Format("[EndRequest]:[{0}], Content-Type: {1}, Status: {2}, Render: {3} ms, url: {4}",
                 rid, context.Response.ContentType, context.Response.StatusCode, strf,
                 context.Request.Url);
 
-            TraceToBuffer(msg);
+            Trace.TraceInformation(msg);
             FlushBuffer();
         }
 
         private static void OnError(object sender)
         {
             var application = (HttpApplication)sender;
-            FlushBuffer();
 
-            if (!Verbose)
-                return;
+            var rid = application.Context.GetRequestId();
 
-            var rid = HttpContext.Current.Timestamp.ToString("T");
-            Trace.TraceInformation("[TracerHttpModule]: Error at {0}, request {1}, Handler: {2}, Message:'{3}'",
+            Trace.TraceError("[TracerHttpModule]: Error at {0}, request {1}, Handler: {2}, Message:'{3}'",
                 application.Context.CurrentNotification, rid, application.Context.CurrentHandler,
                 application.Context.Error);
 
@@ -270,6 +262,9 @@ namespace Frankstein.HttpModules
 
         static void TraceToBuffer(string str, params object[] args)
         {
+            if (!Verbose)
+                return;
+
             if (!Bufferize)
             {
                 if (args.Length == 0)
