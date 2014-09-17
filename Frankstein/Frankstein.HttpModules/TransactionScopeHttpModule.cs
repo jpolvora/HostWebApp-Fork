@@ -22,9 +22,13 @@ namespace Frankstein.HttpModules
         {
             var app = (HttpApplication)sender;
             var context = app.Context;
+            var timeout = TimeSpan.FromSeconds(BootstrapperSection.Instance.HttpModules.TransactionScope.TimeOut);
+            if (context.IsDebuggingEnabled)
+                timeout = TimeSpan.MaxValue;
+
             var scope = new TransactionScope(TransactionScopeOption.Required, new TransactionOptions()
             {
-                Timeout = TimeSpan.FromSeconds(BootstrapperSection.Instance.HttpModules.TransactionScope.TimeOut)
+                Timeout = timeout
             });
             context.Items[ScopeKey] = scope;
         }
