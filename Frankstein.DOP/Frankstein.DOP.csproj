@@ -4,19 +4,17 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{50019CD9-2262-493B-A567-7C44EA945D5C}</ProjectGuid>
-    <OutputType>Exe</OutputType>
+    <ProjectGuid>{F2FCAE43-2505-4454-B8CD-85999C3274E2}</ProjectGuid>
+    <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>ConsoleApplication1</RootNamespace>
-    <AssemblyName>ConsoleApplication1</AssemblyName>
+    <RootNamespace>Frankstein.DOP</RootNamespace>
+    <AssemblyName>Frankstein.DOP</AssemblyName>
     <TargetFrameworkVersion>v4.5.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
     <RestorePackages>true</RestorePackages>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -26,7 +24,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
@@ -35,29 +32,10 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="EntityFramework">
-      <HintPath>$(SolutionDir)\packages\EntityFramework.6.1.1\lib\net45\EntityFramework.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="EntityFramework.SqlServer">
-      <HintPath>$(SolutionDir)\packages\EntityFramework.6.1.1\lib\net45\EntityFramework.SqlServer.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="FluentCommandLineParser">
-      <HintPath>$(SolutionDir)\packages\FluentCommandLineParser.1.2.2\lib\net35\FluentCommandLineParser.dll</HintPath>
-    </Reference>
-    <Reference Include="ImpromptuInterface, Version=6.2.2.0, Culture=neutral, PublicKeyToken=0b1781c923b2975b, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>$(SolutionDir)\packages\ImpromptuInterface.6.2.2\lib\net40\ImpromptuInterface.dll</HintPath>
-    </Reference>
-    <Reference Include="Polly">
-      <HintPath>$(SolutionDir)\packages\Polly.2.0.0\lib\net45\Polly.dll</HintPath>
+    <Reference Include="ImpromptuInterface">
+      <HintPath>..\packages\ImpromptuInterface.6.2.2\lib\net40\ImpromptuInterface.dll</HintPath>
     </Reference>
     <Reference Include="System" />
-    <Reference Include="System.ComponentModel.DataAnnotations">
-      <HintPath>C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5.1\System.ComponentModel.DataAnnotations.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -66,32 +44,16 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Program.cs" />
+    <Compile Include="AspectContext.cs" />
+    <Compile Include="AspectException.cs" />
+    <Compile Include="FluentBuilder.cs" />
+    <Compile Include="ObjectProxy.cs" />
+    <Compile Include="ObjectProxyFactory.cs" />
+    <Compile Include="ObjectProxyHelper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="App.config">
-      <SubType>Designer</SubType>
-    </None>
     <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Frankstein.Common\Frankstein.Common.csproj">
-      <Project>{7ea8cab5-30b9-4069-a8c5-d553ca4016b0}</Project>
-      <Name>Frankstein.Common</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Frankstein.Common.Configuration\Frankstein.Common.Configuration.csproj">
-      <Project>{5bf3a6d6-db75-41ee-9c84-bbfb37f03ea0}</Project>
-      <Name>Frankstein.Common.Configuration</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Frankstein.DbFileSystem\Frankstein.DbFileSystem.csproj">
-      <Project>{969929c3-2898-49b8-9ec8-de7a28884524}</Project>
-      <Name>Frankstein.DbFileSystem</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Frankstein.DOP\Frankstein.DOP.csproj">
-      <Project>{f2fcae43-2505-4454-b8cd-85999c3274e2}</Project>
-      <Name>Frankstein.DOP</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />

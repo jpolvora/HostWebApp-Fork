@@ -11,17 +11,15 @@ namespace Frankstein.HttpModules
 {
     public class TracerHttpModule : IHttpModule
     {
-        private const string RequestId = "_request:id";
         private const string SbKey = "_traceStrBuilder";
 
-        private const string Stopwatch = "_request:sw";
         private static readonly string[] EventsToTrace = new string[0];
         private static readonly bool Verbose;
         private static readonly bool Bufferize;
 
         static TracerHttpModule()
         {
-            EventsToTrace = BootstrapperSection.Instance.HttpModules.Trace.Events.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+            EventsToTrace = BootstrapperSection.Instance.HttpModules.Trace.Events.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
             Verbose = BootstrapperSection.Instance.HttpModules.Trace.Verbose;
             Bufferize = BootstrapperSection.Instance.HttpModules.Trace.Bufferize;
         }
@@ -169,14 +167,6 @@ namespace Frankstein.HttpModules
         {
             var context = application.Context;
 
-            var rid = new Random().Next(1, 99999).ToString("d5");
-            context.Items.Add(RequestId, rid);
-
-            context.Items[Stopwatch] = System.Diagnostics.Stopwatch.StartNew();
-
-            var sb = new StringBuilder();
-            context.Items[SbKey] = sb;
-
             bool isAjax = context.Request.IsAjaxRequest();
 
             if (isAjax)
@@ -193,7 +183,7 @@ namespace Frankstein.HttpModules
                         context.Request.ServerVariables["SCRIPT_NAME"]);
                 }
 
-                TraceToBuffer("[BeginRequest]:[{0}] {1} {2} {3} [{4}]", rid, context.Request.HttpMethod,
+                TraceToBuffer("[BeginRequest]:[{0}] {1} {2} {3} [{4}]", context.Timestamp.ToString("T"), context.Request.HttpMethod,
                     context.Request.RawUrl, isAjax ? "Ajax: True" : "", context.Request.UrlReferrer);
             }
         }
@@ -204,7 +194,7 @@ namespace Frankstein.HttpModules
             var isPost = context.IsPostNotification;
             var postString = isPost ? "[POST]" : "[PRE]";
 
-            var rid = application.Context.Items[RequestId];
+            var rid = HttpContext.Current.Timestamp.ToString("T");
             TraceToBuffer("[TracerHttpModule]:{0}, {1}, rid: [{2}], [{3}], {4} {5}",
                 postString, eventName, rid, application.Context.CurrentHandler,
                 application.User != null ? application.User.Identity.Name : "-", application.Context.Response.StatusCode);
@@ -242,8 +232,6 @@ namespace Frankstein.HttpModules
 
         private static void OnEndRequest(HttpApplication application)
         {
-            StopTimer(application);
-            
             FlushBuffer();
 
             if (!Verbose)
@@ -251,10 +239,13 @@ namespace Frankstein.HttpModules
 
             var context = application.Context;
 
-            var rid = context.Items[RequestId];
+            var rid = HttpContext.Current.Timestamp;
+            var elapsed = DateTime.Now - rid;
+            
+            var strf = String.Format("{0:ss\\.fffff}", elapsed);
 
             var msg = string.Format("[EndRequest]:[{0}], Content-Type: {1}, Status: {2}, Render: {3}, url: {4}",
-                rid, context.Response.ContentType, context.Response.StatusCode, GetTime(application),
+                rid, context.Response.ContentType, context.Response.StatusCode, strf,
                 context.Request.Url);
 
             TraceToBuffer(msg);
@@ -264,39 +255,17 @@ namespace Frankstein.HttpModules
         private static void OnError(object sender)
         {
             var application = (HttpApplication)sender;
-            StopTimer(application);
             FlushBuffer();
 
             if (!Verbose)
                 return;
 
-            var rid = application.Context.Items[RequestId];
+            var rid = HttpContext.Current.Timestamp.ToString("T");
             Trace.TraceInformation("[TracerHttpModule]: Error at {0}, request {1}, Handler: {2}, Message:'{3}'",
                 application.Context.CurrentNotification, rid, application.Context.CurrentHandler,
                 application.Context.Error);
 
             FlushBuffer();
-        }
-
-        private static void StopTimer(HttpApplication application)
-        {
-            if (application == null || application.Context == null) return;
-            var stopwatch = application.Context.Items[Stopwatch] as Stopwatch;
-            if (stopwatch != null)
-                stopwatch.Stop();
-        }
-
-        private static double GetTime(HttpApplication application)
-        {
-            if (application == null || application.Context == null) return -1;
-
-            var stopwatch = application.Context.Items[Stopwatch] as Stopwatch;
-            if (stopwatch != null)
-            {
-                var ts = stopwatch.Elapsed.TotalSeconds;
-                return ts;
-            }
-            return -1;
         }
 
         static void TraceToBuffer(string str, params object[] args)

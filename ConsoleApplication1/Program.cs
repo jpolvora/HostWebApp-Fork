@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Configuration;
+using System.Data.Entity;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -7,6 +8,8 @@ using System.Text;
 using Fclp;
 using Frankstein.Common;
 using Frankstein.DbFileSystem;
+using Frankstein.DOP;
+using Polly;
 
 namespace ConsoleApplication1
 {
@@ -16,7 +19,19 @@ namespace ConsoleApplication1
 
         //recomendado executar este programa no diretório raiz do projeto
         static void Main(string[] args)
-        { 
+        {
+            Policy.Handle<CustomException>().Retry(3).Execute(() => { });
+
+
+            //var program = new Program();
+            //program.RunLoop();
+            //program.RunLoopProxyfied();
+
+            //program.RunLoop();
+            //program.RunLoopProxyfied();
+
+            //new Program().ShoulInterceptOnlyPrivateMethod();
+
             var setDir = ConfigurationManager.AppSettings["dumpdir"];
 
             var p = new FluentCommandLineParser();
@@ -262,5 +277,76 @@ namespace ConsoleApplication1
         {
             return TextExtensions.Any(extension.StartsWith); //remove the dot "."
         }
+
+        public void ShoulInterceptOnlyPrivateMethod()
+        {
+            var privateMethodName = ObjectProxyHelper.GetMethodNames<IPrivateMethod>(i => i.SaveChanges())[0];
+
+            var proxy = ObjectProxyFactory
+                .Configure<IPrivateMethod>(new DbFileContext()) //initialize fluent config, with given interface and instance
+                .FilterMethods(privateMethodName) //only intercept methods with the given name
+                .AddPreDecoration(ctx =>
+                {
+                    Debug.Assert(ctx.CallCtx.MethodName == privateMethodName);
+                    Console.Write("Saving Changes");
+                })
+                .AddPostDecoration(ctx =>
+                {
+                    Console.Write("Saved Changes");
+                    Debug.Assert(ctx.CallCtx.MethodName == privateMethodName);
+                })
+                //.SetParameters(new object())
+                .CreateProxy(); //finally create and return the proxy
+
+
+            proxy.SaveChanges();
+        }
+
+        public void RunLoop()
+        {
+            var dbContext = new DbFileContext();
+
+            var sw = Stopwatch.StartNew();
+
+            for (int i = 0; i < 1000; i++)
+            {
+                int i1 = i;
+                Console.Write(i1);
+                dbContext.SaveChanges();
+            }
+
+            Console.WriteLine("took {0}", sw.Elapsed.ToString("g"));
+            Console.ReadLine();
+        }
+
+        public void RunLoopProxyfied()
+        {
+            var dbContext = new DbFileContext();
+
+            var privateMethodName = ObjectProxyHelper.GetMethodNames<IPrivateMethod>(j => j.SaveChanges())[0];
+
+
+            var proxy = ObjectProxyFactory
+                .Configure<IPrivateMethod>(dbContext) //initialize fluent config, with given interface and instance
+                .FilterMethods(privateMethodName) //only intercept methods with the given name
+                .CreateProxy(); //finally create and return the proxy
+
+            var sw = Stopwatch.StartNew();
+
+            for (int i = 0; i < 1000; i++)
+            {
+                int i1 = i;
+                Console.Write(i1);
+                proxy.SaveChanges();
+            }
+
+            Console.WriteLine("took {0}", sw.Elapsed.ToString("g"));
+            Console.ReadLine();
+        }
+    }
+
+    public interface IPrivateMethod
+    {
+        int SaveChanges();
     }
 }
