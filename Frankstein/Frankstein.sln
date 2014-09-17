@@ -42,6 +42,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Frankstein.Tests", "Frankst
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Frankstein.Common.Configuration", "Frankstein.Common.Configuration\Frankstein.Common.Configuration.csproj", "{5BF3A6D6-DB75-41EE-9C84-BBFB37F03EA0}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Frankstein.DOP", "Frankstein.DOP\Frankstein.DOP.csproj", "{F2FCAE43-2505-4454-B8CD-85999C3274E2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Frankstein.Transactions", "Frankstein.Transactions\Frankstein.Transactions.csproj", "{6DFEA5D3-2BCB-48E5-B772-0FC63A56B035}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -96,6 +100,14 @@ Global
 		{5BF3A6D6-DB75-41EE-9C84-BBFB37F03EA0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5BF3A6D6-DB75-41EE-9C84-BBFB37F03EA0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5BF3A6D6-DB75-41EE-9C84-BBFB37F03EA0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F2FCAE43-2505-4454-B8CD-85999C3274E2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F2FCAE43-2505-4454-B8CD-85999C3274E2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F2FCAE43-2505-4454-B8CD-85999C3274E2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F2FCAE43-2505-4454-B8CD-85999C3274E2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6DFEA5D3-2BCB-48E5-B772-0FC63A56B035}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6DFEA5D3-2BCB-48E5-B772-0FC63A56B035}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6DFEA5D3-2BCB-48E5-B772-0FC63A56B035}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6DFEA5D3-2BCB-48E5-B772-0FC63A56B035}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
