@@ -39,6 +39,7 @@
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Transactions" />
     <Reference Include="System.Web" />
     <Reference Include="System.Web.Helpers">
       <HintPath>$(SolutionDir)\packages\Microsoft.AspNet.WebPages.3.2.2\lib\net45\System.Web.Helpers.dll</HintPath>
@@ -82,6 +83,8 @@
     <Compile Include="PathRewriterHttpModule.cs" />
     <Compile Include="SetCacheHttpModule.cs" />
     <Compile Include="TracerHttpModule.cs" />
+    <Compile Include="TransactionScopeExtensions.cs" />
+    <Compile Include="TransactionScopeHttpModule.cs" />
     <Compile Include="WhitespaceModule.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -74,6 +74,12 @@ namespace Frankstein.Bootstrapper
                     DynamicModuleUtility.RegisterModule(typeof(TracerHttpModule));
                 }
 
+                Trace.TraceInformation("[Bootstrapper]:cfg.HttpModules.TransactionScope.Enabled = {0}", cfg.HttpModules.TransactionScope.Enabled);
+                if (cfg.HttpModules.TransactionScope.Enabled)
+                {
+                    DynamicModuleUtility.RegisterModule(typeof(TransactionScopeHttpModule));
+                }
+
                 Trace.TraceInformation("[Bootstrapper]:cfg.StopMonitoring = {0}", cfg.StopMonitoring);
                 if (cfg.StopMonitoring)
                 {
