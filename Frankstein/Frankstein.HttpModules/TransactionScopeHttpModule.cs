@@ -32,6 +32,8 @@ namespace Frankstein.HttpModules
                 Timeout = timeout
             });
             context.Items[ScopeKey] = scope;
+            var requestId = context.GetRequestId();
+            Trace.TraceInformation("[TransactionScopeHttpModule]: Transaction created for Request [{0}]: {1}, timeout: {2}", requestId, scope, timeout);
         }
 
         private static void ContextOnError(object sender, EventArgs eventArgs)
@@ -55,11 +57,16 @@ namespace Frankstein.HttpModules
             //completes the current request scope if there's not errors pending
             var scope = GetTransactionScope(context);
 
+            var requestId = context.GetRequestId();
             if (scope != null)
             {
-                var requestId = context.GetRequestId();
-                Trace.TraceInformation("Commiting transaction for request [{0}]", requestId);
+
+                Trace.TraceInformation("[TransactionScopeHttpModule]: Commiting transaction for request [{0}], {1}", requestId, scope);
                 scope.Complete();
+            }
+            else
+            {
+                Trace.TraceWarning("No TransactionScope found for Current Request: [{0}]. Error ?", requestId);
             }
         }
 
