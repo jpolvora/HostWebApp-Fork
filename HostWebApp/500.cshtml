@@ -19,7 +19,7 @@
 
     if (HostingEnvironment.VirtualPathProvider.FileExists(this.MapPath("~/500.cshtml")))
     {
-        @RenderPage(this.MapPath("~/404.cshtml"))
+        @RenderPage(this.MapPath("~/500.cshtml"))
         return;
     }
 }
