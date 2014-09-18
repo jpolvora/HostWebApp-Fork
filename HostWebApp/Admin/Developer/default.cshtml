@@ -11,7 +11,8 @@
     var path = VirtualPathUtility.ToAbsolute(VirtualPath);
     if (!path.Equals(Request.Path))
     {
-        Response.Redirect(VirtualPath, true);
+        StopAndRedirectSafe(VirtualPath);
+        return;
     }
 
     PageData["Title"] = "Entropia - Developer";

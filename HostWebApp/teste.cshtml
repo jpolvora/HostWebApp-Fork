@@ -1,9 +1,0 @@
-﻿@if (Request.IsAuthenticated)
-{
-    @IsRazorWebPage.ToString()
-    @ServerInfo.GetHtml()
-}
-else
-{
-    Response.StatusCode = 401;
-}

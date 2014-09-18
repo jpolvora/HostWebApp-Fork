@@ -1,0 +1,25 @@
+﻿@using System.Diagnostics
+@using System.Threading
+@{
+    Response.Charset = "utf8";
+
+    try
+    {
+        RunPage();
+    }
+    catch (ThreadAbortException ex) //Response.End() causes thread abort exception, so, handle it.
+    {
+        Trace.TraceWarning(ex.Message);
+    }
+    catch (Exception ex)
+    {
+        if (!Config.IsInDebugMode)
+        {
+            LogEvent.Raise(ex.Message, ex);
+        }
+        else
+        {
+            throw;
+        }
+    }
+}

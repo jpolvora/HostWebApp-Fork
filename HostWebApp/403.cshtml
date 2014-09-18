@@ -1,10 +1,10 @@
 ﻿@using System.Web.Hosting
 @{
     Layout = null;
-    Response.StatusCode = 404;
+    Response.StatusCode = 403;
     if (IsAjax)
     {
-        Response.Write("Resource not found");
+        Response.Write("Resource forbidden");
         return;
     }
     const string html = "text/html";
@@ -17,19 +17,19 @@
         return;
     }
 
-    if (HostingEnvironment.VirtualPathProvider.FileExists(this.MapPath("~/404.cshtml")))
+    if (HostingEnvironment.VirtualPathProvider.FileExists(this.MapPath("~/403.cshtml")))
     {
-        @RenderPage(this.MapPath("~/404.cshtml"))
+        @RenderPage(this.MapPath("~/403.cshtml"))
         return;
     }
 }
 <!DOCTYPE html>
 <html>
 <head>
-    <title>404 - Not Found</title>
+    <title>403 - Forbidden</title>
 </head>
 <body>
     <p>@Request.RawUrl</p>
-    <p>Este recurso não existe</p>
+    <p>Proibido acessar este recurso.</p>
 </body>
 </html>

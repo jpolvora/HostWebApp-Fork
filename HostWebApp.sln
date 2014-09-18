@@ -37,6 +37,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{6AA9AACA-3
 		docs\manual.txt = docs\manual.txt
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Frankstein.Common.Configuration", "Frankstein\Frankstein.Common.Configuration\Frankstein.Common.Configuration.csproj", "{5BF3A6D6-DB75-41EE-9C84-BBFB37F03EA0}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -83,6 +85,10 @@ Global
 		{FFBE8285-9C7A-41F6-BF1E-58DE5CAC726D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FFBE8285-9C7A-41F6-BF1E-58DE5CAC726D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FFBE8285-9C7A-41F6-BF1E-58DE5CAC726D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5BF3A6D6-DB75-41EE-9C84-BBFB37F03EA0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5BF3A6D6-DB75-41EE-9C84-BBFB37F03EA0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5BF3A6D6-DB75-41EE-9C84-BBFB37F03EA0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5BF3A6D6-DB75-41EE-9C84-BBFB37F03EA0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -97,5 +103,6 @@ Global
 		{061AFD8C-DEFA-4AC6-8CB5-E9A4DEF11D40} = {42293AF8-1211-4E32-8B48-1C7C473B5900}
 		{03B91668-CF22-48FB-8853-82ABFA6E2A27} = {42293AF8-1211-4E32-8B48-1C7C473B5900}
 		{FFBE8285-9C7A-41F6-BF1E-58DE5CAC726D} = {42293AF8-1211-4E32-8B48-1C7C473B5900}
+		{5BF3A6D6-DB75-41EE-9C84-BBFB37F03EA0} = {42293AF8-1211-4E32-8B48-1C7C473B5900}
 	EndGlobalSection
 EndGlobal
