@@ -30,6 +30,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Frankstein.Kompiler", "Fran
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleApplication1", "ConsoleApplication1\ConsoleApplication1.csproj", "{50019CD9-2262-493B-A567-7C44EA945D5C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Frankstein.Common.Configuration", "Frankstein.Common.Configuration\Frankstein.Common.Configuration.csproj", "{5BF3A6D6-DB75-41EE-9C84-BBFB37F03EA0}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -76,6 +78,10 @@ Global
 		{50019CD9-2262-493B-A567-7C44EA945D5C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{50019CD9-2262-493B-A567-7C44EA945D5C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{50019CD9-2262-493B-A567-7C44EA945D5C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5BF3A6D6-DB75-41EE-9C84-BBFB37F03EA0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5BF3A6D6-DB75-41EE-9C84-BBFB37F03EA0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5BF3A6D6-DB75-41EE-9C84-BBFB37F03EA0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5BF3A6D6-DB75-41EE-9C84-BBFB37F03EA0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

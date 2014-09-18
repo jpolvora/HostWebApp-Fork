@@ -17,12 +17,5 @@ namespace Frankstein.Common.Configuration
             get { return (bool)this["verbose"]; }
             set { this["verbose"] = value; }
         }
-
-        [ConfigurationProperty("bufferize", DefaultValue = false)]
-        public bool Bufferize
-        {
-            get { return (bool)this["bufferize"]; }
-            set { this["bufferize"] = value; }
-        }
     }
 }
