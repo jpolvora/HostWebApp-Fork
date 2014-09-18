@@ -2,6 +2,7 @@ using System;
 using System.Diagnostics;
 using System.Transactions;
 using System.Web;
+using Frankstein.Common;
 using Frankstein.Common.Configuration;
 using Frankstein.Common.Mvc;
 
@@ -25,7 +26,7 @@ namespace Frankstein.HttpModules
             var context = app.Context;
             var timeout = TimeSpan.FromSeconds(BootstrapperSection.Instance.HttpModules.TransactionScope.TimeOut);
             if (context.IsDebuggingEnabled)
-                timeout = TimeSpan.FromMinutes(60);
+                timeout = TimeSpan.Zero;
 
             var scope = new TransactionScope(TransactionScopeOption.Required, new TransactionOptions()
             {
@@ -60,13 +61,14 @@ namespace Frankstein.HttpModules
             var requestId = context.GetRequestId();
             if (scope != null)
             {
-
-                Trace.TraceInformation("[TransactionScopeHttpModule]: Commiting transaction for request [{0}], {1}", requestId, scope);
-                scope.Complete();
+                using (DisposableTimer.StartNew("[TransactionScopeHttpModule]: Commiting Transaction for request [{0}], {1}".Fmt(requestId, scope)))
+                {
+                    scope.Complete();
+                }
             }
             else
             {
-                Trace.TraceWarning("No TransactionScope found for Current Request: [{0}]. Error ?", requestId);
+                Trace.TraceWarning("[TransactionScopeHttpModule]: No TransactionScope found for Current Request: [{0}]. Error ?", requestId);
             }
         }
 
