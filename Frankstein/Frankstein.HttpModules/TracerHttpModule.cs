@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Linq;
-using System.Text;
 using System.Web;
 using System.Web.Mvc;
 using Frankstein.Common.Configuration;
@@ -11,24 +10,19 @@ namespace Frankstein.HttpModules
 {
     public class TracerHttpModule : IHttpModule
     {
-        private const string SbKey = "_traceStrBuilder";
-
         private static readonly string[] EventsToTrace = new string[0];
         private static readonly bool Verbose;
-        private static readonly bool Bufferize;
 
         static TracerHttpModule()
         {
             EventsToTrace = BootstrapperSection.Instance.HttpModules.Trace.Events.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
             Verbose = BootstrapperSection.Instance.HttpModules.Trace.Verbose;
-            Bufferize = BootstrapperSection.Instance.HttpModules.Trace.Bufferize;
         }
 
         public void Init(HttpApplication on)
         {
             //http://msdn.microsoft.com/en-us/library/bb470252(v=vs.100).aspx
 
-            on.Error += (sender, args) => OnError(sender);
             on.BeginRequest += (sender, args) => OnBeginRequest(on);
             on.EndRequest += (sender, args) => OnEndRequest(on);
 
@@ -194,10 +188,14 @@ namespace Frankstein.HttpModules
             var postString = isPost ? "[POST]" : "[PRE]";
 
             var rid = context.GetRequestId();
+            var user = application.User != null ? application.User.Identity.Name : "-";
 
-            TraceToBuffer("[TracerHttpModule]:{0}, {1}, rid: [{2}], [{3}], {4} {5}",
+            Trace.TraceInformation("[TracerHttpModule]:{0}, {1}, rid: [{2}], [{3}], {4} {5}",
                 postString, eventName, rid, application.Context.CurrentHandler,
-                application.User != null ? application.User.Identity.Name : "-", application.Context.Response.StatusCode);
+                user, application.Context.Response.StatusCode);
+
+            if (!Verbose)
+                return;
 
             switch (context.CurrentNotification)
             {
@@ -244,20 +242,6 @@ namespace Frankstein.HttpModules
                 context.Request.Url);
 
             Trace.TraceInformation(msg);
-            FlushBuffer();
-        }
-
-        private static void OnError(object sender)
-        {
-            var application = (HttpApplication)sender;
-
-            var rid = application.Context.GetRequestId();
-
-            Trace.TraceError("[TracerHttpModule]: Error at {0}, request {1}, Handler: {2}, Message:'{3}'",
-                application.Context.CurrentNotification, rid, application.Context.CurrentHandler,
-                application.Context.Error);
-
-            FlushBuffer();
         }
 
         static void TraceToBuffer(string str, params object[] args)
@@ -265,55 +249,13 @@ namespace Frankstein.HttpModules
             if (!Verbose)
                 return;
 
-            if (!Bufferize)
-            {
-                if (args.Length == 0)
-                    Trace.TraceInformation(str);
-                else
-                    Trace.TraceInformation(str, args);
-
-                return;
-            }
-
-            var context = HttpContext.Current;
-            if (context == null)
-            {
-                return;
-            }
-
-            var sb = context.Items[SbKey] as StringBuilder;
-            if (sb == null)
-                return;
-
             if (args.Length == 0)
-                sb.AppendLine(str);
+            {
+                Trace.TraceInformation(str);
+            }
             else
-                sb.AppendLine(string.Format(str, args));
-        }
-
-        static void FlushBuffer()
-        {
-            if (!Bufferize)
             {
-                Trace.Flush();
-                return;
-            }
-
-            var context = HttpContext.Current;
-            if (context == null)
-            {
-                return;
-            }
-
-            var sb = context.Items[SbKey] as StringBuilder;
-            if (sb == null)
-                return;
-
-            var lines = sb.ToString().Split(Environment.NewLine.ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
-
-            foreach (var line in lines)
-            {
-                Trace.TraceInformation(line);
+                Trace.TraceInformation(str, args);
             }
 
         }

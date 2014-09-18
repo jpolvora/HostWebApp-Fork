@@ -46,7 +46,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Frankstein.DOP", "Frankstei
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Frankstein.Transactions", "Frankstein.Transactions\Frankstein.Transactions.csproj", "{6DFEA5D3-2BCB-48E5-B772-0FC63A56B035}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Frankstein.UOF", "Frankstein.UOF\Frankstein.UOF.csproj", "{44D4B067-AFBA-4D92-B02A-0D669153A43D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Frankstein.UOW", "Frankstein.UOW\Frankstein.UOW.csproj", "{44D4B067-AFBA-4D92-B02A-0D669153A43D}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Frankstein.Repository", "Frankstein.Repository\Frankstein.Repository.csproj", "{527D56CF-0672-48B8-BDC3-EB44CB1EBE16}"
 EndProject
