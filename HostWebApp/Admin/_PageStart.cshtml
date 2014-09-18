@@ -1,18 +1,20 @@
 ﻿@using System.Web.Mvc
 @{
     Layout = null;
-    if (!User.Identity.IsAuthenticated || !User.IsInRole("Admin"))
-    {
-        if (!Request.IsAjaxRequest())
-        {
-            FormsAuthentication.RedirectToLoginPage();
-        }
-        else
-        {
-            Response.StatusCode = 401;
-        }
-        Response.End();
-        return;
-    }
+    //after implementing authentication, uncomment the following lines
+    
+    //if (!User.Identity.IsAuthenticated || !User.IsInRole("Admin"))
+    //{
+    //    if (!Request.IsAjaxRequest())
+    //    {
+    //        FormsAuthentication.RedirectToLoginPage();
+    //    }
+    //    else
+    //    {
+    //        Response.StatusCode = 401;
+    //    }
+    //    Response.End();
+    //    return;
+    //}
     Response.SetNoCache();
 }
