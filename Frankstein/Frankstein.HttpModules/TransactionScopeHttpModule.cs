@@ -8,6 +8,13 @@ using Frankstein.Common.Mvc;
 
 namespace Frankstein.HttpModules
 {
+    /// <summary>
+    /// it's not possible to ensure that transactions will start and dispose during a request
+    /// because events on asp.net pipeline are not always executed on same thread,
+    /// and transaction scopes are dependent on thread.
+    /// So it only works if you get lucky of entering and exiting the request by the same thread.
+    /// obs: We can use TransactionScopes this way by creating a "Custom Pipeline" on the ProcessRequest of an IHttpHandler.
+    /// </summary>
     public class TransactionScopeHttpModule : IHttpModule
     {
         private const string ScopeKey = "_TransScope_";
@@ -32,6 +39,7 @@ namespace Frankstein.HttpModules
             {
                 Timeout = timeout
             });
+
             context.Items[ScopeKey] = scope;
             var requestId = context.GetRequestId();
             Trace.TraceInformation("[TransactionScopeHttpModule]: Transaction created for Request [{0}]: {1}, timeout: {2}", requestId, scope, timeout);
@@ -61,7 +69,7 @@ namespace Frankstein.HttpModules
             var requestId = context.GetRequestId();
             if (scope != null)
             {
-                using (DisposableTimer.StartNew("[TransactionScopeHttpModule]: Commiting Transaction for request [{0}], {1}".Fmt(requestId, scope)))
+                using (DisposableTimer.StartNew("[TransactionScopeHttpModule]: Commiting Transaction for request [{0}]".Fmt(requestId)))
                 {
                     scope.Complete();
                 }
