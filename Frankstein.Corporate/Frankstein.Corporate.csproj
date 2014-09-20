@@ -42,6 +42,20 @@
     <Compile Include="Class1.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Frankstein.Common\Frankstein.Common.csproj">
+      <Project>{7ea8cab5-30b9-4069-a8c5-d553ca4016b0}</Project>
+      <Name>Frankstein.Common</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Frankstein.Repository\Frankstein.Repository.csproj">
+      <Project>{527d56cf-0672-48b8-bdc3-eb44cb1ebe16}</Project>
+      <Name>Frankstein.Repository</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Frankstein.UOW\Frankstein.UOW.csproj">
+      <Project>{44d4b067-afba-4d92-b02a-0d669153a43d}</Project>
+      <Name>Frankstein.UOW</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

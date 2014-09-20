@@ -2,40 +2,42 @@
 using System.Diagnostics;
 using System.Threading;
 using System.Web;
+using System.Web.SessionState;
 using System.Web.WebPages;
-using Frankstein.Common.Mvc;
 
-namespace Frankstein.HttpModules.ExceptionHandling
+namespace Frankstein.Common.Mvc.ExceptionHandling
 {
     public class ExceptionHelper<TException> : IDisposable
         where TException : Exception
     {
-        protected readonly HttpApplication Application;
+        protected readonly HttpApplication ApplicationInstance;
         protected readonly string ErrorViewPath;
         protected readonly Action<HttpException> LogAction;
 
-        public ExceptionHelper(HttpApplication application, string errorViewPath)
-            : this(application, errorViewPath, exception => Trace.TraceError(exception.Message))
+        public ExceptionHelper(HttpApplication applicationInstance, string errorViewPath)
+            : this(applicationInstance, errorViewPath, exception => Trace.TraceError(exception.Message))
         {
         }
 
-        public ExceptionHelper(HttpApplication application, string errorViewPath, Action<HttpException> logAction)
+        public ExceptionHelper(HttpApplication applicationInstance, string errorViewPath, Action<HttpException> logAction)
         {
-            Application = application;
+            ApplicationInstance = applicationInstance;
             ErrorViewPath = errorViewPath;
             LogAction = logAction;
         }
 
         public virtual void HandleError()
         {
-            var server = Application.Server;
-            var response = Application.Response;
+            var server = ApplicationInstance.Server;
+            var response = ApplicationInstance.Response;
 
             Exception ex = server.GetLastError();
             if (ex is ThreadAbortException)
             {
                 //Esta exception é lançada quando utiliza-se Response.Redirect(url, true).
                 //O correto é Response.REdirect(url, false); CompleteRequest()
+                //mas em alguns casos, é necessário parar imediatamente o processamento da página,
+                //lançando um threadabortexception com Response.End()
                 Trace.TraceInformation("Ignoring Thread abort: " + ex.Message);
                 return;
             }
@@ -44,6 +46,20 @@ namespace Frankstein.HttpModules.ExceptionHandling
                 ?? new HttpException("Generic exception...", ex);
 
             var rootException = httpException.GetBaseException();
+
+            //stores exception in session for later retrieval
+            if (ApplicationInstance.Context.Handler is IRequiresSessionState ||
+                ApplicationInstance.Context.Handler is IReadOnlySessionState)
+            {
+                // Session exists
+
+                ApplicationInstance.Session["exception"] = rootException;
+            }
+            else
+            {
+                ApplicationInstance.Application["exception"] = rootException;
+            }
+            
 
             Trace.TraceError("[ExceptionHelper]: {0}", rootException.Message);
 
@@ -70,12 +86,12 @@ namespace Frankstein.HttpModules.ExceptionHandling
                 case 401: break;
                 case 403:
                     {
-                        if (Application.Request.IsAuthenticated && Application.Response.StatusCode == 403)
+                        if (ApplicationInstance.Request.IsAuthenticated && ApplicationInstance.Response.StatusCode == 403)
                         {
-                            bool isAjax = Application.Request.IsAjaxRequest();
+                            bool isAjax = ApplicationInstance.Request.IsAjaxRequest();
                             if (!isAjax)
                             {
-                                Application.Response.Write("Você está autenticado mas não possui permissões para acessar este recurso");
+                                ApplicationInstance.Response.Write("Você está autenticado mas não possui permissões para acessar este recurso");
                             }
                         }
                         break;
@@ -116,7 +132,7 @@ namespace Frankstein.HttpModules.ExceptionHandling
         /// <returns></returns>
         protected virtual bool IsProduction()
         {
-            return Application.Context.IsCustomErrorEnabled;
+            return ApplicationInstance.Context.IsCustomErrorEnabled;
         }
 
         /// <summary>
@@ -125,19 +141,16 @@ namespace Frankstein.HttpModules.ExceptionHandling
         /// <param name="exception"></param>
         protected virtual void RenderCustomException(TException exception)
         {
-            //stores exception in session for later retrieve
-            Application.Session["exception"] = exception;
-
             //executa a página
             var handler = WebPageHttpHandler.CreateFromVirtualPath(ErrorViewPath);
-            handler.ProcessRequest(Application.Context);
+            handler.ProcessRequest(ApplicationInstance.Context);
 
-            Application.Session.Remove("exception");
+            ApplicationInstance.Session.Remove("exception");
         }
 
         public virtual void Dispose()
         {
-            Application.CompleteRequest();
+            ApplicationInstance.CompleteRequest();
         }
     }
 }

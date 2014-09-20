@@ -3,9 +3,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net.Mail;
-using System.Net.Mime;
 using System.Reflection;
-using System.Text;
 using System.Threading;
 using System.Web;
 using System.Web.Hosting;
@@ -18,9 +16,9 @@ using Frankstein.Common.Cache;
 using Frankstein.Common.Configuration;
 using Frankstein.Common.Mvc;
 using Frankstein.DbFileSystem;
+using Frankstein.EntityFramework;
 using Frankstein.FsDump;
 using Frankstein.HttpModules;
-using Frankstein.HttpModules.ExceptionHandling;
 using Frankstein.Kompiler;
 using Frankstein.PluginLoader;
 using Frankstein.VirtualPathProviders;
@@ -145,12 +143,14 @@ namespace Frankstein.Bootstrapper
                 KompilerEntryPoint.AddReferences(
                     typeof(Controller), //mvc
                     typeof(WebPageRenderingBase), //webpages
-                    typeof(WebCacheWrapper), // mvclib.common
-                    typeof(ViewRenderer), //mvclib.common.mvc
+                    typeof(CustomException), // mvclib.common
+                    typeof(CustomPageBase), //mvclib.common.mvc
                     typeof(DbToLocal), //mvclib.fsdump
                     typeof(IPlugin), //mvclib.pluginloader
                     typeof(DbFileContext), //mvclib.dbfilesystem
-                    typeof(ErrorModel)); //mvclib.httpmodules
+                    typeof(DbContextBase), //mvclib.entityframework
+                    typeof(BootstrapperSection), //mvclib.config
+                    typeof(TracerHttpModule)); //mvclib.httpmodules
 
                 if (cfg.Kompiler.Enabled)
                 {
@@ -158,24 +158,6 @@ namespace Frankstein.Bootstrapper
                     {
                         KompilerEntryPoint.Execute();
                     }
-                }
-
-                Trace.TraceInformation("[Bootstrapper]:cfg.InsertRoutes = {0}", cfg.InsertRoutes);
-                if (cfg.InsertRoutes)
-                {
-                    var routes = RouteTable.Routes;
-
-                    routes.RouteExistingFiles = false;
-                    routes.LowercaseUrls = true;
-                    routes.AppendTrailingSlash = true;
-
-                    routes.IgnoreRoute("{resource}.axd/{*pathInfo}");
-                    routes.IgnoreRoute("{*favicon}", new { favicon = @"(.*/)?favicon.ico(/.*)?" });
-                    routes.IgnoreRoute("{*staticfile}", new { staticfile = @".*\.(css|js|txt|png|gif|jpg|jpeg|bmp)(/.*)?" });
-
-                    routes.IgnoreRoute("Content/{*pathInfo}");
-                    routes.IgnoreRoute("Scripts/{*pathInfo}");
-                    routes.IgnoreRoute("Bundles/{*pathInfo}");
                 }
             }
         }
@@ -201,6 +183,26 @@ namespace Frankstein.Bootstrapper
                     GlobalFilters.Filters.Add(new MvcTracerFilter());
                 }
 
+                Trace.TraceInformation("[Bootstrapper]:cfg.InsertRoutes = {0}", cfg.InsertRoutes);
+                if (cfg.InsertRoutes)
+                {
+                    var routes = RouteTable.Routes;
+
+                    routes.RouteExistingFiles = false;
+                    routes.LowercaseUrls = true;
+                    routes.AppendTrailingSlash = true;
+
+                    routes.IgnoreRoute("{resource}.axd/{*pathInfo}");
+                    //routes.IgnoreRoute("{*favicon}", new { favicon = @"(.*/)?favicon.ico(/.*)?" });
+                    //routes.IgnoreRoute("{*staticfile}", new { staticfile = @".*\.(css|js|txt|png|gif|jpg|jpeg|bmp)(/.*)?" });
+                    routes.IgnoreRoute("{*staticfile}", new { staticfile = @".*\.(?i)(css|js|xml|txt|png|gif|jpg|jpeg|bmp|ico|woff|svg|ttf|eot)(/.*)?" });
+                    routes.IgnoreRoute("Content/{*pathInfo}");
+                    routes.IgnoreRoute("Scripts/{*pathInfo}");
+                    routes.IgnoreRoute("Bundles/{*pathInfo}");
+
+                    routes.MapMvcAttributeRoutes();
+                }
+
                 Trace.TraceInformation("[Bootstrapper]:cfg.Verbose = {0}", cfg.Verbose);
                 if (cfg.Verbose)
                 {
@@ -223,8 +225,17 @@ namespace Frankstein.Bootstrapper
                     Trace.Indent();
                     foreach (var routeBase in routes)
                     {
-                        var route = (Route)routeBase;
-                        Trace.TraceInformation("Handler: {0} at URL: {1}", route.RouteHandler, route.Url);
+                        var route = routeBase as Route;
+                        if (route != null)
+                        {
+                            Trace.TraceInformation("Handler: {0} at URL: {1}", route.RouteHandler, route.Url);
+                        }
+                        else
+                        {
+                            //RouteCollectionRoute => mapped by AttributeRouting
+                            //it's internal, so it's elligible to access his methods and properties with ImpromptuInterface
+                            Trace.TraceInformation("route: {0}", routeBase);
+                        }
                     }
                     Trace.Unindent();
                 }
@@ -298,6 +309,20 @@ namespace Frankstein.Bootstrapper
             }
 
             Trace.Flush();
+
+            if (cfg.Verbose)
+            {
+                Trace.TraceInformation("Listing Attached TraceListeners...");
+                Trace.Indent();
+
+                var listeners = Trace.Listeners;
+                foreach (var logger in listeners)
+                {
+                    Trace.TraceInformation(logger.ToString());
+                }
+                Trace.Unindent();
+            }
+
             var listener = Trace.Listeners["StartupListener"] as TextWriterTraceListener;
             if (listener != null)
             {
@@ -313,34 +338,26 @@ namespace Frankstein.Bootstrapper
                 if (!File.Exists(_traceFileName)) return;
                 ThreadPool.QueueUserWorkItem(state =>
                 {
-                    try
-                    {
-                        var body = File.ReadAllText(_traceFileName);
+                    var body = File.ReadAllText(_traceFileName);
 
-                        using (var client = new SmtpClient())
+                    Trace.TraceInformation("[Bootstrapper]:Sending startup log email to {0}", cfg.Mail.MailDeveloper);
+
+                    EmailExtensions.SendEmail(new MailAddress(cfg.Mail.MailAdmin, "Admin"),
+                        new MailAddress(cfg.Mail.MailDeveloper, "Developer"),
+                        string.Format("App Startup Log: {0} at {1} ", cfg.AppName, DateTime.Now),
+                        body,
+                        true,
+                        (msg, ex) =>
                         {
-                            var msg = new MailMessage(
-                                new MailAddress(cfg.Mail.MailAdmin, "Admin"),
-                                new MailAddress(cfg.Mail.MailDeveloper, "Developer"))
+                            if (ex != null)
                             {
-                                Subject = string.Format("App Startup Log: {0} at {1} ", cfg.AppName, DateTime.Now),
-                                IsBodyHtml = false,
-                                BodyEncoding = Encoding.ASCII
-                            };
-
-                            var alternate = AlternateView.CreateAlternateViewFromString(body,
-                                new ContentType("text/plain"));
-
-                            msg.AlternateViews.Add(alternate);
-
-                            Trace.TraceInformation("[Bootstrapper]:Sending startup log email to {0}", cfg.Mail.MailDeveloper);
-                            client.Send(msg);
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        Trace.TraceError("[Bootstrapper]:Error sending startup log email: {0}", ex.Message);
-                    }
+                                Trace.TraceError("[Bootstrapper]:Error sending startup log email: {0}", ex.Message);
+                            }
+                            else
+                            {
+                                Trace.TraceInformation("[Bootstrapper]:Startup log was sent successfully to {0}", msg);
+                            }
+                        });
                 });
             }
         }

@@ -70,6 +70,10 @@
       <Project>{969929c3-2898-49b8-9ec8-de7a28884524}</Project>
       <Name>Frankstein.DbFileSystem</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Frankstein.EntityFramework\Frankstein.EntityFramework.csproj">
+      <Project>{f1c57f14-c476-4063-b48f-89fb0c18bd03}</Project>
+      <Name>Frankstein.EntityFramework</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />

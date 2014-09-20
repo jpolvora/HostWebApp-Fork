@@ -1,20 +1,17 @@
 using System;
-using System.Configuration;
 using System.Diagnostics;
 using System.Net.Mail;
 using System.Threading;
 using System.Web;
-using Frankstein.Common;
 using Frankstein.Common.Configuration;
-using Frankstein.Common.Mvc;
 
-namespace Frankstein.HttpModules.ExceptionHandling
+namespace Frankstein.Common.Mvc.ExceptionHandling
 {
     public class RazorRenderExceptionHelper<TException> : ExceptionHelper<TException>
         where TException : Exception
     {
-        public RazorRenderExceptionHelper(HttpApplication application, string errorViewPath)
-            : base(application, errorViewPath, LogActionEx)
+        public RazorRenderExceptionHelper(HttpApplication applicationInstance, string errorViewPath)
+            : base(applicationInstance, errorViewPath, LogActionEx)
         {
         }
 
@@ -27,34 +24,9 @@ namespace Frankstein.HttpModules.ExceptionHandling
             if (cfg.Mail.SendExceptionToDeveloper &&
                 (HttpContext.Current == null || !HttpContext.Current.IsDebuggingEnabled))
             {
-                Trace.TraceInformation("[RazorRenderExceptionHelper]: Preparing to send email to developer");
-                string body = exception.GetHtmlErrorMessage();
-                if (string.IsNullOrWhiteSpace(body))
-                    body = exception.ToString();
 
-                string subject = string.Format("Exception for app: {0}, at {1}", cfg.AppName, DateTime.Now);
-                ThreadPool.QueueUserWorkItem(x =>
-                {
-                    try
-                    {
-                        using (var client = new SmtpClient())
-                        {
-                            var msg = new MailMessage(cfg.Mail.MailAdmin, cfg.Mail.MailDeveloper, subject, body)
-                            {
-                                IsBodyHtml = true
-                            };
-
-                            client.Send(msg);
-                            Trace.TraceInformation("[RazorRenderExceptionHelper]: Email was sent to {0}",
-                                cfg.Mail.MailDeveloper);
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        Trace.TraceError("[RazorRenderExceptionHelper]: Failed to send email. {0}", ex.Message);
-                        LogEvent.Raise(exception.Message, exception.GetBaseException());
-                    }
-                });
+                ThreadPool.QueueUserWorkItem(x => SendEmail(exception, cfg.AppName, new MailAddress(cfg.Mail.MailAdmin, "Admin"),
+                    new MailAddress(cfg.Mail.MailDeveloper, "Developer")));
             }
             else
             {
@@ -62,18 +34,47 @@ namespace Frankstein.HttpModules.ExceptionHandling
             }
         }
 
+        static void SendEmail(HttpException exception, string appName, MailAddress from, MailAddress to)
+        {
+            Trace.TraceInformation("[RazorRenderExceptionHelper]: Preparing to send email to developer");
+            string body = exception.GetHtmlErrorMessage();
+            bool html = true;
+            if (string.IsNullOrWhiteSpace(body))
+            {
+                body = exception.ToString();
+                html = false;
+            }
+
+            string subject = string.Format("Exception for app: {0}, at {1}", appName, DateTime.Now);
+
+            EmailExtensions.SendEmail(from, to, subject, body, !html,
+                (message, ex) =>
+                {
+                    if (ex == null)
+                    {
+
+                        Trace.TraceInformation("[RazorRenderExceptionHelper]: Email was sent to {0}",
+                            to);
+                    }
+                    else
+                    {
+                        Trace.TraceError("[RazorRenderExceptionHelper]: Failed to send email. {0}", ex.Message);
+                        LogEvent.Raise(exception.Message, exception.GetBaseException());
+                    }
+                });
+        }
+
         protected override bool IsProduction()
         {
             //checa se o ambiente é de produção
-            bool release = ConfigurationManager.AppSettings["Environment"]
-                .Equals("Release", StringComparison.OrdinalIgnoreCase);
+            bool release = !Config.IsInDebugMode;
 
             return release;
         }
 
         protected override void RenderCustomException(TException exception)
         {
-            //Application.Context.RewritePath(ErrorViewPath);
+            //ApplicationInstance.Context.RewritePath(ErrorViewPath);
 
             Trace.TraceInformation("[RazorRenderExceptionHelper]: Rendering Custom Exception");
             var model = new ErrorModel()
@@ -81,13 +82,13 @@ namespace Frankstein.HttpModules.ExceptionHandling
                 Message = exception.Message,
                 FullMessage = exception.ToString(),
                 StackTrace = exception.StackTrace,
-                Url = Application.Request.RawUrl,
-                StatusCode = Application.Response.StatusCode,
+                Url = ApplicationInstance.Request.RawUrl,
+                StatusCode = ApplicationInstance.Response.StatusCode,
             };
 
             Trace.TraceWarning("Rendering razor view: {0}", ErrorViewPath);
             var html = ViewRenderer.RenderView(ErrorViewPath, model);
-            Application.Response.Write(html);
+            ApplicationInstance.Response.Write(html);
 
         }
     }

@@ -27,6 +27,7 @@ namespace Frankstein.Common
 
             Trace.Indent();
             Trace.TraceInformation("[{0}]: Begin Timer: {1}", _msg, caller);
+            Trace.Indent();
             _stopwatch = Stopwatch.StartNew();
         }
 
@@ -39,6 +40,7 @@ namespace Frankstein.Common
             {
                 _callback.Invoke(ms);
             }
+            Trace.Unindent();
             Trace.TraceInformation("[{0}], Execution time: {1}ms", _msg, ms.ToString("##.000"));
             Trace.Unindent();
         }

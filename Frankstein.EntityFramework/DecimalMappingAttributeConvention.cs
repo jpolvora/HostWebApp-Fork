@@ -1,7 +1,7 @@
 ﻿using System.Data.Entity.ModelConfiguration.Conventions;
 using System.Linq;
 
-namespace Frankstein.DbFileSystem.EF
+namespace Frankstein.EntityFramework
 {
     public class DecimalMappingAttributeConvention : Convention
     {

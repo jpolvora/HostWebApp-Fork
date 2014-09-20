@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Frankstein.EntityFramework;
 
 namespace Frankstein.DbFileSystem
 {
@@ -18,7 +19,7 @@ namespace Frankstein.DbFileSystem
         public int? ParentId { get; set; }
 
         /// <summary>
-        /// Indica se o registro refere-se a um diretório. 
+        /// Indica se o registro é um diretório. 
         /// </summary>
         public bool IsDirectory { get; set; }
 

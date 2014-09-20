@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Frankstein.DbFileSystem.EF
+namespace Frankstein.EntityFramework
 {
     [AttributeUsage(AttributeTargets.Property, AllowMultiple = false)]
     public class DecimalMappingAttribute : Attribute

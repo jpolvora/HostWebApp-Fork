@@ -81,6 +81,7 @@
     <Compile Include="DisposableTimer.cs" />
     <Compile Include="DynamicDictionaryWrapper.cs" />
     <Compile Include="Cache\ICacheProvider.cs" />
+    <Compile Include="EmailExtensions.cs" />
     <Compile Include="ExceptionHelpers.cs" />
     <Compile Include="LogEvent.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

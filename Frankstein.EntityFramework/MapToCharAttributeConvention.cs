@@ -1,7 +1,7 @@
 ﻿using System.Data.Entity.ModelConfiguration.Conventions;
 using System.Linq;
 
-namespace Frankstein.DbFileSystem.EF
+namespace Frankstein.EntityFramework
 {
     public class MapToCharAttributeConvention : Convention
     {
@@ -9,14 +9,6 @@ namespace Frankstein.DbFileSystem.EF
         {
             Properties().Having(x => x.GetCustomAttributes(false).OfType<MapToCharAttribute>().FirstOrDefault())
                 .Configure((cfg, att) => cfg.HasColumnType("char").HasMaxLength(att.FixedLength).IsFixedLength());
-        }
-    }
-
-    public class EmptyStringToNullConvention : Convention
-    {
-        public EmptyStringToNullConvention()
-        {
-
         }
     }
 }

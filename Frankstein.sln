@@ -52,6 +52,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Frankstein.Repository", "Fr
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Frankstein.Corporate", "Frankstein.Corporate\Frankstein.Corporate.csproj", "{13EB667E-984E-432C-85C6-D53D60CAA18F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Frankstein.EntityFramework", "Frankstein.EntityFramework\Frankstein.EntityFramework.csproj", "{F1C57F14-C476-4063-B48F-89FB0C18BD03}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -126,6 +128,10 @@ Global
 		{13EB667E-984E-432C-85C6-D53D60CAA18F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{13EB667E-984E-432C-85C6-D53D60CAA18F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{13EB667E-984E-432C-85C6-D53D60CAA18F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F1C57F14-C476-4063-B48F-89FB0C18BD03}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F1C57F14-C476-4063-B48F-89FB0C18BD03}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F1C57F14-C476-4063-B48F-89FB0C18BD03}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F1C57F14-C476-4063-B48F-89FB0C18BD03}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
