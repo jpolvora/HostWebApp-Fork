@@ -2,7 +2,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace Frankstein.DbFileSystem
+namespace Frankstein.EntityFramework
 {
     public abstract class AuditableEntity
     {

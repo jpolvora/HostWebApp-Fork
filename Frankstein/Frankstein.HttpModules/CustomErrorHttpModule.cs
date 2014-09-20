@@ -1,8 +1,7 @@
 using System;
 using System.Web;
 using Frankstein.Common;
-using Frankstein.Common.Mvc;
-using Frankstein.HttpModules.ExceptionHandling;
+using Frankstein.Common.Mvc.ExceptionHandling;
 
 namespace Frankstein.HttpModules
 {
@@ -18,7 +17,7 @@ namespace Frankstein.HttpModules
             /*
                 sample web.config entry
              */
-            //<httpErrors errorMode="Custom" existingResponse="Auto" defaultResponseMode="ExecuteURL">
+            //<httpErrors errorMode="Custom" existingResponse="Auto" defaultResponseMode="ExecuteURL" defaultPath="/500.cshtml">
             //  <remove statusCode="403" />
             //  <error statusCode="403" path="/403.cshtml" responseMode="ExecuteURL" />
             //  <remove statusCode="404" />

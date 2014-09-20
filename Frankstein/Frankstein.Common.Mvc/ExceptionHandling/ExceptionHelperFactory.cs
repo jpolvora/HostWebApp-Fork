@@ -2,7 +2,7 @@ using System;
 using System.Web;
 using Frankstein.Common.Configuration;
 
-namespace Frankstein.HttpModules.ExceptionHandling
+namespace Frankstein.Common.Mvc.ExceptionHandling
 {
     public static class ExceptionHelperFactory<TException> where TException : Exception
     {

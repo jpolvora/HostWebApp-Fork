@@ -40,30 +40,46 @@ namespace ConsoleApplication1
                 .WithDescription("Diretório raiz")
                 .Callback(x => setDir = x);
 
-            p.Parse(args);
-
-            try
+            var result = p.Parse(args);
+            if (result.HasErrors)
             {
-                var path = Path.Combine(Directory.GetCurrentDirectory(), setDir);
-                Directory.SetCurrentDirectory(path);
-                _dirInfo = new DirectoryInfo(path);
+                Console.WriteLine(string.Join("\n", result.Errors));
             }
-            catch (Exception ex)
+            else
             {
-                Console.WriteLine(ex.Message);
-            }
-            finally
-            {
-                if (_dirInfo != null)
+                try
                 {
-                    Loop();
+                    var path = Path.Combine(Directory.GetCurrentDirectory(), setDir);
+                    _dirInfo = new DirectoryInfo(path);
+                    if (_dirInfo.Exists)
+                    {
+                        Directory.SetCurrentDirectory(path);
+                    }
+                    else
+                    {
+                        Console.WriteLine("Path não encontrado: {0}", _dirInfo);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    //throw new CustomException("failed.", ex);
+                    Console.WriteLine(ex.Message);
+                }
+                finally
+                {
+                    if (_dirInfo != null && _dirInfo.Exists)
+                    {
+                        Console.WriteLine("Path: {0}. Pressione enter para continuar", _dirInfo);
+                        Console.ReadLine();
+                        Loop();
+                    }
                 }
             }
 
             Console.WriteLine("");
             Console.WriteLine("Fim. Pression qualquer tecla ...");
             Console.Beep(440, 1000);
-            Console.ReadLine();
+            Console.ReadKey();
         }
 
         static void Loop()

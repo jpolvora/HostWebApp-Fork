@@ -75,11 +75,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ExceptionHandling\ExceptionHelper.cs" />
     <Compile Include="CustomErrorHttpModule.cs" />
-    <Compile Include="ExceptionHandling\ExceptionHelperFactory.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ExceptionHandling\RazorRenderExceptionHelper.cs" />
     <Compile Include="PathRewriterHttpModule.cs" />
     <Compile Include="SetCacheHttpModule.cs" />
     <Compile Include="TracerHttpModule.cs" />
