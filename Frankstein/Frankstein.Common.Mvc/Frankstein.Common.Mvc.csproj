@@ -113,6 +113,8 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RequestExtensions.cs" />
     <Compile Include="ResponseExtensions.cs" />
+    <Compile Include="Routing\RouteInfo.cs" />
+    <Compile Include="Routing\UriExtensions.cs" />
     <Compile Include="TempData.cs" />
     <Compile Include="ViewRenderer.cs" />
     <Compile Include="WebPageExtensions.cs" />

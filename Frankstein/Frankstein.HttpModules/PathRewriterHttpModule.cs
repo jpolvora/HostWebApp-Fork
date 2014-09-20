@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Web;
 using System.Web.Hosting;
+using System.Web.Routing;
 using Frankstein.Common;
 using Frankstein.Common.Configuration;
 
@@ -33,6 +34,13 @@ namespace Frankstein.HttpModules
 
         private static void ContextOnBeginRequest(HttpApplication application)
         {
+            //check if there's a route matching current URL (MVC)
+            var routeData = RouteTable.Routes.GetRouteData(new HttpContextWrapper(application.Context));
+            if (routeData != null)
+            {
+                Trace.TraceInformation("[PathRewriterHttpModule]: MatchedRoute: '{0}', Route: '{1}'", routeData.RouteHandler, routeData.Route);
+                return;
+            }
 
             string path = application.Request.Url.AbsolutePath.TrimEnd('/').ToLowerInvariant();
 
