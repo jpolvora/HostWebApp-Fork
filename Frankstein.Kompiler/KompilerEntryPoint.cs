@@ -46,7 +46,7 @@ namespace Frankstein.Kompiler
 
                 if (BootstrapperSection.Instance.Kompiler.Roslyn)
                 {
-                    kompiler = new RoslynWrapper();
+                    kompiler = new RoslynKompiler();
                 }
                 else
                 {
