@@ -1,7 +1,10 @@
 using System;
 using System.Data.Entity.Infrastructure;
 using System.Data.Entity.Validation;
+using System.Diagnostics;
+using System.Net.Mail;
 using System.Text;
+using Frankstein.Common.Configuration;
 
 namespace Frankstein.Common
 {
@@ -13,6 +16,39 @@ namespace Frankstein.Common
                 return;
 
             LogEvent.Raise(msg ?? ex.Message, ex);
+        }
+
+        public static void SendExceptionToDeveloper(this Exception ex, string subject, string extraBody = "", string from = "")
+        {
+            if (ex == null)
+            {
+                return;
+            }
+
+            if (string.IsNullOrEmpty(from))
+            {
+                from = BootstrapperSection.Instance.Mail.MailAdmin;
+            }
+            
+            string to = BootstrapperSection.Instance.Mail.MailDeveloper;
+
+            var body = extraBody + Environment.NewLine + ex;
+
+            EmailExtensions.SendEmail(new MailAddress(from), new MailAddress(to), subject, body, true,
+               (message, emailException) =>
+               {
+                   if (emailException == null)
+                   {
+
+                       Trace.TraceInformation("[ExceptionHelpers]: Email was sent to {0}", to);
+                   }
+                   else
+                   {
+                       Trace.TraceError("[ExceptionHelpers]: Failed to send email. {0}", ex.Message);
+                       LogEvent.Raise(emailException.Message, emailException.GetBaseException());
+                   }
+               });
+
         }
 
 
