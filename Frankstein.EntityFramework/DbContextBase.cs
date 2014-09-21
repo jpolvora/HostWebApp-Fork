@@ -26,15 +26,15 @@ namespace Frankstein.EntityFramework
 
             if (Verbose)
             {
-                Database.Log = Log;
+                Database.Log = s => Log(s, this);
             }
         }
 
-        static void Log(string str)
+        static void Log(string str, DbContext instance)
         {
             if (!str.StartsWith("-- Completed")) return;
             Trace.Indent();
-            Trace.TraceInformation("[DbContextBase]:{0}", str.Replace(Environment.NewLine, ""));
+            Trace.TraceInformation("[{0}]:{1}", instance.GetType().Name, str.Replace(Environment.NewLine, ""));
             Trace.Unindent();
         }
 

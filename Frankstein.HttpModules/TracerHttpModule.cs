@@ -233,14 +233,12 @@ namespace Frankstein.HttpModules
             var context = application.Context;
 
             var rid = context.GetRequestId();
-            var elapsed = DateTime.Now - HttpContext.Current.Timestamp; ;
-
-            var strf = String.Format("{0:ss\\.fffff}", elapsed);
+            var now = DateTime.Now;
+            var elapsed = (now - HttpContext.Current.Timestamp);
 
             var msg = string.Format("[EndRequest]:[{0}], Content-Type: {1}, Status: {2}, Render: {3} ms, url: {4}",
-                rid, context.Response.ContentType, context.Response.StatusCode, strf,
+                rid, context.Response.ContentType, context.Response.StatusCode, elapsed.ToString("g"),
                 context.Request.Url);
-
             Trace.TraceInformation(msg);
         }
 
