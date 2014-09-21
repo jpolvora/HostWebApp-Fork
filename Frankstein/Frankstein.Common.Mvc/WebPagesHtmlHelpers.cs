@@ -11,6 +11,11 @@ namespace Frankstein.Common.Mvc
 
         public static string MapPath(this WebPage page, string relativePath)
         {
+            return MapPath(relativePath);
+        }
+
+        public static string MapPath(string relativePath)
+        {
             var result = string.Format("{0}/{1}", BasePath.TrimEnd('/'), relativePath.TrimStart('~', '/'));
             return result;
         }
