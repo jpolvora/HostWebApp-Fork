@@ -85,9 +85,15 @@ namespace Frankstein.Common.Mvc
                     {
                         var result = RenderSection(name, required);
                         if (result != null)
-                            writer.Write(result.ToHtmlString());
+                        {
+                            var @out = result.ToHtmlString();
+                            writer.Write(@out);
+                        }
                         else if (defHelperResult != null)
-                            writer.Write(defHelperResult(writer));
+                        {
+                            var def = defHelperResult(writer);
+                            writer.Write(def);
+                        }
                     }
                     catch
                     {

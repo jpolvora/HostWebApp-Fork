@@ -355,7 +355,7 @@ namespace Frankstein.Bootstrapper
                             }
                             else
                             {
-                                Trace.TraceInformation("[Bootstrapper]:Startup log was sent successfully to {0}", msg);
+                                Trace.TraceInformation("[Bootstrapper]:Startup log was sent successfully to {0}", msg.To[0]);
                             }
                         });
                 });
