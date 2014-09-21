@@ -1,4 +1,9 @@
-﻿@using Microsoft.Web.Helpers
+﻿@using System.Web.Hosting
 @{
-    Themes.Initialize("~/App_Data/Layouts/", "Default");
+    var themePath = WebPagesHtmlHelpers.MapPath("Layouts");
+    
+    if (HostingEnvironment.VirtualPathProvider.DirectoryExists(themePath))
+    {
+        Themes.Initialize(themePath, "Default");
+    }
 }

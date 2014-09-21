@@ -1,18 +1,6 @@
-﻿@using System.Web.Mvc
+﻿@using Frankstein.Common.Mvc.Authentication
 @{
     Layout = null;
-    if (!User.Identity.IsAuthenticated || !User.IsInRole("Admin"))
-    {
-        if (!Request.IsAjaxRequest())
-        {
-            FormsAuthentication.RedirectToLoginPage();
-        }
-        else
-        {
-            Response.StatusCode = 401;
-        }
-        Response.End();
-        return;
-    }
     Response.SetNoCache();
+    Security.RequiresRoles("Admin");
 }

@@ -772,6 +772,7 @@
     <Content Include="Content\ext-theme-classic\Readme.md" />
     <Content Include="Admin\_PageStart.cshtml" />
     <Content Include="403.cshtml" />
+    <Content Include="index.cshtml" />
     <None Include="Scripts\jquery.validate-vsdoc.js" />
     <Content Include="Scripts\CodeMirror\active-line.js" />
     <Content Include="Scripts\CodeMirror\brace-fold.js" />
@@ -899,7 +900,7 @@
           <AutoAssignPort>True</AutoAssignPort>
           <DevelopmentServerPort>4365</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
-          <IISUrl>http://localhost:4365/</IISUrl>
+          <IISUrl>http://localhost:5678</IISUrl>
           <NTLMAuthentication>False</NTLMAuthentication>
           <UseCustomServer>False</UseCustomServer>
           <CustomServerUrl>
