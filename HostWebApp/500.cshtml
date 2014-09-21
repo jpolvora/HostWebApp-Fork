@@ -22,6 +22,8 @@
         @RenderPage(this.MapPath("~/500.cshtml"))
         return;
     }
+
+    var exception = Session["exception"] ?? AppState["exception"];
 }
 <!DOCTYPE html>
 <html>
@@ -31,7 +33,12 @@
 </head>
 <body>
     <h2>Ocorreu um erro. Desculpe-nos pelo incoveniente. O administrador do site foi alertado.</h2>
-    <h3>@Session["exception"]</h3>
+    @if (Request.IsLocal || Config.IsInDebugMode)
+    {
+        <h3>@exception</h3>
+    }
+
+    <h3>@Response.StatusCode - @Response.StatusDescription</h3>
     <h4>Original Url: @Request.RawUrl</h4>
 </body>
 </html>

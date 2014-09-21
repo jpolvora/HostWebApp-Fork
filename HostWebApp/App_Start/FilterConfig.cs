@@ -1,14 +1,16 @@
-﻿using System.Web;
 using System.Web.Mvc;
 
-namespace HostWebApp
+// ReSharper disable once CheckNamespace
+namespace HostWebApp.App_Start
 {
     public class FilterConfig
     {
         public static void RegisterGlobalFilters(GlobalFilterCollection filters)
         {
-            //if (!HttpContext.Current.IsDebuggingEnabled)
-                //filters.Add(new HandleErrorAttribute());
+            /*part of the code for HandlerErrorAttribute was used in Frankstein/ExceptionHandler class.
+             * so currently we don't need this attribute. */
+
+            //filters.Add(new HandleErrorAttribute());
         }
     }
 }

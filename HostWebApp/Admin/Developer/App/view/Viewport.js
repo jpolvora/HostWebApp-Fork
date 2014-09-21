@@ -239,7 +239,7 @@
 
                                 {
                                     xtype: 'button',
-                                    href: '/_session/logout.cshtml',
+                                    href: '/Areas/Session/logout.cshtml',
                                     icon: '/Content/png/27.png',
                                     hrefTarget: '',
                                     text: 'Sair',

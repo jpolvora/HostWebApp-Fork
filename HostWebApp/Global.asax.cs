@@ -2,6 +2,10 @@
 using System.Web.Mvc;
 using System.Web.Optimization;
 using System.Web.Routing;
+using Frankstein.Common;
+using Frankstein.Common.Configuration;
+using Frankstein.PluginLoader;
+using HostWebApp.App_Start;
 
 // ReSharper disable once CheckNamespace
 namespace HostWebApp
@@ -14,6 +18,11 @@ namespace HostWebApp
             RouteConfig.RegisterRoutes(RouteTable.Routes);
             BundleConfig.RegisterBundles(BundleTable.Bundles);
             FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);
+
+            if (!BootstrapperSection.Instance.PluginLoader.Enabled)
+            {
+                //PluginStorage.ExecutePlugins((s, exception) => exception.SendExceptionToDeveloper("Error executando plugin: " + s));
+            }
         }
 
         protected void Session_Start(object sender, EventArgs e)

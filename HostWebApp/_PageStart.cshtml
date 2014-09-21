@@ -11,15 +11,4 @@
     {
         Trace.TraceWarning(ex.Message);
     }
-    catch (Exception ex)
-    {
-        if (!Config.IsInDebugMode)
-        {
-            LogEvent.Raise(ex.Message, ex);
-        }
-        else
-        {
-            throw;
-        }
-    }
 }

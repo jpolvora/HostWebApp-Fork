@@ -1,6 +1,7 @@
-﻿using System.Web.Optimization;
+using System.Web.Optimization;
 
-namespace HostWebApp
+// ReSharper disable once CheckNamespace
+namespace HostWebApp.App_Start
 {
     public class BundleConfig
     {
@@ -61,7 +62,7 @@ namespace HostWebApp
                 .Include("~/Content/codemirror/vibrant-ink.css"));
 
 
-            //BundleTable.EnableOptimizations = true;
+            //BundleTable.EnableOptimizations = false;
         }
     }
 }
