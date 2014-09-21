@@ -70,8 +70,9 @@
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
-    <Reference Include="WebMarkupMin.Core">
-      <HintPath>$(SolutionDir)\packages\WebMarkupMin.Core.0.9.0-beta1\lib\net40\WebMarkupMin.Core.dll</HintPath>
+    <Reference Include="WebMarkupMin.Core, Version=0.9.3.0, Culture=neutral, PublicKeyToken=99472178d266584b, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>$(SolutionDir)\packages\WebMarkupMin.Core.0.9.3\lib\net40\WebMarkupMin.Core.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -85,8 +86,12 @@
     <Compile Include="WhitespaceModule.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="app.config" />
-    <None Include="packages.config" />
+    <None Include="app.config">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="packages.config">
+      <SubType>Designer</SubType>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Frankstein.Common.Mvc\Frankstein.Common.Mvc.csproj">

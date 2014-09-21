@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace Frankstein.Corporate
 {
+    //public 
     public class Module
     {
     }
