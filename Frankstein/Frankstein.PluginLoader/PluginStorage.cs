@@ -14,6 +14,7 @@ namespace Frankstein.PluginLoader
     {
         private readonly DirectoryInfo _pluginFolder;
         private static readonly Dictionary<string, Assembly> StoredAssemblies = new Dictionary<string, Assembly>();
+        private static readonly List<string> _executedPlugins = new List<string>();
 
         public PluginStorage(DirectoryInfo directoryInfo)
         {
@@ -176,7 +177,12 @@ namespace Frankstein.PluginLoader
                     IPlugin instance = null;
                     try
                     {
+                        if (_executedPlugins.Contains(plugin.AssemblyQualifiedName))
+                            continue;
+
                         instance = Activator.CreateInstance(plugin) as IPlugin;
+
+                        _executedPlugins.Add(plugin.AssemblyQualifiedName);
                     }
                     catch (Exception ex)
                     {
