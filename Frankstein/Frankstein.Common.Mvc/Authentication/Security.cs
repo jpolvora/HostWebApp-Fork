@@ -1,6 +1,7 @@
 using System.Net;
 using System.Web;
 using Antlr.Runtime.Misc;
+using Frankstein.Common.Configuration;
 
 namespace Frankstein.Common.Mvc.Authentication
 {
@@ -11,7 +12,11 @@ namespace Frankstein.Common.Mvc.Authentication
         /// </summary>
         public static void RequiresAuthenticatedUser()
         {
+            if (!BootstrapperSection.Instance.SecurityEnabled)
+                return;
+
             var context = HttpContext.Current;
+
 
             if (!context.Request.IsAuthenticated)
             {
@@ -26,6 +31,9 @@ namespace Frankstein.Common.Mvc.Authentication
         /// <param name="roles"></param>
         public static void RequiresRoles(params string[] roles)
         {
+            if (!BootstrapperSection.Instance.SecurityEnabled)
+                return;
+
             RequiresAuthenticatedUser();
 
             var context = HttpContext.Current;
@@ -43,6 +51,9 @@ namespace Frankstein.Common.Mvc.Authentication
 
         public static void RequiresCondition<T>(Func<T, bool> condition) where T : class, IDbUser, new()
         {
+            if (!BootstrapperSection.Instance.SecurityEnabled)
+                return;
+
             RequiresAuthenticatedUser();
 
             var context = HttpContext.Current;

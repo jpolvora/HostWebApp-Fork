@@ -62,6 +62,13 @@ namespace Frankstein.Common.Configuration
             private set { _instance = value; }
         }
 
+        [ConfigurationProperty("securityenabled", DefaultValue = false)]
+        public bool SecurityEnabled
+        {
+            get { return (Boolean)this["securityenabled"]; }
+            set { this["securityenabled"] = value; }
+        }
+
         [ConfigurationProperty("stopMonitoring", DefaultValue = false)]
         public bool StopMonitoring
         {
