@@ -1,15 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data.Entity;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
-using System.Web.Razor;
-using System.Web.WebPages;
-using System.Web.WebPages.Razor;
 using Frankstein.Common.Configuration;
 using Frankstein.PluginLoader;
-using Microsoft.Web.Infrastructure.DynamicModuleHelper;
 
 namespace Frankstein.Kompiler
 {
@@ -95,9 +90,6 @@ namespace Frankstein.Kompiler
 
         public static void AddReferences(params Type[] types)
         {
-            if (_initialized)
-                throw new InvalidOperationException("Compilador só pode ser executado no Pre-Start!");
-
             foreach (var type in types)
             {
                 if (!ReferencePaths.Contains(type.Assembly.Location))
@@ -115,6 +107,15 @@ namespace Frankstein.Kompiler
             }
         }
 
+        public static void AddReferences(params string[] assemblies)
+        {
+            foreach (var assembly in assemblies)
+            {
+                if (!ReferencePaths.Contains(assembly))
+                    ReferencePaths.Add(assembly);
+            }
+        }
+
         //todo: passar para a classe correta
         internal static List<string> ReferencePaths = new List<string>()
         {
@@ -124,14 +125,7 @@ namespace Frankstein.Kompiler
                     typeof(Microsoft.CSharp.RuntimeBinder.Binder).Assembly.Location, //Microsoft.CSharp
                     typeof(System.Web.HttpApplication).Assembly.Location,
                     typeof(Trace).Assembly.Location,
-                    typeof(WebPageExecutingBase).Assembly.Location,
-                    typeof(WebPageRazorHost).Assembly.Location,
-                    typeof(RazorEngineHost).Assembly.Location,
-                    typeof(System.ComponentModel.DataAnnotations.DataType).Assembly.Location,
-                    typeof(DbContext).Assembly.Location,
-                    typeof(System.Web.Optimization.Bundle).Assembly.Location,
-                    typeof(DynamicModuleUtility).Assembly.Location,
-                    typeof(CodeDomWrapper).Assembly.Location
+                    typeof(System.ComponentModel.DataAnnotations.DataType).Assembly.Location
         };
     }
 }

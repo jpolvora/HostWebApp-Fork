@@ -9,14 +9,12 @@ using System.Web;
 using System.Web.Hosting;
 using System.Web.Mvc;
 using System.Web.Routing;
-using System.Web.WebPages;
 using Frankstein.Bootstrapper;
 using Frankstein.Common;
 using Frankstein.Common.Cache;
 using Frankstein.Common.Configuration;
 using Frankstein.Common.Mvc;
 using Frankstein.DbFileSystem;
-using Frankstein.EntityFramework;
 using Frankstein.FsDump;
 using Frankstein.HttpModules;
 using Frankstein.Kompiler;
@@ -140,17 +138,19 @@ namespace Frankstein.Bootstrapper
                 }
 
                 Trace.TraceInformation("[Bootstrapper]:cfg.Kompiler.Enabled = {0}", cfg.Kompiler.Enabled);
-                KompilerEntryPoint.AddReferences(
-                    typeof(Controller), //mvc
-                    typeof(WebPageRenderingBase), //webpages
-                    typeof(CustomException), // mvclib.common
-                    typeof(CustomPageBase), //mvclib.common.mvc
-                    typeof(DbToLocal), //mvclib.fsdump
-                    typeof(IPlugin), //mvclib.pluginloader
-                    typeof(DbFileContext), //mvclib.dbfilesystem
-                    typeof(DbContextBase), //mvclib.entityframework
-                    typeof(BootstrapperSection), //mvclib.config
-                    typeof(TracerHttpModule)); //mvclib.httpmodules
+                var bin = new DirectoryInfo(HttpRuntime.BinDirectory);
+
+                Trace.Indent();
+
+                foreach (var fileInfo in bin.EnumerateFiles("*.dll", SearchOption.AllDirectories))
+                {
+                    if (cfg.Verbose)
+                    {
+                        Trace.TraceInformation("[BinFolder]: {0}", fileInfo.FullName);
+                    }
+                    KompilerEntryPoint.AddReferences(fileInfo.FullName);
+                }
+                Trace.Unindent();
 
                 if (cfg.Kompiler.Enabled)
                 {
