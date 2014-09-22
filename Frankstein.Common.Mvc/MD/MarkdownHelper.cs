@@ -1,4 +1,5 @@
 ﻿using System.Web;
+using System.Web.Helpers;
 using System.Web.WebPages;
 using MarkdownDeep;
 
@@ -31,11 +32,22 @@ namespace Frankstein.Common.Mvc.MD
 
         public static IHtmlString Markdown(this System.Web.WebPages.Html.HtmlHelper helper, string text)
         {
+            var hash = text.GetHashCode().ToString();
+
+            var cachedEntry = WebCache.Get(hash) as HtmlString;
+            if (cachedEntry != null)
+            {
+                return cachedEntry;
+            }
+
             // Transform the supplied text (Markdown) into HTML.
             string html = MarkdownTransformer.Transform(text);
 
             // Wrap the html in an MvcHtmlString otherwise it'll be HtmlEncoded and displayed to the user as HTML :(
-            return new HtmlString(html);
+            var result = new HtmlString(html);
+            WebCache.Set(hash, result);
+
+            return result;
         }
     }
 }
