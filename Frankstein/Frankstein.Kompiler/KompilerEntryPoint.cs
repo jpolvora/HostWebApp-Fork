@@ -9,6 +9,7 @@ using System.Web.WebPages;
 using System.Web.WebPages.Razor;
 using Frankstein.Common.Configuration;
 using Frankstein.PluginLoader;
+using Microsoft.Web.Infrastructure.DynamicModuleHelper;
 
 namespace Frankstein.Kompiler
 {
@@ -128,6 +129,8 @@ namespace Frankstein.Kompiler
                     typeof(RazorEngineHost).Assembly.Location,
                     typeof(System.ComponentModel.DataAnnotations.DataType).Assembly.Location,
                     typeof(DbContext).Assembly.Location,
+                    typeof(System.Web.Optimization.Bundle).Assembly.Location,
+                    typeof(DynamicModuleUtility).Assembly.Location,
                     typeof(CodeDomWrapper).Assembly.Location
         };
     }
