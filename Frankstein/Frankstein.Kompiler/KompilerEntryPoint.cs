@@ -117,7 +117,7 @@ namespace Frankstein.Kompiler
         }
 
         //todo: passar para a classe correta
-        internal static List<string> ReferencePaths = new List<string>()
+        internal static readonly List<string> ReferencePaths = new List<string>()
         {
                     typeof (object).Assembly.Location, //System
                     typeof (Enumerable).Assembly.Location, //System.Core.dll
@@ -125,7 +125,9 @@ namespace Frankstein.Kompiler
                     typeof(Microsoft.CSharp.RuntimeBinder.Binder).Assembly.Location, //Microsoft.CSharp
                     typeof(System.Web.HttpApplication).Assembly.Location,
                     typeof(Trace).Assembly.Location,
-                    typeof(System.ComponentModel.DataAnnotations.DataType).Assembly.Location
+                    typeof(System.ComponentModel.DataAnnotations.DataType).Assembly.Location,
+                    typeof(System.Xml.Linq.XDocument).Assembly.Location,
+                    typeof(System.Net.Http.HttpClient).Assembly.Location
         };
     }
 }
