@@ -126,8 +126,10 @@ namespace Frankstein.Kompiler
                     typeof(System.Web.HttpApplication).Assembly.Location,
                     typeof(Trace).Assembly.Location,
                     typeof(System.ComponentModel.DataAnnotations.DataType).Assembly.Location,
+                    typeof(System.Xml.Serialization.IXmlSerializable).Assembly.Location,
                     typeof(System.Xml.Linq.XDocument).Assembly.Location,
-                    typeof(System.Net.Http.HttpClient).Assembly.Location
+                    typeof(System.Net.Http.HttpClient).Assembly.Location,
+                    typeof(System.Configuration.ConfigurationManager).Assembly.Location
         };
     }
 }
