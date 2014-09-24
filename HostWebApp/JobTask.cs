@@ -67,7 +67,7 @@ namespace HostWebApp
             return string.Format("{0}:{1}s", JobName, TimeSpan.FromSeconds(Interval));
         }
 
-        private void CacheItemRemoved(string k, object v, CacheItemRemovedReason r)
+        private async void CacheItemRemoved(string k, object v, CacheItemRemovedReason r)
         {
             lock (_lock)
             {
@@ -75,22 +75,23 @@ namespace HostWebApp
                 {
                     return;
                 }
-                bool success = false;
-                try
-                {
-                    var result = Execute();
-                    result.Wait();
-                    success = true;
-                }
-                catch (Exception ex)
-                {
-                    Trace.TraceError("Error executing {0}: {1} ", this, ex);
-                }
-                finally
-                {
-                    if (success)
-                        AddTask();
-                }
+            }
+
+            bool success = false;
+            try
+            {
+                await Execute();
+
+                success = true;
+            }
+            catch (Exception ex)
+            {
+                Trace.TraceError("Error executing {0}: {1} ", this, ex);
+            }
+            finally
+            {
+                if (success)
+                    AddTask();
             }
         }
 
@@ -104,19 +105,19 @@ namespace HostWebApp
             HostingEnvironment.UnregisterObject(this);
         }
 
-        public virtual System.Threading.Tasks.Task Execute()
+        public virtual Task Execute()
         {
             Trace.TraceInformation("{0}: Running scheduled Task '{1}'.", DateTime.Now, this);
 
-            return System.Threading.Tasks.Task.FromResult(0);
+            return Task.FromResult(0);
         }
     }
 
     public class ForeverActionJob : ForeverJobBase
     {
-        private readonly Func<System.Threading.Tasks.Task> _action;
+        private readonly Func<Task> _action;
 
-        public ForeverActionJob(string name, int interval, Func<System.Threading.Tasks.Task> action)
+        public ForeverActionJob(string name, int interval, Func<Task> action)
             : base(name, interval)
         {
             _action = action;
