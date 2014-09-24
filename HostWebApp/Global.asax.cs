@@ -1,11 +1,14 @@
 ﻿using System;
 using System.Diagnostics;
+using System.IO;
 using System.Net;
+using System.Net.Mail;
 using System.Web;
 using System.Web.Mvc;
 using System.Web.Optimization;
 using System.Web.Routing;
 using Frankstein.Common;
+using Frankstein.Common.Configuration;
 using Frankstein.Common.Mvc.Jobs;
 using Frankstein.PluginLoader;
 using HostWebApp.App_Start;
@@ -37,7 +40,19 @@ namespace HostWebApp
                 webRequest.Method = "HEAD";
                 using (var webResponse = await webRequest.GetResponseAsync())
                 {
-                    Trace.TraceInformation(((HttpWebResponse) webResponse).StatusCode.ToString());
+                    string html = "";
+                    var rStr = webResponse.GetResponseStream();
+                    using (var sr = new StreamReader(rStr))
+                    {
+                        html = await sr.ReadToEndAsync();
+                    }
+
+                    await EmailExtensions.SendEmailAsync(new MailAddress(BootstrapperSection.Instance.Mail.MailAdmin),
+                        new MailAddress(BootstrapperSection.Instance.Mail.MailDeveloper),
+                        "Task Execution" + BootstrapperSection.Instance.AppName,
+                        html, false, (message, exception) => { });
+
+                    Trace.TraceInformation(((HttpWebResponse)webResponse).StatusCode.ToString());
                 }
             }
         }
