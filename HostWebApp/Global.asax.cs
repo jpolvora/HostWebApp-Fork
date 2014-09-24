@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Net;
+using System.Web;
 using System.Web.Mvc;
 using System.Web.Optimization;
 using System.Web.Routing;
@@ -30,11 +31,14 @@ namespace HostWebApp
 
         private static async System.Threading.Tasks.Task ExecuteJob()
         {
-            var webRequest = WebRequest.Create("http://hostwebapp.apphb.com");
-            webRequest.Method = "HEAD";
-            using (var webResponse = await webRequest.GetResponseAsync())
+            using (DisposableTimer.StartNew("Scheduled Task ..."))
             {
-                Trace.TraceInformation(((HttpWebResponse)webResponse).StatusCode.ToString());
+                var webRequest = WebRequest.Create("http://hostwebapp.apphb.com?source=task");
+                webRequest.Method = "HEAD";
+                using (var webResponse = await webRequest.GetResponseAsync())
+                {
+                    Trace.TraceInformation(((HttpWebResponse) webResponse).StatusCode.ToString());
+                }
             }
         }
 
