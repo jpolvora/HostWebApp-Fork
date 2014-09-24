@@ -5,6 +5,7 @@ using System.Web.Mvc;
 using System.Web.Optimization;
 using System.Web.Routing;
 using Frankstein.Common;
+using Frankstein.Common.Mvc.Jobs;
 using Frankstein.PluginLoader;
 using HostWebApp.App_Start;
 
@@ -22,7 +23,7 @@ namespace HostWebApp
 
             PluginStorage.ExecutePlugins((s, exception) => exception.SendExceptionToDeveloper("Error executando plugin: " + s));
 
-            var job = new ForeverActionJob("teste", 30, ExecuteJob);
+            var job = new ForeverActionJob("teste", 60, ExecuteJob);
             job.Start();
 
         }
