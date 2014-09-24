@@ -28,42 +28,46 @@ namespace HostWebApp
 
             PluginStorage.ExecutePlugins((s, exception) => exception.SendExceptionToDeveloper("Error executando plugin: " + s));
 
-            var job = new ForeverActionJob("teste", 300, ExecuteJob);
+            var job = new ForeverActionJob("test-task-600", 600, ExecuteJob);
             job.Start();
 
         }
 
         private static async System.Threading.Tasks.Task ExecuteJob()
         {
+            var rnd = new Random().Next(0, 99999);
             using (DisposableTimer.StartNew("Scheduled Task ..."))
             {
-                var webRequest = WebRequest.Create("http://hostwebapp.apphb.com?source=task");
+                var webRequest = WebRequest.Create("http://hostwebapp.apphb.com?source=task&id=" + rnd.ToString("D5"));
                 webRequest.Method = "HEAD";
                 using (var webResponse = await webRequest.GetResponseAsync())
                 {
-                    var httpResponse = (HttpWebResponse) webResponse;
-                    
-                    var headers = httpResponse.Headers;
-                    var sb = new StringBuilder();
-                    sb.AppendFormat("Status: {0}", httpResponse.StatusCode).AppendLine();
-                    sb.AppendFormat("Description: {0}", httpResponse.StatusDescription).AppendLine();
-                    sb.AppendFormat("Server: {0}", httpResponse.Server).AppendLine();
-                    sb.AppendFormat("ContentLength: {0}", httpResponse.ContentLength).AppendLine();
-                    sb.AppendFormat("ContentType: {0}", httpResponse.ContentType).AppendLine();
-                    string html = sb.ToString();
-
-                    foreach (var header in headers)
+                    var httpResponse = (HttpWebResponse)webResponse;
+                    Trace.TraceInformation("[Task]: Status = {0}", httpResponse.StatusCode);
+                    if (httpResponse.StatusCode != HttpStatusCode.OK)
                     {
-                        html += header + Environment.NewLine;
+                        var headers = httpResponse.Headers;
+                        var sb = new StringBuilder();
+                        sb.AppendFormat("Status: {0}", httpResponse.StatusCode).AppendLine();
+                        sb.AppendFormat("Description: {0}", httpResponse.StatusDescription).AppendLine();
+                        sb.AppendFormat("Server: {0}", httpResponse.Server).AppendLine();
+                        sb.AppendFormat("ContentLength: {0}", httpResponse.ContentLength).AppendLine();
+                        sb.AppendFormat("ContentType: {0}", httpResponse.ContentType).AppendLine();
+                        string html = sb.ToString();
+
+                        foreach (var header in headers)
+                        {
+                            html += header + Environment.NewLine;
+                        }
+
+                        Trace.TraceInformation("Send task info email");
+
+                        await
+                            EmailExtensions.SendEmailAsync(new MailAddress(BootstrapperSection.Instance.Mail.MailAdmin),
+                                new MailAddress(BootstrapperSection.Instance.Mail.MailDeveloper),
+                                "Task Execution: " + BootstrapperSection.Instance.AppName,
+                                html, false, (message, exception) => { });
                     }
-                  
-                    Trace.TraceInformation("Send task info email");
-
-                    await EmailExtensions.SendEmailAsync(new MailAddress(BootstrapperSection.Instance.Mail.MailAdmin),
-                        new MailAddress(BootstrapperSection.Instance.Mail.MailDeveloper),
-                        "Task Execution: " + BootstrapperSection.Instance.AppName,
-                        html, false, (message, exception) => { });
-
                 }
             }
         }
