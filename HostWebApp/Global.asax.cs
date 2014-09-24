@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Net;
 using System.Net.Mail;
+using System.Text;
 using System.Web;
 using System.Web.Mvc;
 using System.Web.Optimization;
@@ -40,19 +41,27 @@ namespace HostWebApp
                 webRequest.Method = "HEAD";
                 using (var webResponse = await webRequest.GetResponseAsync())
                 {
-                    string html = "";
-                    var rStr = webResponse.GetResponseStream();
-                    using (var sr = new StreamReader(rStr))
-                    {
-                        html = await sr.ReadToEndAsync();
-                    }
+                    var httpResponse = (HttpWebResponse) webResponse;
+                    
+                    var headers = httpResponse.Headers;
+                    var sb = new StringBuilder();
+                    sb.AppendFormat("Status: {0}", httpResponse.StatusCode).AppendLine();
+                    sb.AppendFormat("Description: {0}", httpResponse.StatusDescription).AppendLine();
+                    sb.AppendFormat("Server: {0}", httpResponse.Server).AppendLine();
+                    sb.AppendFormat("ContentLength: {0}", httpResponse.ContentLength).AppendLine();
+                    sb.AppendFormat("ContentType: {0}", httpResponse.ContentType).AppendLine();
+                    string html = sb.ToString();
 
+                    foreach (var header in headers)
+                    {
+                        html += header + Environment.NewLine;
+                    }
+                  
                     await EmailExtensions.SendEmailAsync(new MailAddress(BootstrapperSection.Instance.Mail.MailAdmin),
                         new MailAddress(BootstrapperSection.Instance.Mail.MailDeveloper),
                         "Task Execution" + BootstrapperSection.Instance.AppName,
                         html, false, (message, exception) => { });
 
-                    Trace.TraceInformation(((HttpWebResponse)webResponse).StatusCode.ToString());
                 }
             }
         }
