@@ -46,7 +46,6 @@ namespace Frankstein.Bootstrapper
                 if (!string.IsNullOrWhiteSpace(_traceFileName))
                 {
                     if (File.Exists(_traceFileName))
-                    {
                         try
                         {
                             File.Delete(_traceFileName);
@@ -55,7 +54,7 @@ namespace Frankstein.Bootstrapper
                         {
                             Trace.TraceError(ex.ToString());
                         }
-                    }
+
                     var listener = new TextWriterTraceListener(_traceFileName, "StartupListener");
 
                     Trace.Listeners.Add(listener);
