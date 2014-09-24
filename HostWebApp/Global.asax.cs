@@ -28,7 +28,7 @@ namespace HostWebApp
 
             PluginStorage.ExecutePlugins((s, exception) => exception.SendExceptionToDeveloper("Error executando plugin: " + s));
 
-            var job = new ForeverActionJob("teste", 60, ExecuteJob);
+            var job = new ForeverActionJob("teste", 300, ExecuteJob);
             job.Start();
 
         }
@@ -57,9 +57,11 @@ namespace HostWebApp
                         html += header + Environment.NewLine;
                     }
                   
+                    Trace.TraceInformation("Send task info email");
+
                     await EmailExtensions.SendEmailAsync(new MailAddress(BootstrapperSection.Instance.Mail.MailAdmin),
                         new MailAddress(BootstrapperSection.Instance.Mail.MailDeveloper),
-                        "Task Execution" + BootstrapperSection.Instance.AppName,
+                        "Task Execution: " + BootstrapperSection.Instance.AppName,
                         html, false, (message, exception) => { });
 
                 }
