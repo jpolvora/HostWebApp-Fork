@@ -64,5 +64,23 @@ namespace Frankstein.Common.Mvc
             context.Response.SuppressContent = true;
             context.ApplicationInstance.CompleteRequest();
         }
+
+        public static string ToPublicUrl(this HttpContextBase context, Uri relativeUri, string scheme)
+        {
+            var uriBuilder = new UriBuilder
+            {
+                Host = context.Request.Url.Host,
+                Path = "/",
+                Port = 80,
+                Scheme = scheme,
+            };
+
+            if (context.Request.IsLocal)
+            {
+                uriBuilder.Port = context.Request.Url.Port;
+            }
+
+            return new Uri(uriBuilder.Uri, relativeUri).AbsoluteUri;
+        }
     }
 }
