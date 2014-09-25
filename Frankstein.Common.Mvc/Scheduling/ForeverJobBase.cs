@@ -5,7 +5,7 @@ using System.Web;
 using System.Web.Caching;
 using System.Web.Hosting;
 
-namespace Frankstein.Common.Mvc.Jobs
+namespace Frankstein.Common.Mvc.Scheduling
 {
     public abstract class ForeverJobBase : IRegisteredObject, IJob
     {
@@ -22,10 +22,15 @@ namespace Frankstein.Common.Mvc.Jobs
             Interval = interval;
         }
 
-        public virtual void Start()
+        public virtual void Register()
         {
             HostingEnvironment.RegisterObject(this);
             AddTask();
+        }
+
+        public void Unregister()
+        {
+            
         }
 
         private void AddTask()

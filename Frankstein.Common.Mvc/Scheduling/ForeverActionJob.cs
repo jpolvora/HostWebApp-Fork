@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 
-namespace Frankstein.Common.Mvc.Jobs
+namespace Frankstein.Common.Mvc.Scheduling
 {
     public class ForeverActionJob : ForeverJobBase
     {

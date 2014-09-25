@@ -17,25 +17,6 @@ namespace Frankstein.Common.Mvc
             return (request["X-Requested-With"] == "XMLHttpRequest") || ((request.Headers != null) && (request.Headers["X-Requested-With"] == "XMLHttpRequest"));
         }
 
-        public static string ToPublicUrl(this HttpContextBase context, Uri relativeUri, string scheme)
-        {
-            
-            var uriBuilder = new UriBuilder
-            {
-                Host = context.Request.Url.Host,
-                Path = "/",
-                Port = 80,
-                Scheme = scheme,
-            };
-
-            if (context.Request.IsLocal)
-            {
-                uriBuilder.Port = context.Request.Url.Port;
-            }
-
-            return new Uri(uriBuilder.Uri, relativeUri).AbsoluteUri;
-        }
-
         public static void ValidateAntiforgeryFromHeader(this HttpRequestBase request, int statusCode = 0)
         {
             //ajax setup
