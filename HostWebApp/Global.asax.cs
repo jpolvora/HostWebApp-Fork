@@ -10,7 +10,7 @@ using System.Web.Routing;
 using Frankstein.Common;
 using Frankstein.Common.Configuration;
 using Frankstein.Common.Mvc;
-using Frankstein.Common.Mvc.Jobs;
+using Frankstein.Common.Mvc.Scheduling;
 using Frankstein.PluginLoader;
 using HostWebApp.App_Start;
 
@@ -120,10 +120,12 @@ namespace HostWebApp
                 if (_wasInit)
                     return false;
 
-                if (HttpContext.Current == null || HttpContext.Current.Request == null)
+                var context = HttpContext.Current;
+
+                if (context == null || context.Request == null)
                     throw new Exception("HttpContext not available at this moment.");
 
-                HostUrl = HttpContext.Current.ToPublicUrl(new Uri("/", UriKind.Relative));
+                HostUrl = context.ToPublicUrl(new Uri("/", UriKind.Relative));
 
                 _wasInit = true;
                 return true;
