@@ -22,7 +22,7 @@ namespace Frankstein.Common.Mvc.Jobs
             Interval = interval;
         }
 
-        public virtual void Start()
+        public virtual void Register()
         {
             HostingEnvironment.RegisterObject(this);
             AddTask();

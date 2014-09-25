@@ -4,7 +4,7 @@ namespace Frankstein.Common.Mvc.Jobs
 {
     public interface IJob
     {
-        void Start();
+        void Register();
         Task Execute();
     }
 }

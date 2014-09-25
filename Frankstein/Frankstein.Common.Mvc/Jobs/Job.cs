@@ -4,7 +4,7 @@ namespace Frankstein.Common.Mvc.Jobs
 {
     public class Job : IJob
     {
-        public void Start()
+        public void Register()
         {
             //schedules to a date
         }
