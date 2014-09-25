@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Diagnostics;
-using System.IO;
 using System.Net;
 using System.Net.Mail;
 using System.Text;
@@ -10,6 +9,7 @@ using System.Web.Optimization;
 using System.Web.Routing;
 using Frankstein.Common;
 using Frankstein.Common.Configuration;
+using Frankstein.Common.Mvc;
 using Frankstein.Common.Mvc.Jobs;
 using Frankstein.PluginLoader;
 using HostWebApp.App_Start;
@@ -28,17 +28,48 @@ namespace HostWebApp
 
             PluginStorage.ExecutePlugins((s, exception) => exception.SendExceptionToDeveloper("Error executando plugin: " + s));
 
-            var job = new ForeverActionJob("test-task-600", 600, ExecuteJob);
-            job.Start();
+        }
+
+        protected void Session_Start(object sender, EventArgs e)
+        {
+
+        }
+
+        protected void Application_BeginRequest(object sender, EventArgs e)
+        {
+            if (!FirstRequest.IsFirstRequest()) return;
+
+            var job = new ForeverActionJob("test-task", 120, ExecuteJob);
+            job.Register();
+        }
+
+        protected void Application_AuthenticateRequest(object sender, EventArgs e)
+        {
+
+        }
+
+        protected void Application_Error(object sender, EventArgs e)
+        {
+
+        }
+
+        protected void Session_End(object sender, EventArgs e)
+        {
+
+        }
+
+        protected void Application_End(object sender, EventArgs e)
+        {
 
         }
 
         private static async System.Threading.Tasks.Task ExecuteJob()
         {
-            var rnd = new Random().Next(0, 99999);
             using (DisposableTimer.StartNew("Scheduled Task ..."))
             {
-                var webRequest = WebRequest.Create("http://hostwebapp.apphb.com?source=task&id=" + rnd.ToString("D5"));
+                var url = string.Format("{0}?source={1}", FirstRequest.HostUrl, Guid.NewGuid().ToString("N"));
+                Trace.TraceInformation("Making a request to {0}", url);
+                var webRequest = WebRequest.Create(url);
                 webRequest.Method = "HEAD";
                 using (var webResponse = await webRequest.GetResponseAsync())
                 {
@@ -71,35 +102,32 @@ namespace HostWebApp
                 }
             }
         }
+    }
 
-        protected void Session_Start(object sender, EventArgs e)
+    public class FirstRequest
+    {
+        private static readonly object Lock = new object();
+        private static bool _wasInit;
+        public static string HostUrl { get; private set; }
+
+        public static bool IsFirstRequest()
         {
+            if (_wasInit)
+                return false;
 
-        }
+            lock (Lock)
+            {
+                if (_wasInit)
+                    return false;
 
-        protected void Application_BeginRequest(object sender, EventArgs e)
-        {
+                if (HttpContext.Current == null || HttpContext.Current.Request == null)
+                    throw new Exception("HttpContext not available at this moment.");
 
-        }
+                HostUrl = HttpContext.Current.ToPublicUrl(new Uri("/", UriKind.Relative));
 
-        protected void Application_AuthenticateRequest(object sender, EventArgs e)
-        {
-
-        }
-
-        protected void Application_Error(object sender, EventArgs e)
-        {
-
-        }
-
-        protected void Session_End(object sender, EventArgs e)
-        {
-
-        }
-
-        protected void Application_End(object sender, EventArgs e)
-        {
-
+                _wasInit = true;
+                return true;
+            }
         }
     }
 }
