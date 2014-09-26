@@ -1141,6 +1141,8 @@
     <Content Include="Admin\LTE\less\vars.less" />
     <Content Include="Admin\LTE\LICENSE" />
     <Content Include="Admin\LTE\README.md" />
+    <Content Include="MsBuild\AfterBuild.targets" />
+    <Content Include="MsBuild\Template.zip" />
     <None Include="Scripts\jquery.validate-vsdoc.js" />
     <Content Include="Scripts\CodeMirror\active-line.js" />
     <Content Include="Scripts\CodeMirror\brace-fold.js" />
@@ -1293,4 +1295,5 @@
   <Target Name="AfterBuild">
   </Target>
   -->
+  <Import Project="$(ProjectDir)\MSBuild\AfterBuild.targets" Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' " />
 </Project>
