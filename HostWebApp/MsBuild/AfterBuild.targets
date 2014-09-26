@@ -11,7 +11,7 @@
     <ItemGroup>
       <InstallFiles Include="$(ProjectDir)\Site\**\*.*" />      
     </ItemGroup>
-    <Zip Files="@(InstallFiles)" WorkingDirectory="$(ProjectDir)" ZipFileName="$(ProjectDir)MSBUILD\Template.zip" ZipLevel="9" />
+    <Zip Files="@(InstallFiles)" WorkingDirectory="$(ProjectDir)\Site" ZipFileName="$(ProjectDir)MSBUILD\Template.zip" ZipLevel="9" />
   </Target>
 
 </Project>
