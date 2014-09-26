@@ -27,7 +27,6 @@ namespace HostWebApp
 
 
             PluginStorage.ExecutePlugins((s, exception) => exception.SendExceptionToDeveloper("Error executando plugin: " + s));
-
         }
 
         protected void Session_Start(object sender, EventArgs e)

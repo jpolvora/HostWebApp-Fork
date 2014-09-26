@@ -1,7 +1,4 @@
-﻿using System.Diagnostics;
-using System.IO;
-using System.Web;
-using System.Web.Mvc;
+﻿using System.Web;
 using System.Web.Routing;
 using System.Web.WebPages;
 
@@ -14,13 +11,7 @@ namespace Frankstein.Common.Mvc
 
         public WebPagesRouteHandler(string virtualPath)
         {
-            if (Path.HasExtension(virtualPath))
-                _virtualPath = virtualPath;
-            else _virtualPath = Path.ChangeExtension(virtualPath, "cshtml");
-
-            //WebRazorHostFactory.CreateDefaultHost()
-
-            Trace.TraceInformation("Route added: {0}", virtualPath);
+            _virtualPath = virtualPath;
         }
 
         private Route RouteVirtualPath
@@ -43,22 +34,13 @@ namespace Frankstein.Common.Mvc
             {
                 substitutedVirtualPath = substitutedVirtualPath.Substring(0, index);
             }
-
-            var handler = WebPageHttpHandler.CreateFromVirtualPath(substitutedVirtualPath);
-
-            Trace.TraceInformation("Routing {0} = {1}", this._virtualPath, handler);
-
-            if (handler != null)
-                return handler;
-
-            return new MvcHandler(requestContext);
-
-            //return WebPageHttpHandler.CreateFromVirtualPath("~/db/Error.cshtml");
+            requestContext.HttpContext.Items[HttpContextExtensions.RouteKey] = requestContext.RouteData.Values;
+            return WebPageHttpHandler.CreateFromVirtualPath(substitutedVirtualPath);
         }
 
         public string GetSubstitutedVirtualPath(RequestContext requestContext)
         {
-            var virtualPath = RouteVirtualPath.GetVirtualPath(requestContext, requestContext.RouteData.Values);
+            VirtualPathData virtualPath = RouteVirtualPath.GetVirtualPath(requestContext, requestContext.RouteData.Values);
             if (virtualPath == null)
             {
                 return _virtualPath;
