@@ -1,11 +1,24 @@
 using System;
 using System.Web;
+using System.Web.Routing;
 using System.Web.Security;
 
 namespace Frankstein.Common.Mvc
 {
     public static class HttpContextExtensions
     {
+        internal const string RouteKey = "__Route";
+        public static string GetRouteValue(this HttpContextBase context, string key)
+        {
+            var route = context.Items[RouteKey] as RouteValueDictionary;
+            if (route != null)
+            {
+                var routeValue = route[key];
+                return routeValue != null ? routeValue.ToString() : null;
+            }
+            return null;
+        }
+
         public static string GetRequestId(this HttpContext context)
         {
             var httpContext = context ?? HttpContext.Current;
