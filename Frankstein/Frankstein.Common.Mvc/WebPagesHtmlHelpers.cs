@@ -1,6 +1,4 @@
-﻿using System.Web;
-using System.Web.WebPages;
-using System.Web.WebPages.Html;
+﻿using System.Web.WebPages;
 using Frankstein.Common.Configuration;
 
 namespace Frankstein.Common.Mvc
@@ -17,7 +15,7 @@ namespace Frankstein.Common.Mvc
         public static string MapPath(string relativePath)
         {
             var result = string.Format("{0}/{1}", BasePath.TrimEnd('/'), relativePath.TrimStart('~', '/'));
-            return result;
+            return result.TrimEnd('/');
         }
     }
 }
