@@ -9,7 +9,7 @@
 
   <Target Name="AfterBuild" Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
     <ItemGroup>
-      <InstallFiles Include="$(ProjectDir)\App_Data\**\*.*" />      
+      <InstallFiles Include="$(ProjectDir)\Site\**\*.*" />      
     </ItemGroup>
     <Zip Files="@(InstallFiles)" WorkingDirectory="$(ProjectDir)" ZipFileName="$(ProjectDir)MSBUILD\Template.zip" ZipLevel="9" />
   </Target>

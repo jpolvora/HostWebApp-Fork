@@ -1079,7 +1079,7 @@
     <Content Include="fonts\glyphicons-halflings-regular.eot" />
     <Content Include="Content\bootstrap-theme.css.map" />
     <Content Include="Content\bootstrap.css.map" />
-    <Content Include="App_Data\Views\Web.config" />
+    <Content Include="Site\Views\Web.config" />
     <Content Include="Admin\Developer\Actions\_apprestart.cshtml" />
     <Content Include="Admin\Developer\Actions\_build.cshtml" />
     <Content Include="Admin\Developer\Actions\_createfile.cshtml" />
