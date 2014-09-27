@@ -86,46 +86,52 @@ namespace Frankstein.PluginLoader
 
         #endregion
 
-        private static void ExecutePlugin(Assembly assembly)
+        private static void ExecutePlugin(Assembly assembly, bool force = false)
         {
-            if (!BootstrapperSection.Instance.PluginLoader.Enabled) return;
+            if (!BootstrapperSection.Instance.PluginLoader.Enabled && !force) return;
 
             var plugins = assembly.GetExportedTypes().Where(x => typeof(IPlugin).IsAssignableFrom(x) && x.IsClass && !x.IsAbstract);
             foreach (var plugin in plugins)
             {
+                if (_executedPlugins.Contains(plugin.AssemblyQualifiedName))
+                    continue;
+
+                _executedPlugins.Add(plugin.AssemblyQualifiedName);
+
                 Trace.TraceInformation("[PluginLoader]: Found implementation of IPlugin '{0}'", plugin.FullName);
                 IPlugin instance = null;
-                try
+                using (DisposableTimer.StartNew(plugin.FullName))
                 {
-                    instance = Activator.CreateInstance(plugin) as IPlugin;
-                }
-                catch (Exception ex)
-                {
-                    Trace.TraceError("[PluginLoader]:Could not create instance from type '{0}'. {1}", plugin, ex.Message);
-                }
-                finally
-                {
-                    if (instance != null)
+                    try
                     {
-                        Trace.TraceInformation("[PluginLoader]: Trying to Execute Plugin: {0}", instance.PluginName);
-                        try
+                        instance = Activator.CreateInstance(plugin) as IPlugin;
+                    }
+                    catch (Exception ex)
+                    {
+                        Trace.TraceError("[PluginLoader]:Error activating instance of type '{0}'. {1}", plugin,
+                            ex.Message);
+                    }
+                    finally
+                    {
+                        if (instance != null)
                         {
-                            using (DisposableTimer.StartNew(instance.PluginName))
+                            Trace.TraceInformation("[PluginLoader]: Trying to Execute Plugin: {0}", instance.PluginName);
+                            try
                             {
                                 instance.Start();
+                                Trace.TraceInformation("[PluginLoader]: SUCCESS Executing Plugin: {0}", instance.PluginName);
                             }
-                            Trace.TraceInformation("[PluginLoader]: SUCCESS Executing Plugin: {0}", instance.PluginName);
-                        }
-                        catch (Exception ex)
-                        {
-                            Trace.TraceError(ex.Message);
+                            catch (Exception ex)
+                            {
+                                Trace.TraceError(ex.Message);
+                            }
                         }
                     }
                 }
             }
         }
 
-        internal void LoadAndRegister(string fileName)
+        internal static void LoadAndRegister(string fileName)
         {
             if (StoredAssemblies.ContainsKey(fileName))
             {
@@ -143,7 +149,7 @@ namespace Frankstein.PluginLoader
             }
         }
 
-        internal void RegisterWithCheck(Assembly assembly)
+        internal static void RegisterWithCheck(Assembly assembly)
         {
             if (StoredAssemblies.ContainsKey(assembly.FullName))
             {
@@ -158,61 +164,21 @@ namespace Frankstein.PluginLoader
 
         #region public
 
+        // ReSharper disable once UnusedMember.Global
         public static void ExecutePlugins(Action<string, Exception> onError)
         {
-            var assemblies =
-                   AppDomain.CurrentDomain.GetAssemblies()
-                       .Where(
-                           x =>
-                               x.IsDynamic == false &&
-                               x.GetExportedTypes().Any(y => typeof(IPlugin).IsAssignableFrom(y)));
+            var assemblies = AppDomain.CurrentDomain.GetAssemblies()
+                       .Where(x => x.IsDynamic == false && x.GetExportedTypes().Any(y => typeof(IPlugin).IsAssignableFrom(y)));
             foreach (var assembly in assemblies)
             {
-                var plugins =
-                    assembly.GetExportedTypes()
-                        .Where(x => typeof(IPlugin).IsAssignableFrom(x) && x.IsClass && !x.IsAbstract);
-                foreach (var plugin in plugins)
+                try
                 {
-                    Trace.TraceInformation("[Global]: Found implementation of IPlugin '{0}'", plugin.FullName);
-                    IPlugin instance = null;
-                    try
-                    {
-                        if (_executedPlugins.Contains(plugin.AssemblyQualifiedName))
-                            continue;
-
-                        instance = Activator.CreateInstance(plugin) as IPlugin;
-
-                        _executedPlugins.Add(plugin.AssemblyQualifiedName);
-                    }
-                    catch (Exception ex)
-                    {
-                        Trace.TraceError("[Global]:Could not create instance from type '{0}'. {1}", plugin,
-                            ex.Message);
-                    }
-                    finally
-                    {
-                        if (instance != null)
-                        {
-                            Trace.TraceInformation("[Global]: Trying to Execute Plugin: {0}", instance.PluginName);
-                            try
-                            {
-                                using (DisposableTimer.StartNew(instance.PluginName))
-                                {
-                                    instance.Start();
-                                    Trace.TraceInformation("[Global]: SUCCESS Executing Plugin: {0}",
-                                        instance.PluginName);
-                                }
-                            }
-                            catch (Exception ex)
-                            {
-                                if (onError != null)
-                                {
-                                    onError(instance.PluginName, ex);
-                                }
-                                Trace.TraceError(ex.Message);
-                            }
-                        }
-                    }
+                    ExecutePlugin(assembly, true);
+                }
+                catch (Exception ex)
+                {
+                    if (onError != null)
+                        onError("", ex);
                 }
             }
         }
