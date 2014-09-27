@@ -33,16 +33,23 @@ namespace Frankstein.PluginLoader
             {
                 var configFile = XElement.Load(AppDomain.CurrentDomain.SetupInformation.ConfigurationFile);
 
-                var probingElement = configFile.Descendants("runtime")
-                    .SelectMany(runtime => runtime.Elements(XName.Get("probing")))
-                    .FirstOrDefault();
+                var probingElement = (from runtime in configFile.Descendants("runtime")
+                                      from assemblyBinding in runtime.Elements(XName.Get("assemblyBinding", "urn:schemas-microsoft-com:asm.v1"))
+                                      from probing in assemblyBinding.Elements(XName.Get("probing", "urn:schemas-microsoft-com:asm.v1"))
+                                      select probing).FirstOrDefault();
 
                 if (probingElement != null)
                 {
-                    var paths = probingElement.Attribute("privatePath").Value; //pode conter vários paths, separados por ';'
-                    Trace.TraceInformation("[PluginLoader]:Private Path is '{0}'", paths);
+                    var paths = probingElement.Attribute("privatePath").Value;
+                    //pode conter vários paths, separados por ';'
+                    Trace.TraceInformation("[PluginLoader]:Private Paths are '{0}'", paths);
                     privatePath = paths.Split(';')[0];
+                    if (privatePath.IndexOf('/') != 0)
+                    {
+                        privatePath = "/" + privatePath;
+                    }
                 }
+
             }
             catch (Exception ex)
             {
