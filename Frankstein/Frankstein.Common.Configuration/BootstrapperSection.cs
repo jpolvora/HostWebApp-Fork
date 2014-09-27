@@ -42,7 +42,8 @@ namespace Frankstein.Common.Configuration
                             SubFolderVpp = new SubFolderVppElement(),
                             DbFileSystemVpp = new DbFsVppElement()
                         },
-                        MvcTrace = new MvcTraceElement()
+                        MvcTrace = new MvcTraceElement(),
+
                     };
 
                 }
@@ -158,6 +159,13 @@ namespace Frankstein.Common.Configuration
         {
             get { return (MailConfig)this["mail"]; }
             set { this["mail"] = value; }
+        }
+
+        [ConfigurationProperty("tasks")]
+        public TasksElement Tasks
+        {
+            get { return (TasksElement)this["tasks"]; }
+            set { this["tasks"] = value; }
         }
     }
 }
