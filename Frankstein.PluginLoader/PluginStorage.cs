@@ -200,19 +200,20 @@ namespace Frankstein.PluginLoader
         // ReSharper disable once UnusedMember.Global
         public static void ExecutePlugins(Action<string, Exception> onError)
         {
-            var assemblies = AppDomain.CurrentDomain.GetAssemblies()
-                       .Where(x => x.IsDynamic == false && x.GetExportedTypes().Any(y => typeof(IPlugin).IsAssignableFrom(y)));
-            foreach (var assembly in assemblies)
+            try
             {
-                try
+                var assemblies = AppDomain.CurrentDomain.GetAssemblies()
+                           .Where(x => x.IsDynamic == false && x.GetExportedTypes().Any(y => typeof(IPlugin).IsAssignableFrom(y)));
+                foreach (var assembly in assemblies)
                 {
                     ExecutePlugin(assembly, true);
+
                 }
-                catch (Exception ex)
-                {
-                    if (onError != null)
-                        onError("", ex);
-                }
+            }
+            catch (Exception ex)
+            {
+                if (onError != null)
+                    onError("", ex);
             }
         }
 
