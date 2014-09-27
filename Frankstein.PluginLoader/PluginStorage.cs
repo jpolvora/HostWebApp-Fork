@@ -7,6 +7,7 @@ using System.Reflection;
 using System.Web.Compilation;
 using Frankstein.Common;
 using Frankstein.Common.Configuration;
+using Frankstein.DbFileSystem;
 
 namespace Frankstein.PluginLoader
 {
@@ -115,6 +116,38 @@ namespace Frankstein.PluginLoader
                     {
                         if (instance != null)
                         {
+                            //verifica se o plugin está instalado
+                            using (var ctx = new DbFileContext())
+                            {
+                                var module = ctx.DbModules.FirstOrDefault(
+                                        x => x.Name.Equals(instance.PluginName, StringComparison.OrdinalIgnoreCase));
+
+                                if (module == null)
+                                {
+                                    module = new DbModule();
+                                    module.Name = instance.PluginName;
+                                    ctx.DbModules.Add(module);
+                                    ctx.SaveChanges();
+                                }
+
+                                if (!module.Status)
+                                {
+                                    //instalar
+                                    using (DisposableTimer.StartNew("Installing {0}".Fmt(module.Name)))
+                                    {
+                                        try
+                                        {
+                                            instance.Install();
+                                            module.Status = true;
+                                            ctx.SaveChanges();
+                                        }
+                                        catch (Exception ex)
+                                        {
+                                            Trace.TraceError(ex.ToString());
+                                        }
+                                    }
+                                }
+                            }
                             Trace.TraceInformation("[PluginLoader]: Trying to Execute Plugin: {0}", instance.PluginName);
                             try
                             {
