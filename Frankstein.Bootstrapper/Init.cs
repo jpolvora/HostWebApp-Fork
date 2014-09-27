@@ -71,6 +71,8 @@ namespace Frankstein.Bootstrapper
                 var executingAssembly = Assembly.GetExecutingAssembly();
                 Trace.TraceInformation("[Bootstrapper]:Entry Assembly: {0}", executingAssembly.GetName().Name);
 
+                DynamicModuleUtility.RegisterModule(typeof(FranksteinHttpModule));
+
                 Trace.TraceInformation("[Bootstrapper]:cfg.HttpModules.Trace.Enabled = {0}", cfg.HttpModules.Trace.Enabled);
                 if (cfg.HttpModules.Trace.Enabled)
                 {
