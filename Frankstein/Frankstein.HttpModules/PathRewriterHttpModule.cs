@@ -39,7 +39,8 @@ namespace Frankstein.HttpModules
             if (routeData != null)
             {
                 Trace.TraceInformation("[PathRewriterHttpModule]: MatchedRoute: '{0}', Route: '{1}'", routeData.RouteHandler, routeData.Route);
-                return;
+                if (!(routeData.RouteHandler is StopRoutingHandler))
+                    return;
             }
 
             string path = application.Request.Url.AbsolutePath.TrimEnd('/').ToLowerInvariant();
