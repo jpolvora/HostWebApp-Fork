@@ -1,6 +1,7 @@
 using System;
 using System.CodeDom.Compiler;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -36,10 +37,12 @@ namespace Frankstein.Kompiler
                 GenerateExecutable = false,
                 GenerateInMemory = false,
                 IncludeDebugInformation = false,
+                CompilerOptions = "/optimize"
             };
 
             foreach (var codeDomReference in KompilerEntryPoint.ReferencePaths)
             {
+                Trace.TraceInformation("Adding reference: {0}", codeDomReference);
                 compilerParameters.ReferencedAssemblies.Add(codeDomReference);
             }
 
