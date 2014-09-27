@@ -149,17 +149,22 @@ namespace Frankstein.Bootstrapper
                 Trace.TraceInformation("[Bootstrapper]:cfg.Kompiler.Enabled = {0}", cfg.Kompiler.Enabled);
                 var bin = new DirectoryInfo(HttpRuntime.BinDirectory);
 
-                Trace.Indent();
-
                 foreach (var fileInfo in bin.EnumerateFiles("*.dll", SearchOption.AllDirectories))
                 {
                     if (cfg.Verbose)
                     {
+                        Trace.Indent();
                         Trace.TraceInformation("[BinFolder]: {0}", fileInfo.FullName);
+                        Trace.Unindent();
                     }
                     KompilerEntryPoint.AddReferences(fileInfo.FullName);
                 }
-                Trace.Unindent();
+
+                foreach (var keyValuePair in CustomConfig.RefreshConfig())
+                {
+                    KompilerEntryPoint.AddReferences(keyValuePair);
+                }
+                
 
                 if (cfg.Kompiler.Enabled)
                 {

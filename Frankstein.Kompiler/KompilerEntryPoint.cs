@@ -8,7 +8,7 @@ using Frankstein.PluginLoader;
 
 namespace Frankstein.Kompiler
 {
-    public class KompilerEntryPoint
+    public static class KompilerEntryPoint
     {
         internal readonly static string CompiledAssemblyName = BootstrapperSection.Instance.Kompiler.AssemblyName;
 
