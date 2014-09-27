@@ -11,6 +11,7 @@ using Frankstein.Common;
 using Frankstein.Common.Configuration;
 using Frankstein.Common.Mvc;
 using Frankstein.Common.Mvc.Scheduling;
+using Frankstein.HttpModules;
 using Frankstein.PluginLoader;
 using HostWebApp.App_Start;
 
@@ -27,6 +28,14 @@ namespace HostWebApp
 
 
             PluginStorage.ExecutePlugins((s, exception) => exception.SendExceptionToDeveloper("Error executando plugin: " + s));
+
+            RequestCheck.FirstRequest += RequestCheckOnFirstRequest;
+        }
+
+        private static void RequestCheckOnFirstRequest(object sender, EventArgs eventArgs)
+        {
+            var job = new ForeverActionJob("test-task", 120, ExecuteJob);
+            job.Register();
         }
 
         protected void Session_Start(object sender, EventArgs e)
@@ -36,10 +45,7 @@ namespace HostWebApp
 
         protected void Application_BeginRequest(object sender, EventArgs e)
         {
-            if (!FirstRequest.IsFirstRequest()) return;
 
-            var job = new ForeverActionJob("test-task", 120, ExecuteJob);
-            job.Register();
         }
 
         protected void Application_AuthenticateRequest(object sender, EventArgs e)
@@ -66,7 +72,7 @@ namespace HostWebApp
         {
             using (DisposableTimer.StartNew("Scheduled Task ..."))
             {
-                var url = string.Format("{0}?source={1}", FirstRequest.HostUrl, Guid.NewGuid().ToString("N"));
+                var url = string.Format("{0}?source={1}", RequestCheck.HostUrl, Guid.NewGuid().ToString("N"));
                 Trace.TraceInformation("Making a request to {0}", url);
                 var webRequest = WebRequest.Create(url);
                 webRequest.Method = "HEAD";
@@ -99,35 +105,6 @@ namespace HostWebApp
                                 html, false, (message, exception) => { });
                     }
                 }
-            }
-        }
-    }
-
-    public class FirstRequest
-    {
-        private static readonly object Lock = new object();
-        private static bool _wasInit;
-        public static string HostUrl { get; private set; }
-
-        public static bool IsFirstRequest()
-        {
-            if (_wasInit)
-                return false;
-
-            lock (Lock)
-            {
-                if (_wasInit)
-                    return false;
-
-                var context = HttpContext.Current;
-
-                if (context == null || context.Request == null)
-                    throw new Exception("HttpContext not available at this moment.");
-
-                HostUrl = context.ToPublicUrl(new Uri("/", UriKind.Relative));
-
-                _wasInit = true;
-                return true;
             }
         }
     }

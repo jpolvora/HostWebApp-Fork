@@ -119,6 +119,7 @@
     <Compile Include="ExtJs\ExtJsReader.cs" />
     <Compile Include="ExtJs\ExtJsUpdater.cs" />
     <Compile Include="ExtJs\Lambda.cs" />
+    <Compile Include="RequestCheck.cs" />
     <Compile Include="RouteCollectionExtension.cs" />
     <Compile Include="Scheduling\ForeverJobBase.cs" />
     <Compile Include="Scheduling\IJob.cs" />
