@@ -168,6 +168,7 @@ namespace Frankstein.HttpModules
                 context.Response.SuppressFormsAuthenticationRedirect = true;
             }
 
+            //URL REWRITE (not context.RewritePath)
             if (context.Items.Contains("IIS_WasUrlRewritten") || context.Items.Contains("HTTP_X_ORIGINAL_URL"))
             {
                 Trace.TraceInformation("[TracerHttpModule]:Url was rewriten from '{0}' to '{1}'",
@@ -175,10 +176,13 @@ namespace Frankstein.HttpModules
                     context.Request.ServerVariables["SCRIPT_NAME"]);
             }
 
+            string ipAddress = context.Request.ServerVariables["HTTP_X_FORWARDED_FOR"]
+                ?? context.Request.ServerVariables["REMOTE_ADDR"];
+
             var rid = context.GetRequestId();
 
-            Trace.TraceInformation("[BeginRequest]:[{0}] {1} {2} {3} [{4}]", rid, context.Request.HttpMethod,
-                context.Request.RawUrl, isAjax ? "Ajax: True" : "", context.Request.UrlReferrer);
+            Trace.TraceInformation("[BeginRequest]:[{0}] {1} {2} {3} {4} from {5}", rid, context.Request.HttpMethod,
+                context.Request.RawUrl, isAjax ? "Ajax: True" : "", context.Request.UrlReferrer, ipAddress);
         }
 
         private static void TraceNotification(HttpApplication application, string eventName)
