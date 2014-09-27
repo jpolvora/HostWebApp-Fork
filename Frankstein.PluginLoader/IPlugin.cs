@@ -2,9 +2,8 @@
 {
     public interface IPlugin
     {
-        string PluginName { get;}
+        string PluginName { get; }
         void Start();
-
+        void Install();
     }
-    
 }
