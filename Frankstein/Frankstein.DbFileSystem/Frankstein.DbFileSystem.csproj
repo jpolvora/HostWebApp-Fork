@@ -54,6 +54,7 @@
     <Compile Include="DbFileContextConfig.cs" />
     <Compile Include="DbFileContextMigrationInitializer.cs" />
     <Compile Include="DbFileContextMigrationConfiguration.cs" />
+    <Compile Include="DbModule.cs" />
     <Compile Include="Migrations\201409200308155_teste.cs" />
     <Compile Include="Migrations\201409200308155_teste.Designer.cs">
       <DependentUpon>201409200308155_teste.cs</DependentUpon>

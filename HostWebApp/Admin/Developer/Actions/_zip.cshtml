@@ -1,0 +1,252 @@
+﻿@using System.Data.Entity;
+@using System.Diagnostics
+@using System.Dynamic
+@using System.IO.Compression;
+@using System.Text
+@using Frankstein.FsDump
+@using Frankstein.DbFileSystem
+
+@(IsPost ? Upload() : Download())
+
+
+@helper Upload()
+{
+    string path = Path.GetTempFileName();
+    var file = Request.Files[0];
+    if (file == null)
+    {
+        throw new HttpException("Arquivo não foi enviado corretamente");
+    }
+
+    file.SaveAs(path);
+
+    var folder = GetUniquePath();
+    ZipFile.ExtractToDirectory(path, folder);
+
+    var root = new DirectoryInfo(folder);
+
+    using (var ctx = new DbFileContext())
+    {
+        WriteFilesToDatabase(ctx, new Uri(folder), root, null);
+    }
+
+    Response.WriteAjax(new { success = true, file = file.FileName });
+}
+
+@helper Download()
+{
+    var path = GetUniquePath();
+
+    using (var ctx = new DbFileContext())
+    {
+        var root = ctx.DbFiles.First(x => x.IsDirectory && x.ParentId == null && x.Name == null && x.VirtualPath.Equals("/", StringComparison.InvariantCultureIgnoreCase) && x.IsDirectory);
+
+        var results = new List<IDictionary<string, object>>();
+        CreateTree(ctx, root, results);
+
+        RecursiveWrite(ctx, path, results);
+    }
+
+    var zip = Path.Combine(Path.GetTempPath(), Path.ChangeExtension(Path.GetRandomFileName(), "zip"));
+    ZipFile.CreateFromDirectory(path, zip);
+    try
+    {
+        Directory.Delete(path, true);
+    }
+    catch (Exception ex)
+    {
+        Trace.TraceError(ex.ToString());
+    }
+
+    if (File.Exists(zip))
+    {
+        Response.ContentType = "application/zip";
+        Response.AddHeader("Content-Disposition", string.Format("attachment; filename={0}-{1}.zip", BootstrapperSection.Instance.AppName, DateTime.Now.ToString("yy-MM-dd-HHmmss")));
+        Response.TransmitFile(zip);
+        return;
+    }
+
+    Response.StatusCode = 404;
+}
+
+
+@functions
+{
+    public static string GetUniquePath()
+    {
+        string uniquePath;
+        do
+        {
+            Guid guid = Guid.NewGuid();
+            string uniqueSubFolderName = guid.ToString();
+            uniquePath = Path.Combine(Path.GetTempPath(), uniqueSubFolderName);
+        } while (Directory.Exists(uniquePath));
+        Directory.CreateDirectory(uniquePath);
+        return uniquePath;
+    }
+
+    public static void CreateTree(DbContext ctx, DbFile root, List<IDictionary<string, object>> results)
+    {
+        IDictionary<string, object> self = CreateDirectory(root);
+        results.Add(self);
+
+        var entry = ctx.Entry(root);
+        entry.Collection(x => x.Children).Load();
+
+        foreach (var dbFile in root.Children.OrderBy(x => !x.IsDirectory).ThenBy(x => x.Name))
+        {
+            if (dbFile.IsDirectory)
+            {
+                CreateTree(ctx, dbFile, (List<IDictionary<string, object>>)self["children"]);
+            }
+            else
+            {
+                var result = CreateFile(dbFile);
+                ((List<IDictionary<string, object>>)self["children"]).Add(result);
+            }
+        }
+    }
+
+    public static ExpandoObject CreateDirectory(DbFile root)
+    {
+        var expando = new ExpandoObject();
+        dynamic self = expando;
+        self.id = root.Id;
+        self.name = root.Name ?? "/";
+        self.fileName = root.VirtualPath;
+        self.leaf = false;
+        self.loaded = true;
+        self.expandable = true;
+        self.IsHidden = root.IsHidden;
+        self.children = new List<IDictionary<string, object>>();
+        return expando;
+    }
+
+    public static ExpandoObject CreateFile(DbFile root)
+    {
+        var expando = new ExpandoObject();
+        dynamic self = expando;
+        self.id = root.Id;
+        self.name = string.Format("{0}{1}", root.Name, root.Extension);
+        self.fileName = root.VirtualPath;
+        self.leaf = true;
+        self.loaded = false;
+        self.expandable = false;
+        self.IsHidden = root.IsHidden;
+        return expando;
+    }
+
+    static void RecursiveWrite(DbFileContext ctx, string path, IEnumerable<IDictionary<string, object>> results)
+    {
+        foreach (dynamic result in results)
+        {
+            if (result.leaf)
+            {
+                var fullPath = Path.Combine(path, result.fileName.Substring(1).Replace("/", "\\"));
+                var dir = Path.GetDirectoryName(fullPath);
+                if (!Directory.Exists(dir))
+                    Directory.CreateDirectory(dir);
+
+                var dbFile = ctx.DbFiles.Find(result.id);
+                if (dbFile.IsBinary)
+                {
+                    File.WriteAllBytes(fullPath, dbFile.Bytes);
+                }
+                else
+                {
+                    File.WriteAllText(fullPath, dbFile.Texto);
+                }
+            }
+            else
+            {
+                RecursiveWrite(ctx, path, result.children);
+            }
+        }
+    }
+
+
+
+    public static void WriteFilesToDatabase(DbFileContext ctx, Uri initialUri, DirectoryInfo root, int? id)
+    {
+        string virtualPath;
+        string dirName;
+        if (id == null)
+        {
+            virtualPath = "/";
+            dirName = null;
+        }
+        else
+        {
+            var currentUri = new Uri(root.FullName);
+            var tempRelative = initialUri.MakeRelativeUri(currentUri).ToString();
+            var iof = tempRelative.IndexOf('/');
+            virtualPath = tempRelative.Substring(iof);
+
+            dirName = root.Name;
+        }
+
+        var dbFolder = ctx.DbFiles.FirstOrDefault(x => x.VirtualPath.Equals(virtualPath, StringComparison.OrdinalIgnoreCase) && x.IsDirectory);
+        if (dbFolder == null)
+        {
+            dbFolder = new DbFile
+            {
+                IsDirectory = true,
+                Name = dirName,
+                VirtualPath = virtualPath,
+                ParentId = id
+            };
+
+            ctx.DbFiles.Add(dbFolder);
+            ctx.SaveChanges();
+
+            Trace.TraceInformation("Diretório criado: {0}", dbFolder);
+        }
+
+        foreach (var fi in root.EnumerateFiles())
+        {
+            var bytes = File.ReadAllBytes(fi.FullName);
+
+            var fileVirtualPath = Path.Combine(virtualPath, fi.Name).Replace('\\', '/');
+            var dbFile = ctx.DbFiles.FirstOrDefault(x => !x.IsDirectory && x.VirtualPath.Equals(fileVirtualPath, StringComparison.OrdinalIgnoreCase));
+            bool isNewFile = false;
+            if (dbFile == null)
+            {
+                isNewFile = true;
+                dbFile = new DbFile
+                {
+                    IsDirectory = false,
+                    Name = Path.GetFileNameWithoutExtension(fi.Name),
+                    Extension = fi.Extension,
+                    VirtualPath = Path.Combine(virtualPath, fi.Name).Replace('\\', '/'),
+                    ParentId = dbFolder.Id
+                };
+
+                ctx.DbFiles.Add(dbFile);
+            }
+
+            if (DbToLocal.IsTextFile(fi.Extension))
+            {
+                dbFile.IsBinary = false;
+                dbFile.Texto = Encoding.UTF8.GetString(bytes);
+            }
+            else
+            {
+                dbFile.IsBinary = true;
+                dbFile.Bytes = bytes;
+            }
+
+            ctx.SaveChanges();
+
+            Trace.TraceInformation("Arquivo {0}: {1}", isNewFile ? "criado" : "atualizado", dbFile);
+            if (BootstrapperSection.Instance.DumpToLocal.Sync)
+            {
+                DbToLocal.WriteToDisk(dbFile, true);
+            }
+        }
+
+        foreach (var di in root.EnumerateDirectories())
+        {
+            WriteFilesToDatabase(ctx, initialUri, di, dbFolder.Id);
+        }
+    }
+}

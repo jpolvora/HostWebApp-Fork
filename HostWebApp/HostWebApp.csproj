@@ -1149,6 +1149,7 @@
     <Content Include="Admin\LTE\README.md" />
     <Content Include="MsBuild\AfterBuild.targets" />
     <Content Include="MsBuild\Template.zip" />
+    <Content Include="Admin\Developer\Actions\_zip.cshtml" />
     <None Include="Scripts\jquery.validate-vsdoc.js" />
     <Content Include="Scripts\CodeMirror\active-line.js" />
     <Content Include="Scripts\CodeMirror\brace-fold.js" />

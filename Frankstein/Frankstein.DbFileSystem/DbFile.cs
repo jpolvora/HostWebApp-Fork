@@ -61,5 +61,9 @@ namespace Frankstein.DbFileSystem
         /// </summary>
         public ICollection<DbFile> Children { get; set; }
 
+        public override string ToString()
+        {
+            return string.Format("({0}){1} - {2}", IsDirectory ? "D" : "F", Id, VirtualPath);
+        }
     }
 }

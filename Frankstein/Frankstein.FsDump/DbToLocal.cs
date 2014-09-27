@@ -10,6 +10,14 @@ namespace Frankstein.FsDump
 {
     public class DbToLocal
     {
+        private static readonly string[] IgnoredDirectories = { "/bin", "/App_", "/obj", "/properties", "/_", "/fonts" };
+        private static readonly string[] IgnoredExtensions = { ".csproj", ".user", ".dll", ".config", ".log" };
+        private static readonly string[] IgnoredFiles = { "global.asax", "global.asax.cs" };
+        private static readonly string[] TextExtensions = { ".txt", ".xml", ".cshtml", ".js", ".html", ".htm", ".css", ".cs", ".log", ".config", ".cfg" };
+        public static bool IsTextFile(string extension)
+        {
+            return TextExtensions.Any(extension.StartsWith); //remove the dot "."
+        }
         static void RecursiveDelete(DirectoryInfo fsInfo, bool self, params string[] extensionsToIgnore)
         {
             var files = fsInfo.GetFiles("*.*", SearchOption.AllDirectories);

@@ -9,6 +9,7 @@ namespace Frankstein.DbFileSystem
         private static bool _initialized;
 
         public DbSet<DbFile> DbFiles { get; set; }
+        public DbSet<DbModule> DbModules { get; set; }
 
         public static void Initialize()
         {
