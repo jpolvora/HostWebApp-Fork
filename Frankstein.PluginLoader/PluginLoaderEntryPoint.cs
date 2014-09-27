@@ -116,7 +116,7 @@ namespace Frankstein.PluginLoader
             {
                 if (File.Exists(fileName))
                 {
-                    Storage.LoadAndRegister(fileName);
+                    PluginStorage.LoadAndRegister(fileName);
                 }
             }
         }
