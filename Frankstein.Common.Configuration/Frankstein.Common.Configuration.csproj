@@ -56,6 +56,7 @@
     <Compile Include="PluginLoaderElementBase.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SubFolderVppElement.cs" />
+    <Compile Include="TasksElement.cs" />
     <Compile Include="TraceElement.cs" />
     <Compile Include="TransactionScopeElement.cs" />
     <Compile Include="VirtualPathProviderElement.cs" />

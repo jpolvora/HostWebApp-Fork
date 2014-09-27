@@ -1,14 +1,14 @@
 ﻿using System;
 using System.Diagnostics;
-using System.Threading.Tasks;
 using System.Web;
 using System.Web.Caching;
 using System.Web.Hosting;
 
 namespace Frankstein.Common.Mvc.Scheduling
 {
-    public abstract class ForeverJobBase : IRegisteredObject, IJob
+    public abstract class RecurringJobBase : IRegisteredObject, IJob
     {
+        private readonly bool _continueOnError;
         private readonly object _lock = new object();
         private bool _shuttingDown;
 
@@ -16,8 +16,9 @@ namespace Frankstein.Common.Mvc.Scheduling
 
         public int Interval { get; protected set; }
 
-        protected ForeverJobBase(string name, int interval)
+        protected RecurringJobBase(string name, int interval, bool continueOnError)
         {
+            _continueOnError = continueOnError;
             JobName = name;
             Interval = interval;
         }
@@ -30,7 +31,9 @@ namespace Frankstein.Common.Mvc.Scheduling
 
         public void Unregister()
         {
-            
+            HostingEnvironment.UnregisterObject(this);
+
+            HttpRuntime.Cache.Remove(JobName);
         }
 
         private void AddTask()
@@ -52,7 +55,7 @@ namespace Frankstein.Common.Mvc.Scheduling
             return string.Format("{0}:{1}s", JobName, TimeSpan.FromSeconds(Interval));
         }
 
-        private async void CacheItemRemoved(string k, object v, CacheItemRemovedReason r)
+        private void CacheItemRemoved(string k, object v, CacheItemRemovedReason r)
         {
             lock (_lock)
             {
@@ -60,23 +63,24 @@ namespace Frankstein.Common.Mvc.Scheduling
                 {
                     return;
                 }
-            }
 
-            bool success = false;
-            try
-            {
-                await Execute();
+                var success = false;
+                try
+                {
+                    Trace.TraceInformation("{0}: Running scheduled Task '{1}'.", DateTime.Now, this);
+                    Execute();
 
-                success = true;
-            }
-            catch (Exception ex)
-            {
-                Trace.TraceError("Error executing {0}: {1} ", this, ex);
-            }
-            finally
-            {
-                if (success)
-                    AddTask();
+                    success = true;
+                }
+                catch (Exception ex)
+                {
+                    Trace.TraceError("Error executing {0}: {1} ", this, ex);
+                }
+                finally
+                {
+                    if (success || _continueOnError)
+                        AddTask();
+                }
             }
         }
 
@@ -87,14 +91,10 @@ namespace Frankstein.Common.Mvc.Scheduling
                 _shuttingDown = true;
             }
             Trace.TraceInformation("App is shutting down! Task '{0}' removed.", this);
-            HostingEnvironment.UnregisterObject(this);
+            Unregister();
         }
 
-        public virtual Task Execute()
-        {
-            Trace.TraceInformation("{0}: Running scheduled Task '{1}'.", DateTime.Now, this);
+        public abstract void Execute();
 
-            return Task.FromResult(0);
-        }
     }
 }

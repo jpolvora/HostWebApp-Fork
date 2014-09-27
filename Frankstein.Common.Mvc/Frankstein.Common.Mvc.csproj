@@ -121,10 +121,9 @@
     <Compile Include="ExtJs\Lambda.cs" />
     <Compile Include="RequestCheck.cs" />
     <Compile Include="RouteCollectionExtension.cs" />
-    <Compile Include="Scheduling\ForeverJobBase.cs" />
+    <Compile Include="Scheduling\RecurringJobBase.cs" />
     <Compile Include="Scheduling\IJob.cs" />
-    <Compile Include="Scheduling\Job.cs" />
-    <Compile Include="Scheduling\ForeverActionJob.cs" />
+    <Compile Include="Scheduling\RecurringActionJob.cs" />
     <Compile Include="WebHelpers.cs" />
     <Compile Include="HttpContextExtensions.cs" />
     <Compile Include="HttpHandlerExtensions.cs" />
