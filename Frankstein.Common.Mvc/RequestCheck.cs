@@ -24,6 +24,8 @@ namespace Frankstein.Common.Mvc
 
         public static bool IsFirstRequest()
         {
+            UpdateHost();
+
             if (_wasInit)
                 return false;
 
@@ -32,17 +34,25 @@ namespace Frankstein.Common.Mvc
                 if (_wasInit)
                     return false;
 
-                var context = HttpContext.Current;
-
-                if (context == null || context.Request == null)
-                    throw new Exception("HttpContext not available at this moment.");
-
-                HostUrl = context.ToPublicUrl(new Uri("/", UriKind.Relative));
-
                 _wasInit = true;
+
+                var context = HttpContext.Current;
+                if (context == null)
+                    return false;
+
                 InvokeOnFirstRequest(context.ApplicationInstance);
                 return true;
             }
+        }
+
+        private static void UpdateHost()
+        {
+            var context = HttpContext.Current;
+
+            if (context == null || context.Request == null)
+                return;
+
+            HostUrl = context.ToPublicUrl(new Uri("/", UriKind.Relative));
         }
     }
 }
