@@ -47,9 +47,6 @@ namespace Frankstein.Kompiler
 
             foreach (var codeDomReference in KompilerEntryPoint.ReferencePaths)
             {
-                if (!File.Exists(codeDomReference))
-                    continue;
-
                 Trace.TraceInformation("Adding reference: {0}", codeDomReference);
                 compilerParameters.ReferencedAssemblies.Add(codeDomReference);
             }
