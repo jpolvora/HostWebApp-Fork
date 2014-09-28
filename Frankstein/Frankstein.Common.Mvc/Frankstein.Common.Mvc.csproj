@@ -109,6 +109,7 @@
     <Compile Include="Authentication\Security.cs" />
     <Compile Include="CustomPageBase.cs" />
     <Compile Include="CustomWebViewPage.cs" />
+    <Compile Include="ExceptionHandling\ErrorModel.cs" />
     <Compile Include="ExceptionHandling\ExceptionHelper.cs" />
     <Compile Include="ExceptionHandling\ExceptionHelperFactory.cs" />
     <Compile Include="ExceptionHandling\RazorRenderExceptionHelper.cs" />

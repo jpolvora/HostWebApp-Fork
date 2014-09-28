@@ -57,11 +57,10 @@ namespace Frankstein.Common.Mvc.ExceptionHandling
 
                 ApplicationInstance.Session["exception"] = rootException;
             }
-            else
+            else if (HttpContext.Current != null)
             {
-                ApplicationInstance.Application["exception"] = rootException;
+                HttpContext.Current.Items["exception"] = rootException;
             }
-            
 
             Trace.TraceError("[ExceptionHelper]: {0}", rootException.Message);
 
