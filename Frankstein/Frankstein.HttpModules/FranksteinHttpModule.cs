@@ -39,7 +39,10 @@ namespace Frankstein.HttpModules
 
         private async static void PingHost()
         {
-            using (DisposableTimer.StartNew("Scheduled Task ..."))
+            if (Config.IsInDebugMode)
+                return;
+
+            using (DisposableTimer.StartNew("PingHost Task ..."))
             {
                 var url = string.Format("{0}?source={1}", RequestCheck.HostUrl, Guid.NewGuid().ToString("N"));
                 Trace.TraceInformation("Making a request to {0}", url);
