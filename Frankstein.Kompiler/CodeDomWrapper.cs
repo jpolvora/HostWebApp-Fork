@@ -30,8 +30,13 @@ namespace Frankstein.Kompiler
 
             var output = Path.Combine(Path.GetTempPath(), KompilerEntryPoint.CompiledAssemblyName + ".dll");
 
-            CodeDomProvider codeDomProvider = new CSharpCodeProvider();
-            var compilerParameters = new CompilerParameters
+
+            var provOptions = new Dictionary<string, string> { { "CompilerVersion", "v4.0" } };
+
+            CodeDomProvider codeDomProvider = new CSharpCodeProvider(provOptions);
+            Trace.TraceInformation("Compiler is: {0}", codeDomProvider.ToString());
+
+            var compilerParameters = new CompilerParameters(new[] { "mscorlib.dll" })
             {
                 OutputAssembly = output,
                 GenerateExecutable = false,
