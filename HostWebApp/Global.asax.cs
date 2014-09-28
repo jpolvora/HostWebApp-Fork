@@ -1,19 +1,13 @@
 ﻿using System;
+using System.Collections.Specialized;
 using System.Diagnostics;
-using System.Net;
-using System.Net.Mail;
-using System.Text;
-using System.Web;
 using System.Web.Mvc;
 using System.Web.Optimization;
 using System.Web.Routing;
 using Frankstein.Common;
-using Frankstein.Common.Configuration;
-using Frankstein.Common.Mvc;
-using Frankstein.Common.Mvc.Scheduling;
-using Frankstein.HttpModules;
 using Frankstein.PluginLoader;
 using HostWebApp.App_Start;
+using System.Configuration;
 
 // ReSharper disable once CheckNamespace
 namespace HostWebApp
@@ -25,7 +19,6 @@ namespace HostWebApp
             RouteConfig.RegisterRoutes(RouteTable.Routes);
             BundleConfig.RegisterBundles(BundleTable.Bundles);
             FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);
-
 
             PluginStorage.ExecutePlugins((s, exception) => exception.SendExceptionToDeveloper("Error executando plugin: " + s));
 
