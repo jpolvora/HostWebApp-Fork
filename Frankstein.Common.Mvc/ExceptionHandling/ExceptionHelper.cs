@@ -47,6 +47,8 @@ namespace Frankstein.Common.Mvc.ExceptionHandling
 
             var rootException = httpException.GetBaseException();
 
+            //todo: use HttpContext.Current.Items !!!
+
             //stores exception in session for later retrieval
             if (ApplicationInstance.Context.Handler is IRequiresSessionState ||
                 ApplicationInstance.Context.Handler is IReadOnlySessionState)

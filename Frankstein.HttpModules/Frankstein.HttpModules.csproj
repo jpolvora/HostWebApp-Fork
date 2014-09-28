@@ -78,6 +78,7 @@
   <ItemGroup>
     <Compile Include="CustomErrorHttpModule.cs" />
     <Compile Include="FranksteinHttpModule.cs" />
+    <Compile Include="KeepWebSiteAlive.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="PathRewriterHttpModule.cs" />
     <Compile Include="SetCacheHttpModule.cs" />
