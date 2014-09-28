@@ -12,7 +12,7 @@ namespace Frankstein.Common.Configuration
         {
             var virtualPath = BootstrapperSection.Instance.DumpToLocal.Folder + "/kompiler.config";
             var phisycalPath = HostingEnvironment.MapPath(virtualPath);
-            
+
             var roamingConfig = new FileInfo(phisycalPath);
             if (!roamingConfig.Exists)
             {
@@ -23,10 +23,14 @@ namespace Frankstein.Common.Configuration
 
             // Get the mapped configuration file.
             var config = ConfigurationManager.OpenMappedExeConfiguration(configFileMap, ConfigurationUserLevel.None);
-            
-            foreach (KeyValueConfigurationElement setting in config.AppSettings.Settings)
+
+            var section = config.GetSection("kompiler") as AppSettingsSection;
+            if (section != null)
             {
-                yield return setting.Value;
+                foreach (KeyValueConfigurationElement setting in section.Settings)
+                {
+                    yield return setting.Value;
+                }
             }
         }
     }
